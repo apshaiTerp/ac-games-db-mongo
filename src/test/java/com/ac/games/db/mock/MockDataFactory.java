@@ -4,7 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.ac.games.data.BGGGame;
+import com.ac.games.data.CoolStuffIncPriceData;
+import com.ac.games.data.GameAvailability;
 import com.ac.games.data.GameType;
+import com.ac.games.data.MiniatureMarketPriceData;
 
 /**
  * This class helps us create Mock Data in our test categories
@@ -18,6 +21,21 @@ public class MockDataFactory {
   public final static long BGG_COSMIC_ENCOUNTER_ID = 39463L;
   /** Static ID for Cosmic Incursion */
   public final static long BGG_COSMIC_INCURSION_ID = 61001L;
+  
+  /** Static ID for Abyss */
+  public final static long CSI_ABYSS_ID = 203495L;
+  /** Static ID for Cosmic Encounter */
+  public final static long CSI_COSMIC_ENCOUNTER_ID = 136975L;
+  /** Static ID for Cosmic Incursion */
+  public final static long CSI_COSMIC_INCURSION_ID = 136978L;
+  
+  /** Static ID for Abyss */
+  public final static long MM_ABYSS_ID = 40693L;
+  /** Static ID for Cosmic Encounter */
+  public final static long MM_COSMIC_ENCOUNTER_ID = 15138L;
+  /** Static ID for Cosmic Incursion */
+  public final static long MM_COSMIC_INCURSION_ID = 15102L;
+  
   
   /** Helper method to generate some game data to be used for validation */
   public static BGGGame createBGGGame(long gameID) {
@@ -176,5 +194,112 @@ public class MockDataFactory {
     cosmicGame.setParentGameID(BGG_COSMIC_ENCOUNTER_ID);
     
     return cosmicGame;
+  }
+  
+  /** Helper method to generate some game data to be used for validation */
+  public static CoolStuffIncPriceData createCSIData(long csiID) {
+    if (csiID == CSI_ABYSS_ID)            return createCSIAbyssData();
+    if (csiID == CSI_COSMIC_ENCOUNTER_ID) return createCSICosmicEncounterData();
+    if (csiID == CSI_COSMIC_INCURSION_ID) return createCSICosmicIncursionData();
+    
+    //Fail Case
+    return null;
+  }
+  
+  private static CoolStuffIncPriceData createCSIAbyssData() {
+    CoolStuffIncPriceData data = new CoolStuffIncPriceData();
+    
+    data.setCsiID(CSI_ABYSS_ID);
+    data.setTitle("Abyss");
+    data.setSku("ASMABY01US");
+    data.setImageURL("http://a4.res.cloudinary.com/csicdn/image/upload/v1/Images/Products/Misc%20Art/Asmodee%20Editions/full/ASMABY01US.jpg");
+    data.setAvailability(GameAvailability.INSTOCK);
+    data.setReleaseDate(null);
+    data.setMsrpValue(59.99);
+    data.setCurPrice(40.99);
+    
+    return data;
+  }
+
+  private static CoolStuffIncPriceData createCSICosmicEncounterData() {
+    CoolStuffIncPriceData data = new CoolStuffIncPriceData();
+    
+    data.setCsiID(CSI_COSMIC_ENCOUNTER_ID);
+    data.setTitle("Cosmic Encounter Board Game");
+    data.setSku("FFGCE01");
+    data.setImageURL("http://a1.res.cloudinary.com/csicdn/image/upload/v1/Images/Products/Misc%20Art/Fantasy%20Flight%20Games/full/FFGCosmicEncounter.jpg");
+    data.setAvailability(GameAvailability.PREORDER);
+    data.setReleaseDate("First quarter 2015");
+    data.setMsrpValue(59.95);
+    data.setCurPrice(41.49);
+    
+    return data;
+  }
+
+  private static CoolStuffIncPriceData createCSICosmicIncursionData() {
+    CoolStuffIncPriceData data = new CoolStuffIncPriceData();
+    
+    data.setCsiID(CSI_COSMIC_INCURSION_ID);
+    data.setTitle("Cosmic Encounter: Cosmic Incursion Expansion");
+    data.setSku("FFGCE02");
+    data.setImageURL("http://a5.res.cloudinary.com/csicdn/image/upload/v1/Images/Products/Misc%20Art/Fantasy%20Flight%20Games/full/ffg_cosmicencounterCosmicIncursion.jpg");
+    data.setAvailability(GameAvailability.OUTOFSTOCK);
+    data.setReleaseDate(null);
+    //data.setMsrpValue(0.0);
+    data.setCurPrice(16.99);
+    
+    return data;
+  }
+
+  /** Helper method to generate some game data to be used for validation */
+  public static MiniatureMarketPriceData createMMData(long mmID) {
+    if (mmID == MM_ABYSS_ID)            return createMMAbyssData();
+    if (mmID == MM_COSMIC_ENCOUNTER_ID) return createMMCosmicEncounterData();
+    if (mmID == MM_COSMIC_INCURSION_ID) return createMMCosmicIncursionData();
+    
+    //Fail Case
+    return null;
+  }
+  
+  private static MiniatureMarketPriceData createMMAbyssData() {
+    MiniatureMarketPriceData data = new MiniatureMarketPriceData();
+    
+    data.setMmID(MM_ABYSS_ID);
+    data.setTitle("Abyss");
+    data.setSku("ASMABY01US");
+    data.setImageURL("http://a4.res.cloudinary.com/csicdn/image/upload/v1/Images/Products/Misc%20Art/Asmodee%20Editions/full/ASMABY01US.jpg");
+    data.setAvailability(GameAvailability.INSTOCK);
+    data.setMsrpValue(59.99);
+    data.setCurPrice(41.39);
+
+    return data;
+  }
+
+  private static MiniatureMarketPriceData createMMCosmicEncounterData() {
+    MiniatureMarketPriceData data = new MiniatureMarketPriceData();
+    
+    data.setMmID(MM_COSMIC_ENCOUNTER_ID);
+    data.setTitle("Cosmic Encounter");
+    data.setSku("FFGCE01");
+    data.setImageURL("http://cdn.miniaturemarket.com/media/catalog/product/f/f/ffgce01.jpg");
+    data.setAvailability(GameAvailability.OUTOFSTOCK);
+    data.setMsrpValue(59.95);
+    data.setCurPrice(41.37);
+
+    return data;
+  }
+
+  private static MiniatureMarketPriceData createMMCosmicIncursionData() {
+    MiniatureMarketPriceData data = new MiniatureMarketPriceData();
+    
+    data.setMmID(MM_COSMIC_INCURSION_ID);
+    data.setTitle("Cosmic Encounter Cosmic Incursion Expansion");
+    data.setSku("FFGCE02");
+    data.setImageURL("http://cdn.miniaturemarket.com/media/catalog/product/F/F/FFGCE02.jpg");
+    data.setAvailability(GameAvailability.OUTOFSTOCK);
+    data.setMsrpValue(24.95);
+    data.setCurPrice(17.22);
+
+    return data;
   }
 }

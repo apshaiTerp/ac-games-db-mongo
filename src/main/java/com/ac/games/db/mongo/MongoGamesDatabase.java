@@ -38,7 +38,7 @@ public class MongoGamesDatabase implements GamesDatabase {
   private DB mongoDB;
   
   /** Global setting to help manage debug println statements */
-  public final boolean debugMode = false;
+  public static boolean debugMode = false;
   
   /**
    * Basic Constructor for a MongoGameDatabase Object.
@@ -205,7 +205,7 @@ public class MongoGamesDatabase implements GamesDatabase {
     try {
       //Because we are using non-Mongo based primary keys, we need to specifically check first to see if the object
       //exists, and if it does, we need to do an update instead
-      ObjectId prevDocID = queryForExistingDocID(game.getBggID());
+      ObjectId prevDocID = queryForExistingBGGDocID(game.getBggID());
       if (prevDocID != null) {
         if (debugMode)
           System.out.println ("Converting insert into update because of prior document");
@@ -266,35 +266,6 @@ public class MongoGamesDatabase implements GamesDatabase {
 
   /*
    * (non-Javadoc)
-   * @see com.ac.games.db.GamesDatabase#deleteBGGGameData(com.ac.games.data.BGGGame)
-   */
-  public void deleteBGGGameData(BGGGame game) throws ConfigurationException, DatabaseOperationException {
-    //Check basic pre-conditions
-    if (game == null)
-      throw new DatabaseOperationException("The provided game object was null.");
-    
-    if (mongoClient == null || mongoDB == null)
-      throw new ConfigurationException("There is a problem with the database connection.");
-    
-    //Run the operation
-    try {
-      //Open the collection, i.e. table
-      DBCollection gameCollection = mongoDB.getCollection("bgggame");
-      BasicDBObject deleteObject  = BGGGameConverter.convertGameToIDQuery(game);
-      WriteResult result = gameCollection.remove(deleteObject);
-      
-      if (debugMode)
-        System.out.println ("The number of documents impacted by this operation: " + result.getN());
-      
-    } catch (MongoException me) {
-      throw new DatabaseOperationException("Mongo raised an exception to this delete: " + me.getMessage(), me);
-    } catch (Throwable t) {
-      throw new DatabaseOperationException("Something bad happened executing the delete", t);
-    }
-  }
-
-  /*
-   * (non-Javadoc)
    * @see com.ac.games.db.GamesDatabase#deleteBGGGameData(long)
    */
   public void deleteBGGGameData(long bggID) throws ConfigurationException, DatabaseOperationException {
@@ -331,7 +302,7 @@ public class MongoGamesDatabase implements GamesDatabase {
    * 
    * @return The "_id" key from our existing object, or null if not found
    */
-  private ObjectId queryForExistingDocID(long bggID) throws MongoException {
+  private ObjectId queryForExistingBGGDocID(long bggID) throws MongoException {
     //Open the collection, i.e. table
     DBCollection gameCollection = mongoDB.getCollection("bgggame");
     BasicDBObject searchObject  = BGGGameConverter.convertGameToIDQuery(bggID);
@@ -349,8 +320,39 @@ public class MongoGamesDatabase implements GamesDatabase {
    * @see com.ac.games.db.GamesDatabase#readCSIPriceData(long)
    */
   public CoolStuffIncPriceData readCSIPriceData(long csiID) throws ConfigurationException, DatabaseOperationException {
-    // TODO Auto-generated method stub
-    throw new ConfigurationException("This operation has not yet been implemented");
+    //Check basic pre-conditions
+    if (csiID < 0)
+      throw new DatabaseOperationException("The provided price data object was not valid.");
+    
+    if (mongoClient == null || mongoDB == null)
+      throw new ConfigurationException("There is a problem with the database connection.");
+    
+    //Run the operation
+    try {
+      //Open the collection, i.e. table
+      DBCollection gameCollection = mongoDB.getCollection("csidata");
+      BasicDBObject searchObject  = CSIDataConverter.convertCSIToIDQuery(csiID);
+      
+      DBCursor cursor = gameCollection.find(searchObject);
+      
+      if (debugMode)
+        System.out.println ("Total documents found during this query:            " + cursor.size());
+      
+      CoolStuffIncPriceData data = null;
+      while (cursor.hasNext()) {
+        DBObject object = cursor.next();
+        data = CSIDataConverter.convertMongoToCSI(object);
+      }
+      
+      if (debugMode)
+        System.out.println ("The game found by this query was:                   " + (data == null ? "Nothing Found" : data.getTitle()));
+      return data;
+      
+    } catch (MongoException me) {
+      throw new DatabaseOperationException("Mongo raised an exception to this delete: " + me.getMessage(), me);
+    } catch (Throwable t) {
+      throw new DatabaseOperationException("Something bad happened executing the delete", t);
+    }
   }
 
   /*
@@ -358,8 +360,42 @@ public class MongoGamesDatabase implements GamesDatabase {
    * @see com.ac.games.db.GamesDatabase#insertCSIPriceData(com.ac.games.data.CoolStuffIncPriceData)
    */
   public void insertCSIPriceData(CoolStuffIncPriceData csiData) throws ConfigurationException, DatabaseOperationException {
-    // TODO Auto-generated method stub
-    throw new ConfigurationException("This operation has not yet been implemented");
+    //Check basic pre-conditions
+    if (csiData == null)
+      throw new DatabaseOperationException("The provided price data object was null.");
+    
+    if (mongoClient == null || mongoDB == null)
+      throw new ConfigurationException("There is a problem with the database connection.");
+    
+    //Run the operation
+    try {
+      //Because we are using non-Mongo based primary keys, we need to specifically check first to see if the object
+      //exists, and if it does, we need to do an update instead
+      ObjectId prevDocID = queryForExistingCSIDocID(csiData.getCsiID());
+      if (prevDocID != null) {
+        if (debugMode)
+          System.out.println ("Converting insert into update because of prior document");
+        updateCSIPriceData(csiData);
+        return;
+      }
+      
+      //Open the collection, i.e. table
+      DBCollection gameCollection = mongoDB.getCollection("csidata");
+      
+      BasicDBObject addObject = CSIDataConverter.convertCSIToMongo(csiData);
+      WriteResult result = gameCollection.insert(addObject);
+      
+      if (debugMode) {
+        System.out.println ("The number of documents impacted by this operation: " + result.getN());
+        System.out.println ("Was this insert converted to an upsert?             " + result.isUpdateOfExisting());
+        System.out.println ("The new document _id value added:                   " + addObject.get("_id"));
+      }
+      
+    } catch (MongoException me) {
+      throw new DatabaseOperationException("Mongo raised an exception to this insert: " + me.getMessage(), me);
+    } catch (Throwable t) {
+      throw new DatabaseOperationException("Something bad happened executing the insert", t);
+    }
   }
 
   /*
@@ -367,17 +403,31 @@ public class MongoGamesDatabase implements GamesDatabase {
    * @see com.ac.games.db.GamesDatabase#updateCSIPriceData(com.ac.games.data.CoolStuffIncPriceData)
    */
   public void updateCSIPriceData(CoolStuffIncPriceData csiData) throws ConfigurationException, DatabaseOperationException {
-    // TODO Auto-generated method stub
-    throw new ConfigurationException("This operation has not yet been implemented");
-  }
-
-  /*
-   * (non-Javadoc)
-   * @see com.ac.games.db.GamesDatabase#deleteCSIPriceData(com.ac.games.data.CoolStuffIncPriceData)
-   */
-  public void deleteCSIPriceData(CoolStuffIncPriceData csiData) throws ConfigurationException, DatabaseOperationException {
-    // TODO Auto-generated method stub
-    throw new ConfigurationException("This operation has not yet been implemented");
+    //Check basic pre-conditions
+    if (csiData == null)
+      throw new DatabaseOperationException("The provided price data object was null.");
+    
+    if (mongoClient == null || mongoDB == null)
+      throw new ConfigurationException("There is a problem with the database connection.");
+    
+    //Run the operation
+    try {
+      //Open the collection, i.e. table
+      DBCollection gameCollection = mongoDB.getCollection("csidata");
+      BasicDBObject queryObject  = CSIDataConverter.convertCSIToIDQuery(csiData);
+      BasicDBObject updateObject = CSIDataConverter.convertCSIToMongo(csiData);
+      WriteResult result = gameCollection.update(queryObject, updateObject, true, false);
+      
+      if (debugMode) {
+        System.out.println ("The number of documents impacted by this operation: " + result.getN());
+        System.out.println ("Was this update converted to an insert?             " + !result.isUpdateOfExisting());
+      }
+      
+    } catch (MongoException me) {
+      throw new DatabaseOperationException("Mongo raised an exception to this update: " + me.getMessage(), me);
+    } catch (Throwable t) {
+      throw new DatabaseOperationException("Something bad happened executing the update", t);
+    }
   }
 
   /*
@@ -385,17 +435,90 @@ public class MongoGamesDatabase implements GamesDatabase {
    * @see com.ac.games.db.GamesDatabase#deleteCSIPriceData(long)
    */
   public void deleteCSIPriceData(long csiID) throws ConfigurationException, DatabaseOperationException {
-    // TODO Auto-generated method stub
-    throw new ConfigurationException("This operation has not yet been implemented");
+    //Check basic pre-conditions
+    if (csiID < 0)
+      throw new DatabaseOperationException("The provided price data object was not valid.");
+    
+    if (mongoClient == null || mongoDB == null)
+      throw new ConfigurationException("There is a problem with the database connection.");
+    
+    //Run the operation
+    try {
+      //Open the collection, i.e. table
+      DBCollection gameCollection = mongoDB.getCollection("csidata");
+      BasicDBObject deleteObject  = CSIDataConverter.convertCSIToIDQuery(csiID);
+      WriteResult result = gameCollection.remove(deleteObject);
+      
+      if (debugMode)
+        System.out.println ("The number of documents impacted by this operation: " + result.getN());
+      
+    } catch (MongoException me) {
+      throw new DatabaseOperationException("Mongo raised an exception to this delete: " + me.getMessage(), me);
+    } catch (Throwable t) {
+      throw new DatabaseOperationException("Something bad happened executing the delete", t);
+    }
   }
 
+  /**
+   * We're going to use this method to avoid the work of running our queries.  Because of reliance
+   * on this method in update and insert tasks, we can assume only one other version of this object
+   * can exist in the database.
+   * 
+   * @param csiID The game we want to verify if it exists or not.
+   * 
+   * @return The "_id" key from our existing object, or null if not found
+   */
+  private ObjectId queryForExistingCSIDocID(long csiID) throws MongoException {
+    //Open the collection, i.e. table
+    DBCollection gameCollection = mongoDB.getCollection("csidata");
+    BasicDBObject searchObject  = CSIDataConverter.convertCSIToIDQuery(csiID);
+    
+    DBCursor cursor = gameCollection.find(searchObject);
+    ObjectId docID = null;
+    while (cursor.hasNext()) {
+      docID = (ObjectId)cursor.next().get("_id");
+    }
+    return docID;
+  }
+  
   /*
    * (non-Javadoc)
    * @see com.ac.games.db.GamesDatabase#readMMPriceData(long)
    */
   public MiniatureMarketPriceData readMMPriceData(long mmID) throws ConfigurationException, DatabaseOperationException {
-    // TODO Auto-generated method stub
-    throw new ConfigurationException("This operation has not yet been implemented");
+    //Check basic pre-conditions
+    if (mmID < 0)
+      throw new DatabaseOperationException("The provided price data object was not valid.");
+    
+    if (mongoClient == null || mongoDB == null)
+      throw new ConfigurationException("There is a problem with the database connection.");
+    
+    //Run the operation
+    try {
+      //Open the collection, i.e. table
+      DBCollection gameCollection = mongoDB.getCollection("mmdata");
+      BasicDBObject searchObject  = MMDataConverter.convertMMToIDQuery(mmID);
+      
+      DBCursor cursor = gameCollection.find(searchObject);
+      
+      if (debugMode)
+        System.out.println ("Total documents found during this query:            " + cursor.size());
+      
+      MiniatureMarketPriceData data = null;
+      while (cursor.hasNext()) {
+        DBObject object = cursor.next();
+        data = MMDataConverter.convertMongoToMM(object);
+      }
+      
+      if (debugMode)
+        System.out.println ("The game found by this query was:                   " + (data == null ? "Nothing Found" : data.getTitle()));
+      return data;
+      
+    } catch (MongoException me) {
+      throw new DatabaseOperationException("Mongo raised an exception to this delete: " + me.getMessage(), me);
+    } catch (Throwable t) {
+      throw new DatabaseOperationException("Something bad happened executing the delete", t);
+    }
   }
 
   /*
@@ -403,8 +526,42 @@ public class MongoGamesDatabase implements GamesDatabase {
    * @see com.ac.games.db.GamesDatabase#insertMMPriceData(com.ac.games.data.MiniatureMarketPriceData)
    */
   public void insertMMPriceData(MiniatureMarketPriceData mmData) throws ConfigurationException, DatabaseOperationException {
-    // TODO Auto-generated method stub
-    throw new ConfigurationException("This operation has not yet been implemented");
+    //Check basic pre-conditions
+    if (mmData == null)
+      throw new DatabaseOperationException("The provided price data object was null.");
+    
+    if (mongoClient == null || mongoDB == null)
+      throw new ConfigurationException("There is a problem with the database connection.");
+    
+    //Run the operation
+    try {
+      //Because we are using non-Mongo based primary keys, we need to specifically check first to see if the object
+      //exists, and if it does, we need to do an update instead
+      ObjectId prevDocID = queryForExistingMMDocID(mmData.getMmID());
+      if (prevDocID != null) {
+        if (debugMode)
+          System.out.println ("Converting insert into update because of prior document");
+        updateMMPriceData(mmData);
+        return;
+      }
+      
+      //Open the collection, i.e. table
+      DBCollection gameCollection = mongoDB.getCollection("mmdata");
+      
+      BasicDBObject addObject = MMDataConverter.convertMMToMongo(mmData);
+      WriteResult result = gameCollection.insert(addObject);
+      
+      if (debugMode) {
+        System.out.println ("The number of documents impacted by this operation: " + result.getN());
+        System.out.println ("Was this insert converted to an upsert?             " + result.isUpdateOfExisting());
+        System.out.println ("The new document _id value added:                   " + addObject.get("_id"));
+      }
+      
+    } catch (MongoException me) {
+      throw new DatabaseOperationException("Mongo raised an exception to this insert: " + me.getMessage(), me);
+    } catch (Throwable t) {
+      throw new DatabaseOperationException("Something bad happened executing the insert", t);
+    }
   }
 
   /*
@@ -412,17 +569,31 @@ public class MongoGamesDatabase implements GamesDatabase {
    * @see com.ac.games.db.GamesDatabase#updateMMPriceData(com.ac.games.data.MiniatureMarketPriceData)
    */
   public void updateMMPriceData(MiniatureMarketPriceData mmData) throws ConfigurationException, DatabaseOperationException {
-    // TODO Auto-generated method stub
-    throw new ConfigurationException("This operation has not yet been implemented");
-  }
-
-  /*
-   * (non-Javadoc)
-   * @see com.ac.games.db.GamesDatabase#deleteMMPriceData(com.ac.games.data.MiniatureMarketPriceData)
-   */
-  public void deleteMMPriceData(MiniatureMarketPriceData mmData) throws ConfigurationException, DatabaseOperationException {
-    // TODO Auto-generated method stub
-    throw new ConfigurationException("This operation has not yet been implemented");
+    //Check basic pre-conditions
+    if (mmData == null)
+      throw new DatabaseOperationException("The provided price data object was null.");
+    
+    if (mongoClient == null || mongoDB == null)
+      throw new ConfigurationException("There is a problem with the database connection.");
+    
+    //Run the operation
+    try {
+      //Open the collection, i.e. table
+      DBCollection gameCollection = mongoDB.getCollection("mmdata");
+      BasicDBObject queryObject  = MMDataConverter.convertMMToIDQuery(mmData);
+      BasicDBObject updateObject = MMDataConverter.convertMMToMongo(mmData);
+      WriteResult result = gameCollection.update(queryObject, updateObject, true, false);
+      
+      if (debugMode) {
+        System.out.println ("The number of documents impacted by this operation: " + result.getN());
+        System.out.println ("Was this update converted to an insert?             " + !result.isUpdateOfExisting());
+      }
+      
+    } catch (MongoException me) {
+      throw new DatabaseOperationException("Mongo raised an exception to this update: " + me.getMessage(), me);
+    } catch (Throwable t) {
+      throw new DatabaseOperationException("Something bad happened executing the update", t);
+    }
   }
 
   /*
@@ -430,7 +601,49 @@ public class MongoGamesDatabase implements GamesDatabase {
    * @see com.ac.games.db.GamesDatabase#deleteMMPriceData(long)
    */
   public void deleteMMPriceData(long mmID) throws ConfigurationException, DatabaseOperationException {
-    // TODO Auto-generated method stub
-    throw new ConfigurationException("This operation has not yet been implemented");
+    //Check basic pre-conditions
+    if (mmID < 0)
+      throw new DatabaseOperationException("The provided price data object was not valid.");
+    
+    if (mongoClient == null || mongoDB == null)
+      throw new ConfigurationException("There is a problem with the database connection.");
+    
+    //Run the operation
+    try {
+      //Open the collection, i.e. table
+      DBCollection gameCollection = mongoDB.getCollection("mmdata");
+      BasicDBObject deleteObject  = MMDataConverter.convertMMToIDQuery(mmID);
+      WriteResult result = gameCollection.remove(deleteObject);
+      
+      if (debugMode)
+        System.out.println ("The number of documents impacted by this operation: " + result.getN());
+      
+    } catch (MongoException me) {
+      throw new DatabaseOperationException("Mongo raised an exception to this delete: " + me.getMessage(), me);
+    } catch (Throwable t) {
+      throw new DatabaseOperationException("Something bad happened executing the delete", t);
+    }
+  }
+
+  /**
+   * We're going to use this method to avoid the work of running our queries.  Because of reliance
+   * on this method in update and insert tasks, we can assume only one other version of this object
+   * can exist in the database.
+   * 
+   * @param mmID The game we want to verify if it exists or not.
+   * 
+   * @return The "_id" key from our existing object, or null if not found
+   */
+  private ObjectId queryForExistingMMDocID(long mmID) throws MongoException {
+    //Open the collection, i.e. table
+    DBCollection gameCollection = mongoDB.getCollection("mmdata");
+    BasicDBObject searchObject  = MMDataConverter.convertMMToIDQuery(mmID);
+    
+    DBCursor cursor = gameCollection.find(searchObject);
+    ObjectId docID = null;
+    while (cursor.hasNext()) {
+      docID = (ObjectId)cursor.next().get("_id");
+    }
+    return docID;
   }
 }

@@ -1,0 +1,81 @@
+package com.ac.games.db.mongo;
+
+import com.ac.games.data.CoolStuffIncPriceData;
+import com.ac.games.data.GameAvailabilityConverter;
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
+
+/**
+ * @author ac010168
+ *
+ */
+public class CSIDataConverter {
+
+  /**
+   * Helper method that will construct a basic query using the csiID from the provided price data.
+   * 
+   * @param data The CSI data we want to build a query for.
+   * 
+   * @return Returns a {@link BasicDBObject} object that represents this query, or null if no price data was provided
+   */
+  public static BasicDBObject convertCSIToIDQuery(CoolStuffIncPriceData data) {
+    if (data == null) return null;
+    
+    BasicDBObject dbObject = new BasicDBObject("csiid", data.getCsiID());
+    return dbObject;
+  }
+  
+  /**
+   * Helper method that will construct a basic query using the csiID from the provided price data.
+   * 
+   * @param csiID The CSI ID we want to build a query for.
+   * 
+   * @return Returns a {@link BasicDBObject} object that represents this query, or null if no price data was provided
+   */
+  public static BasicDBObject convertCSIToIDQuery(long csiID) {
+    if (csiID < 0) return null;
+
+    BasicDBObject dbObject = new BasicDBObject("csiid", csiID);
+    return dbObject;
+  }
+  
+  /**
+   * Conversion method used to map our price data into a mongo object.
+   * 
+   * @param data
+   * 
+   * @return Returns a {@link BasicDBObject} object that represents this query, or null if no price data was provided
+   */
+  public static BasicDBObject convertCSIToMongo(CoolStuffIncPriceData data) {
+    if (data == null) return null;
+    
+    BasicDBObject dbObject = new BasicDBObject("csiid", data.getCsiID());
+    
+    if (data.getSku() != null)          dbObject.append("sku", data.getSku());
+    if (data.getTitle() != null)        dbObject.append("title", data.getTitle());
+    if (data.getImageURL() != null)     dbObject.append("imageURL", data.getImageURL());
+    if (data.getAvailability() != null) dbObject.append("availability", GameAvailabilityConverter.convertGameAvailabilityToFlag(data.getAvailability()));
+    if (data.getMsrpValue() != -1.0)    dbObject.append("msrpValue", data.getMsrpValue());
+    if (data.getCurPrice() != -1.0)     dbObject.append("curPrice", data.getCurPrice());
+    if (data.getReleaseDate() != null)  dbObject.append("releaseDate", data.getReleaseDate());
+    
+    return dbObject;
+  }
+  
+  public static CoolStuffIncPriceData convertMongoToCSI(DBObject dbObject) {
+    if (dbObject == null) return null;
+    
+    CoolStuffIncPriceData data = new CoolStuffIncPriceData();
+    
+    if (dbObject.containsField("csiid"))        data.setCsiID((Long)dbObject.get("csiid"));
+    if (dbObject.containsField("sku"))          data.setSku((String)dbObject.get("sku"));
+    if (dbObject.containsField("title"))        data.setTitle((String)dbObject.get("title"));
+    if (dbObject.containsField("imageURL"))     data.setImageURL((String)dbObject.get("imageURL"));
+    if (dbObject.containsField("availability")) data.setAvailability(GameAvailabilityConverter.convertFlagToGameAvailability((Integer)dbObject.get("availability")));
+    if (dbObject.containsField("msrpValue"))    data.setMsrpValue((Double)dbObject.get("msrpValue"));
+    if (dbObject.containsField("curPrice"))     data.setCurPrice((Double)dbObject.get("curPrice"));
+    if (dbObject.containsField("releaseDate"))  data.setReleaseDate((String)dbObject.get("releaseDate "));
+    
+    return data;
+  }
+}
