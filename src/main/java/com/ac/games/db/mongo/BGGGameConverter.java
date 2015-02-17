@@ -25,7 +25,7 @@ public class BGGGameConverter {
   public static BasicDBObject convertGameToIDQuery(BGGGame game) {
     if (game == null) return null;
     
-    BasicDBObject dbObject = new BasicDBObject("bggid", game.getBggID());
+    BasicDBObject dbObject = new BasicDBObject("bggID", game.getBggID());
     return dbObject;
   }
 
@@ -39,7 +39,7 @@ public class BGGGameConverter {
   public static BasicDBObject convertGameToIDQuery(long bggID) {
     if (bggID < 0) return null;
     
-    BasicDBObject dbObject = new BasicDBObject("bggid", new Long(bggID));
+    BasicDBObject dbObject = new BasicDBObject("bggID", new Long(bggID));
     return dbObject;
   }
 
@@ -53,7 +53,7 @@ public class BGGGameConverter {
   public static BasicDBObject convertGameToMongo(BGGGame game) {
     if (game == null) return null;
     
-    BasicDBObject dbObject = new BasicDBObject("bggid", game.getBggID());
+    BasicDBObject dbObject = new BasicDBObject("bggID", game.getBggID());
     
     if (game.getName() != null)              dbObject.append("name", game.getName());
     if (game.getYearPublished() != -1)       dbObject.append("yearPublished", game.getYearPublished());
@@ -84,7 +84,7 @@ public class BGGGameConverter {
     
     BGGGame game = new BGGGame();
     
-    if (dbObject.containsField("bggid"))             game.setBggID((Long)dbObject.get("bggid"));
+    if (dbObject.containsField("bggID"))             game.setBggID((Long)dbObject.get("bggID"));
     if (dbObject.containsField("name"))              game.setName((String)dbObject.get("name"));
     if (dbObject.containsField("yearPublished"))     game.setYearPublished((Integer)dbObject.get("yearPublished"));
     if (dbObject.containsField("minPlayers"))        game.setMinPlayers((Integer)dbObject.get("minPlayers"));

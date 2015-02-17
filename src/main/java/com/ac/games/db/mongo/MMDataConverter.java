@@ -21,7 +21,7 @@ public class MMDataConverter {
   public static BasicDBObject convertMMToIDQuery(MiniatureMarketPriceData data) {
     if (data == null) return null;
     
-    BasicDBObject dbObject = new BasicDBObject("mmid", data.getMmID());
+    BasicDBObject dbObject = new BasicDBObject("mmID", data.getMmID());
     return dbObject;
   }
   
@@ -35,7 +35,7 @@ public class MMDataConverter {
   public static BasicDBObject convertMMToIDQuery(long mmID) {
     if (mmID < 0) return null;
 
-    BasicDBObject dbObject = new BasicDBObject("mmid", mmID);
+    BasicDBObject dbObject = new BasicDBObject("mmID", mmID);
     return dbObject;
   }
   
@@ -49,7 +49,7 @@ public class MMDataConverter {
   public static BasicDBObject convertMMToMongo(MiniatureMarketPriceData data) {
     if (data == null) return null;
     
-    BasicDBObject dbObject = new BasicDBObject("mmid", data.getMmID());
+    BasicDBObject dbObject = new BasicDBObject("mmID", data.getMmID());
     
     if (data.getSku() != null)          dbObject.append("sku", data.getSku());
     if (data.getTitle() != null)        dbObject.append("title", data.getTitle());
@@ -66,7 +66,7 @@ public class MMDataConverter {
     
     MiniatureMarketPriceData data = new MiniatureMarketPriceData();
     
-    if (dbObject.containsField("mmid"))         data.setMmID((Long)dbObject.get("mmid"));
+    if (dbObject.containsField("mmID"))         data.setMmID((Long)dbObject.get("mmID"));
     if (dbObject.containsField("sku"))          data.setSku((String)dbObject.get("sku"));
     if (dbObject.containsField("title"))        data.setTitle((String)dbObject.get("title"));
     if (dbObject.containsField("imageURL"))     data.setImageURL((String)dbObject.get("imageURL"));

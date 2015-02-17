@@ -1,8 +1,8 @@
 package com.ac.games.db.test;
 
-import org.junit.Test;
-
 import junit.framework.TestCase;
+
+import org.junit.Test;
 
 import com.ac.games.data.BGGGame;
 import com.ac.games.data.CoolStuffIncPriceData;
@@ -13,7 +13,6 @@ import com.ac.games.db.MongoDBFactory;
 import com.ac.games.db.exception.ConfigurationException;
 import com.ac.games.db.exception.DatabaseOperationException;
 import com.ac.games.db.mock.MockDataFactory;
-import com.ac.games.db.mongo.MongoGamesDatabase;
 
 /**
  * @author ac010168
