@@ -1,6 +1,7 @@
 package com.ac.games.db.mock;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import com.ac.games.data.BGGGame;
@@ -8,6 +9,7 @@ import com.ac.games.data.CoolStuffIncPriceData;
 import com.ac.games.data.GameAvailability;
 import com.ac.games.data.GameType;
 import com.ac.games.data.MiniatureMarketPriceData;
+import com.ac.games.data.ReviewState;
 
 /**
  * This class helps us create Mock Data in our test categories
@@ -88,6 +90,10 @@ public class MockDataFactory {
     
     abyssGame.setGameType(GameType.BASE);
     abyssGame.setBggRank(412);
+    
+    abyssGame.setReviewState(ReviewState.REVIEWED);
+    abyssGame.setAddDate(new Date (new Date().getTime() - 10000000));
+    abyssGame.setReviewDate(new Date());
     
     return abyssGame;
   }
@@ -218,6 +224,10 @@ public class MockDataFactory {
     data.setMsrpValue(59.99);
     data.setCurPrice(40.99);
     
+    data.setReviewState(ReviewState.REVIEWED);
+    data.setAddDate(new Date (new Date().getTime() - 10000000));
+    data.setReviewDate(new Date());
+    
     return data;
   }
 
@@ -271,6 +281,10 @@ public class MockDataFactory {
     data.setAvailability(GameAvailability.INSTOCK);
     data.setMsrpValue(59.99);
     data.setCurPrice(41.39);
+
+    data.setReviewState(ReviewState.REVIEWED);
+    data.setAddDate(new Date (new Date().getTime() - 10000000));
+    data.setReviewDate(new Date());
 
     return data;
   }

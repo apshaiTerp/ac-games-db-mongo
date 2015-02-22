@@ -1,10 +1,12 @@
 package com.ac.games.db.mongo;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import com.ac.games.data.BGGGame;
 import com.ac.games.data.GameTypeConverter;
+import com.ac.games.data.ReviewStateConverter;
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
@@ -75,6 +77,9 @@ public class BGGGameConverter {
     if (game.getParentGameID() != -1)        dbObject.append("parentGameID", game.getParentGameID());
     //Need a converter here because BSON won't accept Enums for serializability
     if (game.getGameType() != null)          dbObject.append("gameType", GameTypeConverter.convertGameTypeToFlag(game.getGameType()));
+    if (game.getReviewState() != null)       dbObject.append("reviewState", ReviewStateConverter.convertReviewStateToFlag(game.getReviewState()));
+    if (game.getAddDate() != null)           dbObject.append("addDate", game.getAddDate());
+    if (game.getReviewDate() != null)        dbObject.append("reviewDate", game.getReviewDate());
     
     return dbObject;
   }
@@ -105,6 +110,9 @@ public class BGGGameConverter {
     if (dbObject.containsField("parentGameID"))      game.setParentGameID((Long)dbObject.get("parentGameID"));
     //Need a converter here because BSON won't accept Enums for serializability
     if (dbObject.containsField("gameType"))          game.setGameType(GameTypeConverter.convertFlagToGameType((Integer)dbObject.get("gameType")));
+    if (dbObject.containsField("reviewState"))       game.setReviewState(ReviewStateConverter.convertFlagToReviewState((Integer)dbObject.get("reviewState")));
+    if (dbObject.containsField("addDate"))           game.setAddDate((Date)dbObject.get("addDate"));
+    if (dbObject.containsField("reviewDate"))        game.setReviewDate((Date)dbObject.get("reviewDate"));
     
     return game;
   }

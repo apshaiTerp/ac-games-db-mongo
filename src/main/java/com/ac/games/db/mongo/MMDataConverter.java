@@ -1,7 +1,10 @@
 package com.ac.games.db.mongo;
 
+import java.util.Date;
+
 import com.ac.games.data.MiniatureMarketPriceData;
 import com.ac.games.data.GameAvailabilityConverter;
+import com.ac.games.data.ReviewStateConverter;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 
@@ -57,6 +60,9 @@ public class MMDataConverter {
     if (data.getAvailability() != null) dbObject.append("availability", GameAvailabilityConverter.convertGameAvailabilityToFlag(data.getAvailability()));
     if (data.getMsrpValue() != -1.0)    dbObject.append("msrpValue", data.getMsrpValue());
     if (data.getCurPrice() != -1.0)     dbObject.append("curPrice", data.getCurPrice());
+    if (data.getReviewState() != null)  dbObject.append("reviewState", ReviewStateConverter.convertReviewStateToFlag(data.getReviewState()));
+    if (data.getAddDate() != null)      dbObject.append("addDate", data.getAddDate());
+    if (data.getReviewDate() != null)   dbObject.append("reviewDate", data.getReviewDate());
     
     return dbObject;
   }
@@ -73,6 +79,9 @@ public class MMDataConverter {
     if (dbObject.containsField("availability")) data.setAvailability(GameAvailabilityConverter.convertFlagToGameAvailability((Integer)dbObject.get("availability")));
     if (dbObject.containsField("msrpValue"))    data.setMsrpValue((Double)dbObject.get("msrpValue"));
     if (dbObject.containsField("curPrice"))     data.setCurPrice((Double)dbObject.get("curPrice"));
+    if (dbObject.containsField("reviewState"))  data.setReviewState(ReviewStateConverter.convertFlagToReviewState((Integer)dbObject.get("reviewState")));
+    if (dbObject.containsField("addDate"))      data.setAddDate((Date)dbObject.get("addDate"));
+    if (dbObject.containsField("reviewDate"))   data.setReviewDate((Date)dbObject.get("reviewDate"));
     
     return data;
   }
