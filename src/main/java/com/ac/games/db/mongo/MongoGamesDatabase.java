@@ -1,5 +1,8 @@
 package com.ac.games.db.mongo;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.bson.types.ObjectId;
 
 import com.ac.games.data.BGGGame;
@@ -645,5 +648,103 @@ public class MongoGamesDatabase implements GamesDatabase {
       docID = (ObjectId)cursor.next().get("_id");
     }
     return docID;
+  }
+
+  /*
+   * (non-Javadoc)
+   * @see com.ac.games.db.GamesDatabase#getBggIDList()
+   */
+  public List<Long> getBggIDList() throws ConfigurationException, DatabaseOperationException {
+    if (mongoClient == null || mongoDB == null)
+      throw new ConfigurationException("There is a problem with the database connection.");
+    
+    List<Long> resultList = new LinkedList<Long>();
+    try {
+      DBCollection gameCollection = mongoDB.getCollection("bgggame");
+      //Limit the result set to bggIDs
+      BasicDBObject columns = new BasicDBObject();
+      columns.put("bggID", 1);
+      columns.put("_id", 0);
+      //Search for all documents, return only the bggID values
+      DBCursor cursor = gameCollection.find(new BasicDBObject(), columns); 
+      while (cursor.hasNext()) {
+        DBObject object = cursor.next();
+        long curBGGID = (Long)object.get("bggID");
+        if (!resultList.contains(curBGGID))
+          resultList.add(curBGGID);
+      }
+    } catch (MongoException me) {
+      throw new DatabaseOperationException("Mongo raised an exception to this select: " + me.getMessage(), me);
+    } catch (Throwable t) {
+      throw new DatabaseOperationException("Something bad happened executing the select", t);
+    }
+    
+    return resultList;
+  }
+
+  /*
+   * (non-Javadoc)
+   * @see com.ac.games.db.GamesDatabase#getCSIIDList()
+   */
+  public List<Long> getCSIIDList() throws ConfigurationException, DatabaseOperationException {
+    if (mongoClient == null || mongoDB == null)
+      throw new ConfigurationException("There is a problem with the database connection.");
+    
+    List<Long> resultList = new LinkedList<Long>();
+    try {
+      DBCollection gameCollection = mongoDB.getCollection("csidata");
+      //Limit the result set to bggIDs
+      BasicDBObject columns = new BasicDBObject();
+      columns.put("csiID", 1);
+      columns.put("_id", 0);
+      //Search for all documents, return only the bggID values
+      DBCursor cursor = gameCollection.find(new BasicDBObject(), columns); 
+      while (cursor.hasNext()) {
+        DBObject object = cursor.next();
+        long curCSIID = (Long)object.get("csiID");
+        if (!resultList.contains(curCSIID))
+          resultList.add(curCSIID);
+      }
+    } catch (MongoException me) {
+      throw new DatabaseOperationException("Mongo raised an exception to this select: " + me.getMessage(), me);
+    } catch (Throwable t) {
+      throw new DatabaseOperationException("Something bad happened executing the select", t);
+    }
+    
+    return resultList;
+  }
+
+  /*
+   * (non-Javadoc)
+   * @see com.ac.games.db.GamesDatabase#getMMIDList()
+   */
+  public List<Long> getMMIDList() throws ConfigurationException, DatabaseOperationException {
+    if (mongoClient == null || mongoDB == null)
+      throw new ConfigurationException("There is a problem with the database connection.");
+    
+    List<Long> resultList = new LinkedList<Long>();
+    try {
+      DBCollection gameCollection = mongoDB.getCollection("mmdata");
+      //Limit the result set to mmIDs
+      BasicDBObject columns = new BasicDBObject();
+      columns.put("mmID", 1);
+      columns.put("_id", 0);
+      //Search for all documents, return only the bggID values
+      DBCursor cursor = gameCollection.find(new BasicDBObject(), columns); 
+      while (cursor.hasNext()) {
+        DBObject object = cursor.next();
+        long curMMID = (Long)object.get("mmID");
+        if (!resultList.contains(curMMID))
+          resultList.add(curMMID);
+      }
+    } catch (MongoException me) {
+      me.printStackTrace();
+      throw new DatabaseOperationException("Mongo raised an exception to this select: " + me.getMessage(), me);
+    } catch (Throwable t) {
+      t.printStackTrace();
+      throw new DatabaseOperationException("Something bad happened executing the select", t);
+    }
+    
+    return resultList;
   }
 }

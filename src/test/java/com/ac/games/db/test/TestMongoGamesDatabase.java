@@ -1,8 +1,10 @@
 package com.ac.games.db.test;
 
-import org.junit.Test;
+import java.util.List;
 
 import junit.framework.TestCase;
+
+import org.junit.Test;
 
 import com.ac.games.data.BGGGame;
 import com.ac.games.data.CoolStuffIncPriceData;
@@ -13,7 +15,6 @@ import com.ac.games.db.MongoDBFactory;
 import com.ac.games.db.exception.ConfigurationException;
 import com.ac.games.db.exception.DatabaseOperationException;
 import com.ac.games.db.mock.MockDataFactory;
-import com.ac.games.db.mongo.MongoGamesDatabase;
 
 /**
  * @author ac010168
@@ -69,6 +70,7 @@ public class TestMongoGamesDatabase extends TestCase {
    * <li>Modify Abyss Data</li>
    * <li>Update Abyss</li>
    * <li>Read Abyss and Verify</li>
+   * <li>Run the IDs select and verify all three games found</li>
    * <li>Delete Cosmic Encounter and Cosmic Incursion</li>
    * <li>Read Nothing for two games, verify Abyss still exists</li>
    * <li>Delete Abyss</li>
@@ -149,6 +151,9 @@ public class TestMongoGamesDatabase extends TestCase {
       assertNull("The first expansionList was not empty", abyss.getExpansionIDs());
       assertNull("The second expansionList was not empty", abyss2.getExpansionIDs());
       assertTrue("The GameTypes are not equal", abyss.getGameType() == abyss2.getGameType());
+      assertTrue("The ReviewStates are not equal", abyss.getReviewState() == abyss2.getReviewState());
+      assertTrue("The addDates are not equal", abyss.getAddDate().getTime() == abyss2.getAddDate().getTime());
+      assertTrue("The reviewDates are not equal", abyss.getReviewDate().getTime() == abyss2.getReviewDate().getTime());
 
       //Modify Abyss Data and Update
       System.out.println ("===  Modify Abyss Data and Update  ===");
@@ -169,6 +174,14 @@ public class TestMongoGamesDatabase extends TestCase {
       assertTrue("The maxPlayingTimes are not equal", abyss.getMaxPlayingTime() == abyss3.getMaxPlayingTime());
       assertTrue("The bggRatingsUsers are not equal", abyss.getBggRating() == abyss3.getBggRating());
       assertTrue("The bggRanks are not equal", abyss.getBggRank() == abyss3.getBggRank());
+      
+      //Run the IDs select and verify all three games found
+      System.out.println ("===  Run the IDs select and verify all three games found  ===");
+      List<Long> bggIDList = database.getBggIDList();
+      assertNotNull("I didn't get an ID List", bggIDList);
+      assertTrue("My List didn't contain Cosmic Encounter", bggIDList.contains(MockDataFactory.BGG_COSMIC_ENCOUNTER_ID));
+      assertTrue("My List didn't contain Cosmic Incursion", bggIDList.contains(MockDataFactory.BGG_COSMIC_INCURSION_ID));
+      assertTrue("My List didn't contain Abyss", bggIDList.contains(MockDataFactory.BGG_ABYSS_ID));
       
       //Delete Cosmic Encounter and Cosmic Incursion
       System.out.println ("===  Delete Cosmic Encounter and Cosmic Incursion  ===");
@@ -215,6 +228,7 @@ public class TestMongoGamesDatabase extends TestCase {
    * <li>Modify Abyss Data</li>
    * <li>Update Abyss</li>
    * <li>Read Abyss and Verify</li>
+   * <li>Run the IDs select and verify all three games found</li>
    * <li>Delete Cosmic Encounter and Cosmic Incursion</li>
    * <li>Read Nothing for two games, verify Abyss still exists</li>
    * <li>Delete Abyss</li>
@@ -290,6 +304,9 @@ public class TestMongoGamesDatabase extends TestCase {
       assertTrue("The skus are not equal", abyss.getSku().equalsIgnoreCase(abyss2.getSku()));
       assertTrue("The curPrices are not equal", abyss.getCurPrice() == abyss2.getCurPrice());
       assertTrue("The GameAvailabilities are not equal", abyss.getAvailability() == abyss2.getAvailability());
+      assertTrue("The ReviewStates are not equal", abyss.getReviewState() == abyss2.getReviewState());
+      assertTrue("The addDates are not equal", abyss.getAddDate().getTime() == abyss2.getAddDate().getTime());
+      assertTrue("The reviewDates are not equal", abyss.getReviewDate().getTime() == abyss2.getReviewDate().getTime());
 
       //Modify Abyss Data and Update
       System.out.println ("===  Modify Abyss Data and Update  ===");
@@ -308,6 +325,14 @@ public class TestMongoGamesDatabase extends TestCase {
       assertNotNull("I didn't find my result", abyss3);
       assertTrue("The curPrices are not equal", abyss.getCurPrice() == abyss3.getCurPrice());
       assertTrue("The availabilities are not equal", abyss.getAvailability() == abyss3.getAvailability());
+      
+      //Run the IDs select and verify all three games found
+      System.out.println ("===  Run the IDs select and verify all three games found  ===");
+      List<Long> csiIDList = database.getCSIIDList();
+      assertNotNull("I didn't get an ID List", csiIDList);
+      assertTrue("My List didn't contain Cosmic Encounter", csiIDList.contains(MockDataFactory.CSI_COSMIC_ENCOUNTER_ID));
+      assertTrue("My List didn't contain Cosmic Incursion", csiIDList.contains(MockDataFactory.CSI_COSMIC_INCURSION_ID));
+      assertTrue("My List didn't contain Abyss", csiIDList.contains(MockDataFactory.CSI_ABYSS_ID));
       
       //Delete Cosmic Encounter and Cosmic Incursion
       System.out.println ("===  Delete Cosmic Encounter and Cosmic Incursion  ===");
@@ -354,6 +379,7 @@ public class TestMongoGamesDatabase extends TestCase {
    * <li>Modify Abyss Data</li>
    * <li>Update Abyss</li>
    * <li>Read Abyss and Verify</li>
+   * <li>Run the IDs select and verify all three games found</li>
    * <li>Delete Cosmic Encounter and Cosmic Incursion</li>
    * <li>Read Nothing for two games, verify Abyss still exists</li>
    * <li>Delete Abyss</li>
@@ -429,6 +455,9 @@ public class TestMongoGamesDatabase extends TestCase {
       assertTrue("The skus are not equal", abyss.getSku().equalsIgnoreCase(abyss2.getSku()));
       assertTrue("The curPrices are not equal", abyss.getCurPrice() == abyss2.getCurPrice());
       assertTrue("The GameAvailabilities are not equal", abyss.getAvailability() == abyss2.getAvailability());
+      assertTrue("The ReviewStates are not equal", abyss.getReviewState() == abyss2.getReviewState());
+      assertTrue("The addDates are not equal", abyss.getAddDate().getTime() == abyss2.getAddDate().getTime());
+      assertTrue("The reviewDates are not equal", abyss.getReviewDate().getTime() == abyss2.getReviewDate().getTime());
 
       //Modify Abyss Data and Update
       System.out.println ("===  Modify Abyss Data and Update  ===");
@@ -448,6 +477,14 @@ public class TestMongoGamesDatabase extends TestCase {
       assertTrue("The curPrices are not equal", abyss.getCurPrice() == abyss3.getCurPrice());
       assertTrue("The availabilities are not equal", abyss.getAvailability() == abyss3.getAvailability());
       
+      //Run the IDs select and verify all three games found
+      System.out.println ("===  Run the IDs select and verify all three games found  ===");
+      List<Long> mmIDList = database.getMMIDList();
+      assertNotNull("I didn't get an ID List", mmIDList);
+      assertTrue("My List didn't contain Cosmic Encounter", mmIDList.contains(MockDataFactory.MM_COSMIC_ENCOUNTER_ID));
+      assertTrue("My List didn't contain Cosmic Incursion", mmIDList.contains(MockDataFactory.MM_COSMIC_INCURSION_ID));
+      assertTrue("My List didn't contain Abyss", mmIDList.contains(MockDataFactory.MM_ABYSS_ID));
+
       //Delete Cosmic Encounter and Cosmic Incursion
       System.out.println ("===  Delete Cosmic Encounter and Cosmic Incursion  ===");
       database.deleteMMPriceData(cosmicEncounter.getMmID());
