@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--AgileJ Ltd. (http://www.agilej.com)-->
+<ajsv>
+    <diagram creationDate="2015-Feb-25 03:23" filterScript="" licenseGrade="single" licenseeName="Adam_Carter" licenseeOrganization="Personal" version="1.7.17.v20140508-2136">
+        <class className="com.ac.games.db.MongoDBFactory" project="ac-games-db-mongo" xLocation="784" yLocation="466"/>
+        <class className="com.ac.games.db.mongo.BGGGameConverter" project="ac-games-db-mongo" xLocation="207" yLocation="512"/>
+        <class className="com.ac.games.db.mongo.CSIDataConverter" project="ac-games-db-mongo" xLocation="924" yLocation="175"/>
+        <class className="com.ac.games.db.mongo.MMDataConverter" project="ac-games-db-mongo" xLocation="100" yLocation="860"/>
+        <class className="com.ac.games.db.mongo.MongoGamesDatabase" project="ac-games-db-mongo" xLocation="741" yLocation="719"/>
+        <class className="com.ac.games.db.GamesDatabase" project="ac-games-db-mongo" xLocation="1727" yLocation="729"/>
+        <class className="com.ac.games.db.test.TestMongoGamesDatabase" project="ac-games-db-mongo" xLocation="1602" yLocation="346"/>
+        <class className="com.ac.games.db.mock.MockDataFactory" project="ac-games-db-mongo" xLocation="2063" yLocation="100"/>
+    </diagram>
+</ajsv>
