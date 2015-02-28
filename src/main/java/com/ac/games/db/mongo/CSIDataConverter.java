@@ -2,6 +2,7 @@ package com.ac.games.db.mongo;
 
 import java.util.Date;
 
+import com.ac.games.data.CoolStuffIncCategoryConverter;
 import com.ac.games.data.CoolStuffIncPriceData;
 import com.ac.games.data.GameAvailabilityConverter;
 import com.ac.games.data.ReviewStateConverter;
@@ -56,6 +57,7 @@ public class CSIDataConverter {
     
     if (data.getSku() != null)          dbObject.append("sku", data.getSku());
     if (data.getTitle() != null)        dbObject.append("title", data.getTitle());
+    if (data.getCategory() != null)     dbObject.append("category", CoolStuffIncCategoryConverter.convertCSICategoryToFlag(data.getCategory()));
     if (data.getImageURL() != null)     dbObject.append("imageURL", data.getImageURL());
     if (data.getAvailability() != null) dbObject.append("availability", GameAvailabilityConverter.convertGameAvailabilityToFlag(data.getAvailability()));
     if (data.getMsrpValue() != -1.0)    dbObject.append("msrpValue", data.getMsrpValue());
@@ -76,6 +78,7 @@ public class CSIDataConverter {
     if (dbObject.containsField("csiID"))        data.setCsiID((Long)dbObject.get("csiID"));
     if (dbObject.containsField("sku"))          data.setSku((String)dbObject.get("sku"));
     if (dbObject.containsField("title"))        data.setTitle((String)dbObject.get("title"));
+    if (dbObject.containsField("category"))     data.setCategory(CoolStuffIncCategoryConverter.convertFlagToCSICategory((Integer)dbObject.get("category")));
     if (dbObject.containsField("imageURL"))     data.setImageURL((String)dbObject.get("imageURL"));
     if (dbObject.containsField("availability")) data.setAvailability(GameAvailabilityConverter.convertFlagToGameAvailability((Integer)dbObject.get("availability")));
     if (dbObject.containsField("msrpValue"))    data.setMsrpValue((Double)dbObject.get("msrpValue"));

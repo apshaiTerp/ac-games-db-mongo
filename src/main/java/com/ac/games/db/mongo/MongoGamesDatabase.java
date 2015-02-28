@@ -144,7 +144,8 @@ public class MongoGamesDatabase implements GamesDatabase {
   public void closeDBConnection() throws ConfigurationException {
     //Close the current collection
     try {
-      mongoClient.close();
+      if (mongoClient != null)
+        mongoClient.close();
       mongoClient = null;
       mongoDB     = null;
     } catch (Throwable t) {

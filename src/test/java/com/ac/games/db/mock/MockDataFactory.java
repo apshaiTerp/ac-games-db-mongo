@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 import com.ac.games.data.BGGGame;
+import com.ac.games.data.CoolStuffIncCategory;
 import com.ac.games.data.CoolStuffIncPriceData;
 import com.ac.games.data.GameAvailability;
 import com.ac.games.data.GameType;
@@ -217,6 +218,7 @@ public class MockDataFactory {
     
     data.setCsiID(CSI_ABYSS_ID);
     data.setTitle("Abyss");
+    data.setCategory(CoolStuffIncCategory.BOARDGAMES);
     data.setSku("ASMABY01US");
     data.setImageURL("http://a4.res.cloudinary.com/csicdn/image/upload/v1/Images/Products/Misc%20Art/Asmodee%20Editions/full/ASMABY01US.jpg");
     data.setAvailability(GameAvailability.INSTOCK);
@@ -236,6 +238,7 @@ public class MockDataFactory {
     
     data.setCsiID(CSI_COSMIC_ENCOUNTER_ID);
     data.setTitle("Cosmic Encounter Board Game");
+    data.setCategory(CoolStuffIncCategory.BOARDGAMES);
     data.setSku("FFGCE01");
     data.setImageURL("http://a1.res.cloudinary.com/csicdn/image/upload/v1/Images/Products/Misc%20Art/Fantasy%20Flight%20Games/full/FFGCosmicEncounter.jpg");
     data.setAvailability(GameAvailability.PREORDER);
@@ -251,6 +254,7 @@ public class MockDataFactory {
     
     data.setCsiID(CSI_COSMIC_INCURSION_ID);
     data.setTitle("Cosmic Encounter: Cosmic Incursion Expansion");
+    data.setCategory(CoolStuffIncCategory.BOARDGAMES);
     data.setSku("FFGCE02");
     data.setImageURL("http://a5.res.cloudinary.com/csicdn/image/upload/v1/Images/Products/Misc%20Art/Fantasy%20Flight%20Games/full/ffg_cosmicencounterCosmicIncursion.jpg");
     data.setAvailability(GameAvailability.OUTOFSTOCK);
