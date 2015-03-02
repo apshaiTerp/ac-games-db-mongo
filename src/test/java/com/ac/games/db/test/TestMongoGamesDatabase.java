@@ -24,6 +24,8 @@ public class TestMongoGamesDatabase extends TestCase {
 
   /** Reference to the host address for mongo. */
   protected final String mongoHostAddress = "localhost";
+  /** Reference to the true remote host for mongo */
+  protected final String mongoTrueHostAddress = "107.188.249.238";
   /** Port number used for mongo. */
   protected final int mongoPort           = 27017;
   /** Database name to be connected to. */
@@ -41,6 +43,7 @@ public class TestMongoGamesDatabase extends TestCase {
     System.out.println ("Initializing Database Connection...");
     
     database = MongoDBFactory.createMongoGamesDatabase(mongoHostAddress, mongoPort, databaseName);
+    //database = MongoDBFactory.createMongoGamesDatabase(mongoTrueHostAddress, mongoPort, databaseName);
     database.initializeDBConnection();
   }
   
