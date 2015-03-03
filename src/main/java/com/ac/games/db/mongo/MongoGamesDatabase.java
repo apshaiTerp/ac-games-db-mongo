@@ -7,6 +7,8 @@ import org.bson.types.ObjectId;
 
 import com.ac.games.data.BGGGame;
 import com.ac.games.data.CoolStuffIncPriceData;
+import com.ac.games.data.Game;
+import com.ac.games.data.GameReltn;
 import com.ac.games.data.MiniatureMarketPriceData;
 import com.ac.games.db.GamesDatabase;
 import com.ac.games.db.exception.ConfigurationException;
@@ -747,5 +749,45 @@ public class MongoGamesDatabase implements GamesDatabase {
     }
     
     return resultList;
+  }
+
+  public Game getGame(long gameID) throws ConfigurationException, DatabaseOperationException {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  public void insertGame(Game game) throws ConfigurationException, DatabaseOperationException {
+    // TODO Auto-generated method stub
+    
+  }
+
+  public void updateGame(Game game) throws ConfigurationException, DatabaseOperationException {
+    // TODO Auto-generated method stub
+    
+  }
+
+  public void deleteGame(long gameID) throws ConfigurationException, DatabaseOperationException {
+    // TODO Auto-generated method stub
+    
+  }
+
+  public GameReltn getGameReltn(long gameID) throws ConfigurationException, DatabaseOperationException {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  public void insertGameReltn(GameReltn gameReltn) throws ConfigurationException, DatabaseOperationException {
+    // TODO Auto-generated method stub
+    
+  }
+
+  public void updateGameReltn(GameReltn gameReltn) throws ConfigurationException, DatabaseOperationException {
+    // TODO Auto-generated method stub
+    
+  }
+
+  public void deleteGameReltn(long reltnID) throws ConfigurationException, DatabaseOperationException {
+    // TODO Auto-generated method stub
+    
   }
 }
