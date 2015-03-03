@@ -9,6 +9,7 @@ import com.ac.games.data.CoolStuffIncCategory;
 import com.ac.games.data.CoolStuffIncPriceData;
 import com.ac.games.data.GameAvailability;
 import com.ac.games.data.GameType;
+import com.ac.games.data.MiniatureMarketCategory;
 import com.ac.games.data.MiniatureMarketPriceData;
 import com.ac.games.data.ReviewState;
 
@@ -281,6 +282,7 @@ public class MockDataFactory {
     data.setMmID(MM_ABYSS_ID);
     data.setTitle("Abyss");
     data.setSku("ASMABY01US");
+    data.setCategory(MiniatureMarketCategory.BOARDGAMES);
     data.setImageURL("http://a4.res.cloudinary.com/csicdn/image/upload/v1/Images/Products/Misc%20Art/Asmodee%20Editions/full/ASMABY01US.jpg");
     data.setAvailability(GameAvailability.INSTOCK);
     data.setMsrpValue(59.99);
@@ -298,6 +300,7 @@ public class MockDataFactory {
     
     data.setMmID(MM_COSMIC_ENCOUNTER_ID);
     data.setTitle("Cosmic Encounter");
+    data.setCategory(MiniatureMarketCategory.BOARDGAMES);
     data.setSku("FFGCE01");
     data.setImageURL("http://cdn.miniaturemarket.com/media/catalog/product/f/f/ffgce01.jpg");
     data.setAvailability(GameAvailability.OUTOFSTOCK);
@@ -312,6 +315,7 @@ public class MockDataFactory {
     
     data.setMmID(MM_COSMIC_INCURSION_ID);
     data.setTitle("Cosmic Encounter Cosmic Incursion Expansion");
+    data.setCategory(MiniatureMarketCategory.BOARDGAMES);
     data.setSku("FFGCE02");
     data.setImageURL("http://cdn.miniaturemarket.com/media/catalog/product/F/F/FFGCE02.jpg");
     data.setAvailability(GameAvailability.OUTOFSTOCK);
