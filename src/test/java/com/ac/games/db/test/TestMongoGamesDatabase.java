@@ -8,7 +8,9 @@ import org.junit.Test;
 
 import com.ac.games.data.BGGGame;
 import com.ac.games.data.CoolStuffIncPriceData;
+import com.ac.games.data.Game;
 import com.ac.games.data.GameAvailability;
+import com.ac.games.data.GameReltn;
 import com.ac.games.data.MiniatureMarketPriceData;
 import com.ac.games.db.GamesDatabase;
 import com.ac.games.db.MongoDBFactory;
@@ -23,13 +25,13 @@ import com.ac.games.db.mock.MockDataFactory;
 public class TestMongoGamesDatabase extends TestCase {
 
   /** Reference to the host address for mongo. */
-  protected final String mongoHostAddress = "localhost";
+  protected final String mongoHostAddress     = "localhost";
   /** Reference to the true remote host for mongo */
   protected final String mongoTrueHostAddress = "107.188.249.238";
   /** Port number used for mongo. */
-  protected final int mongoPort           = 27017;
+  protected final int mongoPort               = 27017;
   /** Database name to be connected to. */
-  protected final String databaseName     = "mockDB";
+  protected final String databaseName         = "mockDB";
   
   /** The database to be used during the tests */
   private GamesDatabase database;
@@ -74,6 +76,8 @@ public class TestMongoGamesDatabase extends TestCase {
    * <li>Update Abyss</li>
    * <li>Read Abyss and Verify</li>
    * <li>Run the IDs select and verify all three games found</li>
+   * <li>Run the Max ID Query and verify that the largest id value is returned</li>
+   * <li>Run the Count Query and Verify we got three games</li>
    * <li>Delete Cosmic Encounter and Cosmic Incursion</li>
    * <li>Read Nothing for two games, verify Abyss still exists</li>
    * <li>Delete Abyss</li>
@@ -186,6 +190,16 @@ public class TestMongoGamesDatabase extends TestCase {
       assertTrue("My List didn't contain Cosmic Incursion", bggIDList.contains(MockDataFactory.BGG_COSMIC_INCURSION_ID));
       assertTrue("My List didn't contain Abyss", bggIDList.contains(MockDataFactory.BGG_ABYSS_ID));
       
+      //Run the Max ID Query and verify that the largest id value (in this case, Abyss) is returned
+      System.out.println ("===  Run the Max ID Query and verify that the largest id value (in this case, Abyss) is returned  ===");
+      long maxValue = database.getMaxBGGGameID();
+      assertTrue("I got a value other than I was expecting for maxValue", maxValue == MockDataFactory.BGG_ABYSS_ID);
+      
+      //Run the Count Query and Verify we got three games
+      System.out.println ("===  Run the Count Query and Verify we got three games  ===");
+      int count = database.getBGGGameCount();
+      assertTrue("I got a value other than I was expecting for maxValue", count == 3);
+      
       //Delete Cosmic Encounter and Cosmic Incursion
       System.out.println ("===  Delete Cosmic Encounter and Cosmic Incursion  ===");
       database.deleteBGGGameData(cosmicEncounter.getBggID());
@@ -232,6 +246,8 @@ public class TestMongoGamesDatabase extends TestCase {
    * <li>Update Abyss</li>
    * <li>Read Abyss and Verify</li>
    * <li>Run the IDs select and verify all three games found</li>
+   * <li>Run the Max ID Query and verify that the largest id value is returned</li>
+   * <li>Run the Count Query and Verify we got three games</li>
    * <li>Delete Cosmic Encounter and Cosmic Incursion</li>
    * <li>Read Nothing for two games, verify Abyss still exists</li>
    * <li>Delete Abyss</li>
@@ -341,6 +357,16 @@ public class TestMongoGamesDatabase extends TestCase {
       assertTrue("My List didn't contain Cosmic Incursion", csiIDList.contains(MockDataFactory.CSI_COSMIC_INCURSION_ID));
       assertTrue("My List didn't contain Abyss", csiIDList.contains(MockDataFactory.CSI_ABYSS_ID));
       
+      //Run the Max ID Query and verify that the largest id value (in this case, Abyss) is returned
+      System.out.println ("===  Run the Max ID Query and verify that the largest id value (in this case, Abyss) is returned  ===");
+      long maxValue = database.getMaxCSIDataID();
+      assertTrue("I got a value other than I was expecting for maxValue", maxValue == MockDataFactory.CSI_ABYSS_ID);
+      
+      //Run the Count Query and Verify we got three games
+      System.out.println ("===  Run the Count Query and Verify we got three games  ===");
+      int count = database.getCSIDataCount();
+      assertTrue("I got a value other than I was expecting for maxValue", count == 3);
+
       //Delete Cosmic Encounter and Cosmic Incursion
       System.out.println ("===  Delete Cosmic Encounter and Cosmic Incursion  ===");
       database.deleteCSIPriceData(cosmicEncounter.getCsiID());
@@ -387,6 +413,8 @@ public class TestMongoGamesDatabase extends TestCase {
    * <li>Update Abyss</li>
    * <li>Read Abyss and Verify</li>
    * <li>Run the IDs select and verify all three games found</li>
+   * <li>Run the Max ID Query and verify that the largest id value is returned</li>
+   * <li>Run the Count Query and Verify we got three games</li>
    * <li>Delete Cosmic Encounter and Cosmic Incursion</li>
    * <li>Read Nothing for two games, verify Abyss still exists</li>
    * <li>Delete Abyss</li>
@@ -496,6 +524,16 @@ public class TestMongoGamesDatabase extends TestCase {
       assertTrue("My List didn't contain Cosmic Incursion", mmIDList.contains(MockDataFactory.MM_COSMIC_INCURSION_ID));
       assertTrue("My List didn't contain Abyss", mmIDList.contains(MockDataFactory.MM_ABYSS_ID));
 
+      //Run the Max ID Query and verify that the largest id value (in this case, Abyss) is returned
+      System.out.println ("===  Run the Max ID Query and verify that the largest id value (in this case, Abyss) is returned  ===");
+      long maxValue = database.getMaxMMDataID();
+      assertTrue("I got a value other than I was expecting for maxValue", maxValue == MockDataFactory.MM_ABYSS_ID);
+      
+      //Run the Count Query and Verify we got three games
+      System.out.println ("===  Run the Count Query and Verify we got three games  ===");
+      int count = database.getMMDataCount();
+      assertTrue("I got a value other than I was expecting for maxValue", count == 3);
+
       //Delete Cosmic Encounter and Cosmic Incursion
       System.out.println ("===  Delete Cosmic Encounter and Cosmic Incursion  ===");
       database.deleteMMPriceData(cosmicEncounter.getMmID());
@@ -526,4 +564,331 @@ public class TestMongoGamesDatabase extends TestCase {
       fail("I failed for some gorram reason: " + t.getLocalizedMessage());
     }
   }
+
+  /**
+   * Method to test features of BGG Data operations.  The basic steps of this test are:
+   * <ol>
+   * <li>Insert Cosmic Encounter</li>
+   * <li>Insert Cosmic Incursion</li>
+   * <li>Read Cosmic Encounter and Verify</li>
+   * <li>Read Cosmic Incursion and Verify</li>
+   * <li>Reinsert Cosmic Encounter</li>
+   * <li>Upsert Abyss</li>
+   * <li>Read Cosmic Encounter and Verify</li>
+   * <li>Read Abyss and Verify</li>
+   * <li>Modify Abyss Data</li>
+   * <li>Update Abyss</li>
+   * <li>Read Abyss and Verify</li>
+   * <li>Run the IDs select and verify all three games found</li>
+   * <li>Run the Max ID Query and verify that the largest id value is returned</li>
+   * <li>Run the Count Query and Verify we got three games</li>
+   * <li>Delete Cosmic Encounter and Cosmic Incursion</li>
+   * <li>Read Nothing for two games, verify Abyss still exists</li>
+   * <li>Delete Abyss</li>
+   * <li>Test Complete</li></ol>
+   */
+  @Test
+  public void testGameData() {
+    //MongoGamesDatabase.debugMode = true;
+    try {
+      //Insert Cosmic Encounter
+      System.out.println ("===  Insert Cosmic Encounter  ===");
+      Game cosmicEncounter = MockDataFactory.createGameData(MockDataFactory.COSMIC_ENCOUNTER_ID);
+      database.insertGame(cosmicEncounter);
+      
+      //Insert Cosmic Incursion
+      System.out.println ("===  Insert Cosmic Incursion  ===");
+      Game cosmicIncursion = MockDataFactory.createGameData(MockDataFactory.COSMIC_INCURSION_ID);
+      database.insertGame(cosmicIncursion);
+
+      //Read Cosmic Encounter and Verify
+      System.out.println ("===  Read Cosmic Encounter and Verify  ===");
+      Game cosmicEncounter2 = database.readGame(cosmicEncounter.getGameID());
+      
+      //Spot checking as opposed to all possible values.
+      assertNotNull("I didn't find my result", cosmicEncounter2);
+      assertTrue("The gameIDs are not equal", cosmicEncounter.getGameID() == cosmicEncounter2.getGameID());
+      assertTrue("The bggIDs are not equal", cosmicEncounter.getBggID() == cosmicEncounter2.getBggID());
+      assertTrue("The names are not equal", cosmicEncounter.getName().equalsIgnoreCase(cosmicEncounter2.getName()));
+      assertTrue("The primaryPublishers are not equal", cosmicEncounter.getPrimaryPublisher().equalsIgnoreCase(cosmicEncounter2.getPrimaryPublisher()));
+      assertTrue("The publishers lists are not equal", cosmicEncounter.getPublishers().size() == cosmicEncounter2.getPublishers().size());
+      assertTrue("The expansion lists are not equal", cosmicEncounter.getExpansionIDs().size() == cosmicEncounter2.getExpansionIDs().size());
+      assertTrue("The GameTypes are not equal", cosmicEncounter.getGameType() == cosmicEncounter2.getGameType());
+      
+      //Read Cosmic Incursion and Verify
+      System.out.println ("===  Read Cosmic Incursion and Verify  ===");
+      Game cosmicIncursion2 = database.readGame(cosmicIncursion.getGameID());
+      
+      //Spot checking as opposed to all possible values.
+      assertNotNull("I didn't find my result", cosmicIncursion2);
+      assertTrue("The gameIDs are not equal", cosmicIncursion.getGameID() == cosmicIncursion2.getGameID());
+      assertTrue("The bggIDs are not equal", cosmicIncursion.getBggID() == cosmicIncursion2.getBggID());
+      assertTrue("The names are not equal", cosmicIncursion.getName().equalsIgnoreCase(cosmicIncursion2.getName()));
+      assertTrue("The primaryPublishers are not equal", cosmicIncursion.getPrimaryPublisher().equalsIgnoreCase(cosmicIncursion2.getPrimaryPublisher()));
+      assertTrue("The publishers lists are not equal", cosmicIncursion.getPublishers().size() == cosmicIncursion2.getPublishers().size());
+      assertTrue("The parentGameIDs are not equal", cosmicIncursion.getParentGameID() == cosmicIncursion2.getParentGameID());
+      assertTrue("The GameTypes are not equal", cosmicIncursion.getGameType() == cosmicIncursion2.getGameType());
+      
+      //Reinsert Cosmic Encounter
+      System.out.println ("===  Reinsert Cosmic Encounter  ===");
+      database.insertGame(cosmicEncounter);
+      
+      //Upsert Abyss
+      System.out.println ("===  Upsert Abyss  ===");
+      Game abyss = MockDataFactory.createGameData(MockDataFactory.ABYSS_ID);
+      database.updateGame(abyss);
+      
+      //Read Cosmic Encounter and Verify
+      System.out.println ("===  Read Cosmic Encounter and Verify  ===");
+      Game cosmicEncounter3 = database.readGame(cosmicEncounter.getGameID());
+      
+      //Spot checking as opposed to all possible values.
+      assertNotNull("I didn't find my result", cosmicEncounter3);
+      assertTrue("The gameIDs are not equal", cosmicEncounter.getGameID() == cosmicEncounter3.getGameID());
+      assertTrue("The bggIDs are not equal", cosmicEncounter.getBggID() == cosmicEncounter3.getBggID());
+      assertTrue("The names are not equal", cosmicEncounter.getName().equalsIgnoreCase(cosmicEncounter3.getName()));
+      assertTrue("The primaryPublishers are not equal", cosmicEncounter.getPrimaryPublisher().equalsIgnoreCase(cosmicEncounter3.getPrimaryPublisher()));
+      assertTrue("The publishers lists are not equal", cosmicEncounter.getPublishers().size() == cosmicEncounter3.getPublishers().size());
+      assertTrue("The expansion lists are not equal", cosmicEncounter.getExpansionIDs().size() == cosmicEncounter3.getExpansionIDs().size());
+      assertTrue("The GameTypes are not equal", cosmicEncounter.getGameType() == cosmicEncounter3.getGameType());
+
+      //Read Abyss and Verify
+      System.out.println ("===  Read Abyss and Verify  ===");
+      Game abyss2 = database.readGame(abyss.getGameID());
+      
+      //Spot checking as opposed to all possible values.
+      assertNotNull("I didn't find my result", abyss2);
+      assertTrue("The gameIDs are not equal", abyss.getGameID() == abyss2.getGameID());
+      assertTrue("The bggIDs are not equal", abyss.getBggID() == abyss2.getBggID());
+      assertTrue("The names are not equal", abyss.getName().equalsIgnoreCase(abyss2.getName()));
+      assertTrue("The primaryPublishers are not equal", abyss.getPrimaryPublisher().equalsIgnoreCase(abyss2.getPrimaryPublisher()));
+      assertTrue("The publishers lists are not equal", abyss.getPublishers().size() == abyss2.getPublishers().size());
+      assertNull("The first expansionList was not empty", abyss.getExpansionIDs());
+      assertNull("The second expansionList was not empty", abyss2.getExpansionIDs());
+      assertTrue("The GameTypes are not equal", abyss.getGameType() == abyss2.getGameType());
+      assertTrue("The addDates are not equal", abyss.getAddDate().getTime() == abyss2.getAddDate().getTime());
+
+      //Modify Abyss Data and Update
+      System.out.println ("===  Modify Abyss Data and Update  ===");
+      abyss.setMaxPlayingTime(abyss.getMaxPlayingTime() + 45);
+      
+      //Update Abyss
+      System.out.println ("===  Update Abyss  ===");
+      database.updateGame(abyss);
+      
+      //Read Abyss and Verify
+      System.out.println ("===  Read Abyss and Verify  ===");
+      Game abyss3 = database.readGame(abyss.getGameID());
+      
+      //Spot checking as opposed to all possible values.
+      assertNotNull("I didn't find my result", abyss3);
+      assertTrue("The maxPlayingTimes are not equal", abyss.getMaxPlayingTime() == abyss3.getMaxPlayingTime());
+      
+      //Run the IDs select and verify all three games found
+      System.out.println ("===  Run the IDs select and verify all three games found  ===");
+      List<Long> gameIDList = database.getGameIDList();
+      assertNotNull("I didn't get an ID List", gameIDList);
+      assertTrue("My List didn't contain Cosmic Encounter", gameIDList.contains(MockDataFactory.COSMIC_ENCOUNTER_ID));
+      assertTrue("My List didn't contain Cosmic Incursion", gameIDList.contains(MockDataFactory.COSMIC_INCURSION_ID));
+      assertTrue("My List didn't contain Abyss", gameIDList.contains(MockDataFactory.ABYSS_ID));
+      
+      //Run the Max ID Query and verify that the largest id value (in this case, Cosmic Incursion) is returned
+      System.out.println ("===  Run the Max ID Query and verify that the largest id value is returned  ===");
+      long maxValue = database.getMaxGameID();
+      assertTrue("I got a value other than I was expecting for maxValue", maxValue == MockDataFactory.COSMIC_INCURSION_ID);
+      
+      //Run the Count Query and Verify we got three games
+      System.out.println ("===  Run the Count Query and Verify we got three games  ===");
+      int count = database.getGameCount();
+      assertTrue("I got a value other than I was expecting for maxValue", count == 3);
+
+      //Delete Cosmic Encounter and Cosmic Incursion
+      System.out.println ("===  Delete Cosmic Encounter and Cosmic Incursion  ===");
+      database.deleteGame(cosmicEncounter.getGameID());
+      database.deleteGame(cosmicIncursion.getGameID());
+      
+      //Read Nothing for two games, verify Abyss still exists
+      System.out.println ("===  Read Nothing for two games, verify Abyss still exists  ===");
+      Game notFound1  = database.readGame(cosmicEncounter.getGameID());
+      Game notFound2  = database.readGame(cosmicIncursion.getGameID());
+      Game foundAbyss = database.readGame(abyss.getGameID());
+      
+      assertNull("I shouldn't have found Cosmic Encounter, but did.", notFound1);
+      assertNull("I shouldn't have found Cosmic Incursion, but did.", notFound2);
+      assertNotNull("I should have found Abyss, but didn't.", foundAbyss);
+      
+      //Delete Abyss
+      System.out.println ("===  Delete Abyss  ===");
+      database.deleteGame(abyss.getGameID());
+      
+    } catch (ConfigurationException ce) {
+      ce.printStackTrace();
+      fail("I failed with a ConfigurationException: " + ce.getLocalizedMessage());
+    } catch (DatabaseOperationException doe) {
+      doe.printStackTrace();
+      fail("I failed with a DatabaseOperationException: " + doe.getLocalizedMessage());
+    } catch (Throwable t) {
+      t.printStackTrace();
+      fail("I failed for some gorram reason: " + t.getLocalizedMessage());
+    }
+  }
+  
+  /**
+   * Method to test features of BGG Data operations.  The basic steps of this test are:
+   * <ol>
+   * <li>Insert Cosmic Encounter</li>
+   * <li>Insert Cosmic Incursion</li>
+   * <li>Read Cosmic Encounter and Verify</li>
+   * <li>Read Cosmic Incursion and Verify</li>
+   * <li>Reinsert Cosmic Encounter</li>
+   * <li>Upsert Abyss</li>
+   * <li>Read Cosmic Encounter and Verify</li>
+   * <li>Read Abyss and Verify</li>
+   * <li>Modify Abyss Data</li>
+   * <li>Update Abyss</li>
+   * <li>Read Abyss and Verify</li>
+   * <li>Run the IDs select and verify all three games found</li>
+   * <li>Delete Cosmic Encounter and Cosmic Incursion</li>
+   * <li>Read Nothing for two games, verify Abyss still exists</li>
+   * <li>Delete Abyss</li>
+   * <li>Test Complete</li></ol>
+   */
+  @Test
+  public void testGameReltnData() {
+    //MongoGamesDatabase.debugMode = true;
+    try {
+      //Insert Cosmic Encounter
+      System.out.println ("===  Insert Cosmic Encounter  ===");
+      GameReltn cosmicEncounter = MockDataFactory.createGameReltnData(MockDataFactory.COSMIC_ENCOUNTER_RELTN_ID);
+      database.insertGameReltn(cosmicEncounter);
+      
+      //Insert Cosmic Incursion
+      System.out.println ("===  Insert Cosmic Incursion  ===");
+      GameReltn cosmicIncursion = MockDataFactory.createGameReltnData(MockDataFactory.COSMIC_INCURSION_RELTN_ID);
+      database.insertGameReltn(cosmicIncursion);
+
+      //Read Cosmic Encounter and Verify
+      System.out.println ("===  Read Cosmic Encounter and Verify  ===");
+      GameReltn cosmicEncounter2 = database.readGameReltn(cosmicEncounter.getGameID());
+      
+      //Spot checking as opposed to all possible values.
+      assertNotNull("I didn't find my result", cosmicEncounter2);
+      assertTrue("The reltnIDs are not equal", cosmicEncounter.getReltnID() == cosmicEncounter2.getReltnID());
+      assertTrue("The gameIDs are not equal", cosmicEncounter.getGameID() == cosmicEncounter2.getGameID());
+      assertTrue("The bggIDs are not equal", cosmicEncounter.getBggID() == cosmicEncounter2.getBggID());
+      assertTrue("The csiIDs are not equal", cosmicEncounter.getCsiID() == cosmicEncounter2.getCsiID());
+      assertTrue("The mmIDs are not equal", cosmicEncounter.getMmID() == cosmicEncounter2.getMmID());
+      assertTrue("The publishers lists are not equal", cosmicEncounter.getAsinKeys().size() == cosmicEncounter2.getAsinKeys().size());
+      assertTrue("The expansion lists are not equal", cosmicEncounter.getOtherSites().size() == cosmicEncounter2.getOtherSites().size());
+      
+      //Read Cosmic Incursion and Verify
+      System.out.println ("===  Read Cosmic Incursion and Verify  ===");
+      GameReltn cosmicIncursion2 = database.readGameReltn(cosmicIncursion.getGameID());
+      
+      //Spot checking as opposed to all possible values.
+      assertNotNull("I didn't find my result", cosmicIncursion2);
+      assertTrue("The reltnIDs are not equal", cosmicIncursion.getReltnID() == cosmicIncursion2.getReltnID());
+      assertTrue("The gameIDs are not equal", cosmicIncursion.getGameID() == cosmicIncursion2.getGameID());
+      assertTrue("The bggIDs are not equal", cosmicIncursion.getBggID() == cosmicIncursion2.getBggID());
+      assertTrue("The csiIDs are not equal", cosmicIncursion.getCsiID() == cosmicIncursion2.getCsiID());
+      assertTrue("The mmIDs are not equal", cosmicIncursion.getMmID() == cosmicIncursion2.getMmID());
+      assertTrue("The publishers lists are not equal", cosmicIncursion.getAsinKeys().size() == cosmicIncursion2.getAsinKeys().size());
+      //Should be null
+      assertTrue("The expansion lists are not equal", cosmicIncursion.getOtherSites() == cosmicIncursion2.getOtherSites());
+      
+      //Reinsert Cosmic Encounter
+      System.out.println ("===  Reinsert Cosmic Encounter  ===");
+      database.insertGameReltn(cosmicEncounter);
+      
+      //Upsert Abyss
+      System.out.println ("===  Upsert Abyss  ===");
+      GameReltn abyss = MockDataFactory.createGameReltnData(MockDataFactory.ABYSS_RELTN_ID);
+      database.updateGameReltn(abyss);
+      
+      //Read Cosmic Encounter and Verify
+      System.out.println ("===  Read Cosmic Encounter and Verify  ===");
+      GameReltn cosmicEncounter3 = database.readGameReltn(cosmicEncounter.getGameID());
+      
+      //Spot checking as opposed to all possible values.
+      assertNotNull("I didn't find my result", cosmicEncounter3);
+      assertTrue("The reltnIDs are not equal", cosmicEncounter.getReltnID() == cosmicEncounter3.getReltnID());
+      assertTrue("The gameIDs are not equal", cosmicEncounter.getGameID() == cosmicEncounter3.getGameID());
+      assertTrue("The bggIDs are not equal", cosmicEncounter.getBggID() == cosmicEncounter3.getBggID());
+      assertTrue("The csiIDs are not equal", cosmicEncounter.getCsiID() == cosmicEncounter3.getCsiID());
+      assertTrue("The mmIDs are not equal", cosmicEncounter.getMmID() == cosmicEncounter3.getMmID());
+      assertTrue("The publishers lists are not equal", cosmicEncounter.getAsinKeys().size() == cosmicEncounter3.getAsinKeys().size());
+      assertTrue("The expansion lists are not equal", cosmicEncounter.getOtherSites().size() == cosmicEncounter3.getOtherSites().size());
+
+      //Read Abyss and Verify
+      System.out.println ("===  Read Abyss and Verify  ===");
+      GameReltn abyss2 = database.readGameReltn(abyss.getGameID());
+      
+      //Spot checking as opposed to all possible values.
+      assertNotNull("I didn't find my result", abyss2);
+      assertTrue("The reltnIDs are not equal", abyss.getReltnID() == abyss2.getReltnID());
+      assertTrue("The gameIDs are not equal", abyss.getGameID() == abyss2.getGameID());
+      assertTrue("The bggIDs are not equal", abyss.getBggID() == abyss2.getBggID());
+      assertTrue("The csiIDs are not equal", abyss.getCsiID() == abyss2.getCsiID());
+      assertTrue("The mmIDs are not equal", abyss.getMmID() == abyss2.getMmID());
+      assertTrue("The publishers lists are not equal", abyss.getAsinKeys().size() == abyss2.getAsinKeys().size());
+      //Should be null
+      assertTrue("The expansion lists are not equal", cosmicIncursion.getOtherSites() == abyss2.getOtherSites());
+
+      //Modify Abyss Data and Update
+      System.out.println ("===  Modify Abyss Data and Update  ===");
+      abyss.setCsiID(MockDataFactory.CSI_ABYSS_ID + 20);
+      abyss.setMmID(MockDataFactory.MM_ABYSS_ID + 20);
+      
+      //Update Abyss
+      System.out.println ("===  Update Abyss  ===");
+      database.updateGameReltn(abyss);
+      
+      //Read Abyss and Verify
+      System.out.println ("===  Read Abyss and Verify  ===");
+      GameReltn abyss3 = database.readGameReltn(abyss.getGameID());
+      
+      //Spot checking as opposed to all possible values.
+      assertNotNull("I didn't find my result", abyss3);
+      assertTrue("The csiIDs are not equal", abyss.getCsiID() == abyss3.getCsiID());
+      assertTrue("The mmIDs are not equal", abyss.getMmID() == abyss3.getMmID());
+      
+      //Run the IDs select and verify all three games found
+      System.out.println ("===  Run the IDs select and verify all three games found  ===");
+      List<Long> reltnIDList = database.getGameReltnIDList();
+      assertNotNull("I didn't get an ID List", reltnIDList);
+      assertTrue("My List didn't contain Cosmic Encounter", reltnIDList.contains(MockDataFactory.COSMIC_ENCOUNTER_RELTN_ID));
+      assertTrue("My List didn't contain Cosmic Incursion", reltnIDList.contains(MockDataFactory.COSMIC_INCURSION_RELTN_ID));
+      assertTrue("My List didn't contain Abyss", reltnIDList.contains(MockDataFactory.ABYSS_RELTN_ID));
+      
+      //Delete Cosmic Encounter and Cosmic Incursion
+      System.out.println ("===  Delete Cosmic Encounter and Cosmic Incursion  ===");
+      database.deleteGameReltn(cosmicEncounter.getReltnID());
+      database.deleteGameReltn(cosmicIncursion.getReltnID());
+      
+      //Read Nothing for two games, verify Abyss still exists
+      System.out.println ("===  Read Nothing for two games, verify Abyss still exists  ===");
+      GameReltn notFound1  = database.readGameReltn(cosmicEncounter.getGameID());
+      GameReltn notFound2  = database.readGameReltn(cosmicIncursion.getGameID());
+      GameReltn foundAbyss = database.readGameReltn(abyss.getGameID());
+      
+      assertNull("I shouldn't have found Cosmic Encounter, but did.", notFound1);
+      assertNull("I shouldn't have found Cosmic Incursion, but did.", notFound2);
+      assertNotNull("I should have found Abyss, but didn't.", foundAbyss);
+      
+      //Delete Abyss
+      System.out.println ("===  Delete Abyss  ===");
+      database.deleteGameReltn(abyss.getReltnID());
+      
+    } catch (ConfigurationException ce) {
+      ce.printStackTrace();
+      fail("I failed with a ConfigurationException: " + ce.getLocalizedMessage());
+    } catch (DatabaseOperationException doe) {
+      doe.printStackTrace();
+      fail("I failed with a DatabaseOperationException: " + doe.getLocalizedMessage());
+    } catch (Throwable t) {
+      t.printStackTrace();
+      fail("I failed for some gorram reason: " + t.getLocalizedMessage());
+    }
+  }
+
 }

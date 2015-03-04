@@ -81,6 +81,13 @@ public class GameConverter {
     return dbObject;
   }
   
+  /**
+   * Convert a Mongo BSON record back into a {@link Game} object.
+   * 
+   * @param dbObject The Mongo DBObject result
+   * 
+   * @return a {@link Game} object, or null if the dbObject was null
+   */
   public static Game convertMongoToGame(DBObject dbObject) {
     if (dbObject == null) return null;
     

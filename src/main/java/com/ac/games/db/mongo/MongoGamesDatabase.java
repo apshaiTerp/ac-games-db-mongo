@@ -1,5 +1,6 @@
 package com.ac.games.db.mongo;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -13,6 +14,7 @@ import com.ac.games.data.MiniatureMarketPriceData;
 import com.ac.games.db.GamesDatabase;
 import com.ac.games.db.exception.ConfigurationException;
 import com.ac.games.db.exception.DatabaseOperationException;
+import com.mongodb.AggregationOutput;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
@@ -189,9 +191,9 @@ public class MongoGamesDatabase implements GamesDatabase {
       return game;
       
     } catch (MongoException me) {
-      throw new DatabaseOperationException("Mongo raised an exception to this delete: " + me.getMessage(), me);
+      throw new DatabaseOperationException("Mongo raised an exception to this select: " + me.getMessage(), me);
     } catch (Throwable t) {
-      throw new DatabaseOperationException("Something bad happened executing the delete", t);
+      throw new DatabaseOperationException("Something bad happened executing the select", t);
     }
   }
   
@@ -355,9 +357,9 @@ public class MongoGamesDatabase implements GamesDatabase {
       return data;
       
     } catch (MongoException me) {
-      throw new DatabaseOperationException("Mongo raised an exception to this delete: " + me.getMessage(), me);
+      throw new DatabaseOperationException("Mongo raised an exception to this select: " + me.getMessage(), me);
     } catch (Throwable t) {
-      throw new DatabaseOperationException("Something bad happened executing the delete", t);
+      throw new DatabaseOperationException("Something bad happened executing the select", t);
     }
   }
 
@@ -521,9 +523,9 @@ public class MongoGamesDatabase implements GamesDatabase {
       return data;
       
     } catch (MongoException me) {
-      throw new DatabaseOperationException("Mongo raised an exception to this delete: " + me.getMessage(), me);
+      throw new DatabaseOperationException("Mongo raised an exception to this select: " + me.getMessage(), me);
     } catch (Throwable t) {
-      throw new DatabaseOperationException("Something bad happened executing the delete", t);
+      throw new DatabaseOperationException("Something bad happened executing the select", t);
     }
   }
 
@@ -658,31 +660,7 @@ public class MongoGamesDatabase implements GamesDatabase {
    * @see com.ac.games.db.GamesDatabase#getBggIDList()
    */
   public List<Long> getBggIDList() throws ConfigurationException, DatabaseOperationException {
-    if (mongoClient == null || mongoDB == null)
-      throw new ConfigurationException("There is a problem with the database connection.");
-    
-    List<Long> resultList = new LinkedList<Long>();
-    try {
-      DBCollection gameCollection = mongoDB.getCollection("bgggame");
-      //Limit the result set to bggIDs
-      BasicDBObject columns = new BasicDBObject();
-      columns.put("bggID", 1);
-      columns.put("_id", 0);
-      //Search for all documents, return only the bggID values
-      DBCursor cursor = gameCollection.find(new BasicDBObject(), columns); 
-      while (cursor.hasNext()) {
-        DBObject object = cursor.next();
-        long curBGGID = (Long)object.get("bggID");
-        if (!resultList.contains(curBGGID))
-          resultList.add(curBGGID);
-      }
-    } catch (MongoException me) {
-      throw new DatabaseOperationException("Mongo raised an exception to this select: " + me.getMessage(), me);
-    } catch (Throwable t) {
-      throw new DatabaseOperationException("Something bad happened executing the select", t);
-    }
-    
-    return resultList;
+    return getGenericIDList("bgggame", "bggID");
   }
 
   /*
@@ -690,23 +668,392 @@ public class MongoGamesDatabase implements GamesDatabase {
    * @see com.ac.games.db.GamesDatabase#getCSIIDList()
    */
   public List<Long> getCSIIDList() throws ConfigurationException, DatabaseOperationException {
+    return getGenericIDList("csidata", "csiID");
+  }
+
+  /*
+   * (non-Javadoc)
+   * @see com.ac.games.db.GamesDatabase#getMMIDList()
+   */
+  public List<Long> getMMIDList() throws ConfigurationException, DatabaseOperationException {
+    return getGenericIDList("mmdata", "mmID");
+  }
+
+  /*
+   * (non-Javadoc)
+   * @see com.ac.games.db.GamesDatabase#readGame(long)
+   */
+  public Game readGame(long gameID) throws ConfigurationException, DatabaseOperationException {
+    //Check basic pre-conditions
+    if (gameID < 0)
+      throw new DatabaseOperationException("The provided game object was not valid.");
+    
     if (mongoClient == null || mongoDB == null)
       throw new ConfigurationException("There is a problem with the database connection.");
     
-    List<Long> resultList = new LinkedList<Long>();
+    //Run the operation
     try {
-      DBCollection gameCollection = mongoDB.getCollection("csidata");
-      //Limit the result set to bggIDs
-      BasicDBObject columns = new BasicDBObject();
-      columns.put("csiID", 1);
-      columns.put("_id", 0);
-      //Search for all documents, return only the bggID values
-      DBCursor cursor = gameCollection.find(new BasicDBObject(), columns); 
+      //Open the collection, i.e. table
+      DBCollection gameCollection = mongoDB.getCollection("game");
+      BasicDBObject searchObject  = GameConverter.convertGameToIDQuery(gameID);
+      
+      DBCursor cursor = gameCollection.find(searchObject);
+      
+      if (debugMode)
+        System.out.println ("Total documents found during this query:            " + cursor.size());
+      
+      Game game = null;
       while (cursor.hasNext()) {
         DBObject object = cursor.next();
-        long curCSIID = (Long)object.get("csiID");
-        if (!resultList.contains(curCSIID))
-          resultList.add(curCSIID);
+        game = GameConverter.convertMongoToGame(object);
+      }
+      
+      if (debugMode)
+        System.out.println ("The game found by this query was:                   " + (game == null ? "Nothing Found" : game.getName()));
+      return game;
+      
+    } catch (MongoException me) {
+      throw new DatabaseOperationException("Mongo raised an exception to this select: " + me.getMessage(), me);
+    } catch (Throwable t) {
+      throw new DatabaseOperationException("Something bad happened executing the select", t);
+    }
+  }
+
+  /*
+   * (non-Javadoc)
+   * @see com.ac.games.db.GamesDatabase#insertGame(com.ac.games.data.Game)
+   */
+  public void insertGame(Game game) throws ConfigurationException, DatabaseOperationException {
+    //Check basic pre-conditions
+    if (game == null)
+      throw new DatabaseOperationException("The provided game object was null.");
+    
+    if (mongoClient == null || mongoDB == null)
+      throw new ConfigurationException("There is a problem with the database connection.");
+    
+    //Run the operation
+    try {
+      //Because we are using non-Mongo based primary keys, we need to specifically check first to see if the object
+      //exists, and if it does, we need to do an update instead
+      ObjectId prevDocID = queryForExistingGameDocID(game.getGameID());
+      if (prevDocID != null) {
+        if (debugMode)
+          System.out.println ("Converting insert into update because of prior document");
+        updateGame(game);
+        return;
+      }
+      
+      //Open the collection, i.e. table
+      DBCollection gameCollection = mongoDB.getCollection("game");
+      
+      BasicDBObject addObject = GameConverter.convertGameToMongo(game);
+      WriteResult result = gameCollection.insert(addObject);
+      
+      if (debugMode) {
+        System.out.println ("The number of documents impacted by this operation: " + result.getN());
+        System.out.println ("Was this insert converted to an upsert?             " + result.isUpdateOfExisting());
+        System.out.println ("The new document _id value added:                   " + addObject.get("_id"));
+      }
+      
+    } catch (MongoException me) {
+      throw new DatabaseOperationException("Mongo raised an exception to this insert: " + me.getMessage(), me);
+    } catch (Throwable t) {
+      throw new DatabaseOperationException("Something bad happened executing the insert", t);
+    }
+  }
+
+  /*
+   * (non-Javadoc)
+   * @see com.ac.games.db.GamesDatabase#updateGame(com.ac.games.data.Game)
+   */
+  public void updateGame(Game game) throws ConfigurationException, DatabaseOperationException {
+    //Check basic pre-conditions
+    if (game == null)
+      throw new DatabaseOperationException("The provided game object was null.");
+    
+    if (mongoClient == null || mongoDB == null)
+      throw new ConfigurationException("There is a problem with the database connection.");
+    
+    //Run the operation
+    try {
+      //Open the collection, i.e. table
+      DBCollection gameCollection = mongoDB.getCollection("game");
+      BasicDBObject queryObject  = GameConverter.convertGameToIDQuery(game);
+      BasicDBObject updateObject = GameConverter.convertGameToMongo(game);
+      WriteResult result = gameCollection.update(queryObject, updateObject, true, false);
+      
+      if (debugMode) {
+        System.out.println ("The number of documents impacted by this operation: " + result.getN());
+        System.out.println ("Was this update converted to an insert?             " + !result.isUpdateOfExisting());
+      }
+      
+    } catch (MongoException me) {
+      throw new DatabaseOperationException("Mongo raised an exception to this update: " + me.getMessage(), me);
+    } catch (Throwable t) {
+      throw new DatabaseOperationException("Something bad happened executing the update", t);
+    }
+  }
+
+  /*
+   * (non-Javadoc)
+   * @see com.ac.games.db.GamesDatabase#deleteGame(long)
+   */
+  public void deleteGame(long gameID) throws ConfigurationException, DatabaseOperationException {
+    //Check basic pre-conditions
+    if (gameID < 0)
+      throw new DatabaseOperationException("The provided game object was not valid.");
+    
+    if (mongoClient == null || mongoDB == null)
+      throw new ConfigurationException("There is a problem with the database connection.");
+    
+    //Run the operation
+    try {
+      //Open the collection, i.e. table
+      DBCollection gameCollection = mongoDB.getCollection("game");
+      BasicDBObject deleteObject  = GameConverter.convertGameToIDQuery(gameID);
+      WriteResult result = gameCollection.remove(deleteObject);
+      
+      if (debugMode)
+        System.out.println ("The number of documents impacted by this operation: " + result.getN());
+      
+    } catch (MongoException me) {
+      throw new DatabaseOperationException("Mongo raised an exception to this delete: " + me.getMessage(), me);
+    } catch (Throwable t) {
+      throw new DatabaseOperationException("Something bad happened executing the delete", t);
+    }
+  }
+
+  /*
+   * (non-Javadoc)
+   * @see com.ac.games.db.GamesDatabase#getGameIDList()
+   */
+  public List<Long> getGameIDList() throws ConfigurationException, DatabaseOperationException {
+    return getGenericIDList("game", "gameID");
+  }
+
+  /**
+   * We're going to use this method to avoid the work of running our queries.  Because of reliance
+   * on this method in update and insert tasks, we can assume only one other version of this object
+   * can exist in the database.
+   * 
+   * @param bggID The game we want to verify if it exists or not.
+   * 
+   * @return The "_id" key from our existing object, or null if not found
+   */
+  private ObjectId queryForExistingGameDocID(long gameID) throws MongoException {
+    //Open the collection, i.e. table
+    DBCollection gameCollection = mongoDB.getCollection("game");
+    BasicDBObject searchObject  = GameConverter.convertGameToIDQuery(gameID);
+    
+    DBCursor cursor = gameCollection.find(searchObject);
+    ObjectId docID = null;
+    while (cursor.hasNext()) {
+      docID = (ObjectId)cursor.next().get("_id");
+    }
+    return docID;
+  }
+  
+  /*
+   * (non-Javadoc)
+   * @see com.ac.games.db.GamesDatabase#readGameReltn(long)
+   */
+  public GameReltn readGameReltn(long gameID) throws ConfigurationException, DatabaseOperationException {
+    //Check basic pre-conditions
+    if (gameID < 0)
+      throw new DatabaseOperationException("The provided game relation data was not valid.");
+    
+    if (mongoClient == null || mongoDB == null)
+      throw new ConfigurationException("There is a problem with the database connection.");
+    
+    //Run the operation
+    try {
+      //Open the collection, i.e. table
+      DBCollection reltnCollection = mongoDB.getCollection("gamereltn");
+      BasicDBObject searchObject  = GameReltnConverter.convertGameReltnToGameIDQuery(gameID);
+      
+      DBCursor cursor = reltnCollection.find(searchObject);
+      
+      if (debugMode)
+        System.out.println ("Total documents found during this query:            " + cursor.size());
+      
+      GameReltn gameReltn = null;
+      while (cursor.hasNext()) {
+        DBObject object = cursor.next();
+        gameReltn = GameReltnConverter.convertMongoToGameReltn(object);
+      }
+      
+      if (debugMode)
+        System.out.println ("The game found by this query was:                   " + (gameReltn == null ? "Nothing Found" : gameReltn.getReltnID()));
+      return gameReltn;
+      
+    } catch (MongoException me) {
+      throw new DatabaseOperationException("Mongo raised an exception to this select: " + me.getMessage(), me);
+    } catch (Throwable t) {
+      throw new DatabaseOperationException("Something bad happened executing the select", t);
+    }
+  }
+
+  /*
+   * (non-Javadoc)
+   * @see com.ac.games.db.GamesDatabase#insertGameReltn(com.ac.games.data.GameReltn)
+   */
+  public void insertGameReltn(GameReltn gameReltn) throws ConfigurationException, DatabaseOperationException {
+    //Check basic pre-conditions
+    if (gameReltn == null)
+      throw new DatabaseOperationException("The provided game relation object was null.");
+    
+    if (mongoClient == null || mongoDB == null)
+      throw new ConfigurationException("There is a problem with the database connection.");
+    
+    //Run the operation
+    try {
+      //Because we are using non-Mongo based primary keys, we need to specifically check first to see if the object
+      //exists, and if it does, we need to do an update instead
+      ObjectId prevDocID = queryForExistingGameReltnDocID(gameReltn.getReltnID());
+      if (prevDocID != null) {
+        if (debugMode)
+          System.out.println ("Converting insert into update because of prior document");
+        updateGameReltn(gameReltn);
+        return;
+      }
+      
+      //Open the collection, i.e. table
+      DBCollection reltnCollection = mongoDB.getCollection("gamereltn");
+      
+      BasicDBObject addObject = GameReltnConverter.convertGameReltnToMongo(gameReltn);
+      WriteResult result = reltnCollection.insert(addObject);
+      
+      if (debugMode) {
+        System.out.println ("The number of documents impacted by this operation: " + result.getN());
+        System.out.println ("Was this insert converted to an upsert?             " + result.isUpdateOfExisting());
+        System.out.println ("The new document _id value added:                   " + addObject.get("_id"));
+      }
+      
+    } catch (MongoException me) {
+      throw new DatabaseOperationException("Mongo raised an exception to this insert: " + me.getMessage(), me);
+    } catch (Throwable t) {
+      throw new DatabaseOperationException("Something bad happened executing the insert", t);
+    }
+  }
+
+  /*
+   * (non-Javadoc)
+   * @see com.ac.games.db.GamesDatabase#updateGameReltn(com.ac.games.data.GameReltn)
+   */
+  public void updateGameReltn(GameReltn gameReltn) throws ConfigurationException, DatabaseOperationException {
+    //Check basic pre-conditions
+    if (gameReltn == null)
+      throw new DatabaseOperationException("The provided game relation object was null.");
+    
+    if (mongoClient == null || mongoDB == null)
+      throw new ConfigurationException("There is a problem with the database connection.");
+    
+    //Run the operation
+    try {
+      //Open the collection, i.e. table
+      DBCollection reltnCollection = mongoDB.getCollection("gamereltn");
+      BasicDBObject queryObject  = GameReltnConverter.convertGameReltnToIDQuery(gameReltn);
+      BasicDBObject updateObject = GameReltnConverter.convertGameReltnToMongo(gameReltn);
+      WriteResult result = reltnCollection.update(queryObject, updateObject, true, false);
+      
+      if (debugMode) {
+        System.out.println ("The number of documents impacted by this operation: " + result.getN());
+        System.out.println ("Was this update converted to an insert?             " + !result.isUpdateOfExisting());
+      }
+      
+    } catch (MongoException me) {
+      throw new DatabaseOperationException("Mongo raised an exception to this update: " + me.getMessage(), me);
+    } catch (Throwable t) {
+      throw new DatabaseOperationException("Something bad happened executing the update", t);
+    }
+  }
+
+  /*
+   * (non-Javadoc)
+   * @see com.ac.games.db.GamesDatabase#deleteGameReltn(long)
+   */
+  public void deleteGameReltn(long reltnID) throws ConfigurationException, DatabaseOperationException {
+    //Check basic pre-conditions
+    if (reltnID < 0)
+      throw new DatabaseOperationException("The provided game object was not valid.");
+    
+    if (mongoClient == null || mongoDB == null)
+      throw new ConfigurationException("There is a problem with the database connection.");
+    
+    //Run the operation
+    try {
+      //Open the collection, i.e. table
+      DBCollection reltnCollection = mongoDB.getCollection("gamereltn");
+      BasicDBObject deleteObject  = GameReltnConverter.convertGameReltnToReltnIDQuery(reltnID);
+      WriteResult result = reltnCollection.remove(deleteObject);
+      
+      if (debugMode)
+        System.out.println ("The number of documents impacted by this operation: " + result.getN());
+      
+    } catch (MongoException me) {
+      throw new DatabaseOperationException("Mongo raised an exception to this delete: " + me.getMessage(), me);
+    } catch (Throwable t) {
+      throw new DatabaseOperationException("Something bad happened executing the delete", t);
+    }
+  }
+
+  /**
+   * We're going to use this method to avoid the work of running our queries.  Because of reliance
+   * on this method in update and insert tasks, we can assume only one other version of this object
+   * can exist in the database.
+   * 
+   * @param bggID The game we want to verify if it exists or not.
+   * 
+   * @return The "_id" key from our existing object, or null if not found
+   */
+  private ObjectId queryForExistingGameReltnDocID(long reltnID) throws MongoException {
+    //Open the collection, i.e. table
+    DBCollection reltnCollection = mongoDB.getCollection("gamereltn");
+    BasicDBObject searchObject  = GameReltnConverter.convertGameReltnToReltnIDQuery(reltnID);
+    
+    DBCursor cursor = reltnCollection.find(searchObject);
+    ObjectId docID = null;
+    while (cursor.hasNext()) {
+      docID = (ObjectId)cursor.next().get("_id");
+    }
+    return docID;
+  }
+
+  /*
+   * (non-Javadoc)
+   * @see com.ac.games.db.GamesDatabase#getGameReltnIDList()
+   */
+  public List<Long> getGameReltnIDList() throws ConfigurationException, DatabaseOperationException {
+    return getGenericIDList("gamereltn", "reltnID");
+  }
+  
+  /**
+   * Generic Helper method to only perform this code once.
+   * 
+   * @param collection The collection, or table name, we are wanting the list of values for
+   * @param fieldName  The field name of the column we want the list of values for
+   * 
+   * @return The List of requested values, or an empty list if nothing found
+   * 
+   * @throws ConfigurationException Throws this exception if the database connection is not active.
+   * @throws DatabaseOperationException Throws this exception if there are errors during the execution
+   * of the requested operation.
+   */
+  private List<Long> getGenericIDList(String collection, String fieldName) {
+    List<Long> resultList = new LinkedList<Long>();
+    try {
+      DBCollection reltnCollection = mongoDB.getCollection(collection);
+      //Limit the result set to reltnIDs
+      BasicDBObject columns = new BasicDBObject();
+      columns.put(fieldName, 1);
+      columns.put("_id", 0);
+      //Search for all documents, return only the bggID values
+      DBCursor cursor = reltnCollection.find(new BasicDBObject(), columns); 
+      while (cursor.hasNext()) {
+        DBObject object = cursor.next();
+        long curID = (Long)object.get(fieldName);
+        if (!resultList.contains(curID))
+          resultList.add(curID);
       }
     } catch (MongoException me) {
       throw new DatabaseOperationException("Mongo raised an exception to this select: " + me.getMessage(), me);
@@ -719,75 +1066,135 @@ public class MongoGamesDatabase implements GamesDatabase {
 
   /*
    * (non-Javadoc)
-   * @see com.ac.games.db.GamesDatabase#getMMIDList()
+   * @see com.ac.games.db.GamesDatabase#getMaxBGGGameID()
    */
-  public List<Long> getMMIDList() throws ConfigurationException, DatabaseOperationException {
+  public long getMaxBGGGameID() throws ConfigurationException, DatabaseOperationException {
+    return getGenericMaxID("bgggame", "bggID");
+  }
+
+  /*
+   * (non-Javadoc)
+   * @see com.ac.games.db.GamesDatabase#getMaxCSIDataID()
+   */
+  public long getMaxCSIDataID() throws ConfigurationException, DatabaseOperationException {
+    return getGenericMaxID("csidata", "csiID");
+  }
+
+  /*
+   * (non-Javadoc)
+   * @see com.ac.games.db.GamesDatabase#getMaxMMDataID()
+   */
+  public long getMaxMMDataID() throws ConfigurationException, DatabaseOperationException {
+    return getGenericMaxID("mmdata", "mmID");
+  }
+
+  /*
+   * (non-Javadoc)
+   * @see com.ac.games.db.GamesDatabase#getMaxGameID()
+   */
+  public long getMaxGameID() throws ConfigurationException, DatabaseOperationException {
+    return getGenericMaxID("game", "gameID");
+  }
+  
+  /**
+   * Generic Helper method to only perform this code once.
+   * 
+   * @param collection The collection, or table name, we are wanting the max value on
+   * @param fieldName  The field name of the column we want the max performed on
+   * 
+   * @return The max id value for this column in this collection, or -1 if not found
+   * 
+   * @throws ConfigurationException Throws this exception if the database connection is not active.
+   * @throws DatabaseOperationException Throws this exception if there are errors during the execution
+   * of the requested operation.
+   */
+  private long getGenericMaxID(String collection, String fieldName) throws ConfigurationException, DatabaseOperationException {
     if (mongoClient == null || mongoDB == null)
       throw new ConfigurationException("There is a problem with the database connection.");
     
-    List<Long> resultList = new LinkedList<Long>();
+    long result = -1;
     try {
-      DBCollection gameCollection = mongoDB.getCollection("mmdata");
-      //Limit the result set to mmIDs
-      BasicDBObject columns = new BasicDBObject();
-      columns.put("mmID", 1);
-      columns.put("_id", 0);
-      //Search for all documents, return only the bggID values
-      DBCursor cursor = gameCollection.find(new BasicDBObject(), columns); 
-      while (cursor.hasNext()) {
-        DBObject object = cursor.next();
-        long curMMID = (Long)object.get("mmID");
-        if (!resultList.contains(curMMID))
-          resultList.add(curMMID);
+      DBCollection curCollection = mongoDB.getCollection(collection);
+      
+      //This is the format we are trying to emulate:
+      //db.bgggame.aggregate( { $group : { _id  : "", maxValue : { $max : "$bggID" } } } )
+
+      DBObject maxObject         = new BasicDBObject("$max", "$" + fieldName);
+      DBObject groupFieldsObject = new BasicDBObject("_id", "");
+      groupFieldsObject.put("maxValue", maxObject);
+      DBObject groupObject       = new BasicDBObject("$group", groupFieldsObject);
+      
+      List<DBObject> pipeline = new ArrayList<DBObject>(1);
+      pipeline.add(groupObject);
+      
+      AggregationOutput output = curCollection.aggregate(pipeline);
+      for (DBObject object : output.results()) {
+        if (object.containsField("maxValue")) result = (Long)object.get("maxValue");
       }
+      return result;
     } catch (MongoException me) {
-      me.printStackTrace();
       throw new DatabaseOperationException("Mongo raised an exception to this select: " + me.getMessage(), me);
     } catch (Throwable t) {
-      t.printStackTrace();
       throw new DatabaseOperationException("Something bad happened executing the select", t);
     }
+  }
+
+  public int getBGGGameCount() throws ConfigurationException, DatabaseOperationException {
+    return getGenericCount("bgggame");
+  }
+
+  public int getCSIDataCount() throws ConfigurationException, DatabaseOperationException {
+    return getGenericCount("csidata");
+  }
+
+  public int getMMDataCount() throws ConfigurationException, DatabaseOperationException {
+    return getGenericCount("mmdata");
+  }
+
+  public int getGameCount() throws ConfigurationException, DatabaseOperationException {
+    return getGenericCount("game");
+  }
+
+  /**
+   * Generic Helper method to only perform this code once.
+   * 
+   * @param collection The collection, or table name, we are wanting the row count
+   * @param fieldName  The field name of the column we want the row count for
+   * 
+   * @return The count of documents in this collection, or -1 if not found
+   * 
+   * @throws ConfigurationException Throws this exception if the database connection is not active.
+   * @throws DatabaseOperationException Throws this exception if there are errors during the execution
+   * of the requested operation.
+   */
+  private int getGenericCount(String collection) throws ConfigurationException, DatabaseOperationException {
+    if (mongoClient == null || mongoDB == null)
+      throw new ConfigurationException("There is a problem with the database connection.");
     
-    return resultList;
-  }
+    int result = -1;
+    try {
+      DBCollection curCollection = mongoDB.getCollection(collection);
+      
+      //This is the format we are trying to emulate:
+      //db.collection.aggregate( { $group : { _id  : "", count : { $sum : 1 } } } )
 
-  public Game getGame(long gameID) throws ConfigurationException, DatabaseOperationException {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  public void insertGame(Game game) throws ConfigurationException, DatabaseOperationException {
-    // TODO Auto-generated method stub
-    
-  }
-
-  public void updateGame(Game game) throws ConfigurationException, DatabaseOperationException {
-    // TODO Auto-generated method stub
-    
-  }
-
-  public void deleteGame(long gameID) throws ConfigurationException, DatabaseOperationException {
-    // TODO Auto-generated method stub
-    
-  }
-
-  public GameReltn getGameReltn(long gameID) throws ConfigurationException, DatabaseOperationException {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  public void insertGameReltn(GameReltn gameReltn) throws ConfigurationException, DatabaseOperationException {
-    // TODO Auto-generated method stub
-    
-  }
-
-  public void updateGameReltn(GameReltn gameReltn) throws ConfigurationException, DatabaseOperationException {
-    // TODO Auto-generated method stub
-    
-  }
-
-  public void deleteGameReltn(long reltnID) throws ConfigurationException, DatabaseOperationException {
-    // TODO Auto-generated method stub
-    
+      DBObject maxObject         = new BasicDBObject("$sum", 1);
+      DBObject groupFieldsObject = new BasicDBObject("_id", "");
+      groupFieldsObject.put("count", maxObject);
+      DBObject groupObject       = new BasicDBObject("$group", groupFieldsObject);
+      
+      List<DBObject> pipeline = new ArrayList<DBObject>(1);
+      pipeline.add(groupObject);
+      
+      AggregationOutput output = curCollection.aggregate(pipeline);
+      for (DBObject object : output.results()) {
+        if (object.containsField("count")) result = (Integer)object.get("count");
+      }
+      return result;
+    } catch (MongoException me) {
+      throw new DatabaseOperationException("Mongo raised an exception to this select: " + me.getMessage(), me);
+    } catch (Throwable t) {
+      throw new DatabaseOperationException("Something bad happened executing the select", t);
+    }
   }
 }

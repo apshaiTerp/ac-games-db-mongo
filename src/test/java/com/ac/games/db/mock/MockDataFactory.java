@@ -7,7 +7,9 @@ import java.util.List;
 import com.ac.games.data.BGGGame;
 import com.ac.games.data.CoolStuffIncCategory;
 import com.ac.games.data.CoolStuffIncPriceData;
+import com.ac.games.data.Game;
 import com.ac.games.data.GameAvailability;
+import com.ac.games.data.GameReltn;
 import com.ac.games.data.GameType;
 import com.ac.games.data.MiniatureMarketCategory;
 import com.ac.games.data.MiniatureMarketPriceData;
@@ -40,6 +42,19 @@ public class MockDataFactory {
   /** Static ID for Cosmic Incursion */
   public final static long MM_COSMIC_INCURSION_ID = 15102L;
   
+  /** Non-Intelligent ID for Abyss Game */
+  public final static long ABYSS_ID = 1234L;
+  /** Non-Intelligent ID for Cosmic Encounte Game */
+  public final static long COSMIC_ENCOUNTER_ID = 2345L;
+  /** Non-Intelligent ID for Cosmic Incursion Game */
+  public final static long COSMIC_INCURSION_ID = 3456L;
+  
+  /** Non-Intelligent ID for Abyss Game Relation */
+  public final static long ABYSS_RELTN_ID = 1234L;
+  /** Non-Intelligent ID for Cosmic Encounte Game Relation */
+  public final static long COSMIC_ENCOUNTER_RELTN_ID = 2345L;
+  /** Non-Intelligent ID for Cosmic Incursion Game Relation */
+  public final static long COSMIC_INCURSION_RELTN_ID = 3456L;
   
   /** Helper method to generate some game data to be used for validation */
   public static BGGGame createBGGGame(long gameID) {
@@ -324,4 +339,236 @@ public class MockDataFactory {
 
     return data;
   }
+
+  /** Helper method to generate some game data to be used for validation */
+  public static Game createGameData(long gameID) {
+    if (gameID == ABYSS_ID)            return createRealAbyssGame();
+    if (gameID == COSMIC_ENCOUNTER_ID) return createRealCosmicEncounterGame();
+    if (gameID == COSMIC_INCURSION_ID) return createRealCosmicIncursionGame();
+    
+    //Fail Case
+    return null;
+  }
+  
+  private static Game createRealAbyssGame() {
+    Game abyssGame = new Game();
+    abyssGame.setGameID(ABYSS_ID);
+    abyssGame.setBggID(BGG_ABYSS_ID);
+    abyssGame.setName("Abyss");
+    abyssGame.setYearPublished(2014);
+    abyssGame.setMinPlayers(2);
+    abyssGame.setMaxPlayers(4);
+    abyssGame.setMinPlayingTime(45);
+    abyssGame.setMaxPlayingTime(45);
+    abyssGame.setImageURL("http://cf.geekdo-images.com/images/pic1965255.jpg");
+    abyssGame.setImageThumbnailURL("http://cf.geekdo-images.com/images/pic1965255_t.jpg");
+    abyssGame.setDescription("The Abyss power is once again vacant, so the time has come to get your hands on the throne and its privileges. Use all of your cunning to win or buy votes in the Council. Recruit the most influential Lords and abuse their powers to take control of the most strategic territories. Finally, impose yourself as the only one able to rule the Abyssal people!\n\nAbyss is a game of development, combination and collection in which players try to take control of strategic locations in an underwater city. To achieve this, players must develop on three levels: first by collecting allies, then using them to recruit Lords of the Abyss, who will then grant access to different parts of the city. Players acquire cards through a draft of sorts, and the Lords of the Abyss acquired on those cards grant special powers to the cardholder - but once you use the cards to acquire a location, that power is shut off, so players need to time their land grabs well in order to put themselves in the best position for when the game ends.");
+    
+    abyssGame.setPrimaryPublisher("Asmodee");
+    List<String> publishers = new ArrayList<String>(4);
+    publishers.add("Bombyx");
+    publishers.add("Asmodee");
+    publishers.add("Asterion Press");
+    publishers.add("REBEL.pl");
+    abyssGame.setPublishers(publishers);
+    
+    List<String> designers = new ArrayList<String>(2);
+    designers.add("Bruno Cathala");
+    designers.add("Charles Chevallier");
+    abyssGame.setDesigners(designers);
+    
+    List<String> categories = new ArrayList<String>(3);
+    categories.add("Card Game");
+    categories.add("Mythology");
+    categories.add("Nautical");
+    abyssGame.setCategories(categories);
+    
+    List<String> mechanisms = new ArrayList<String>(3);
+    mechanisms.add("Auction/Bidding");
+    mechanisms.add("Hand Management");
+    mechanisms.add("Set Collection");
+    abyssGame.setMechanisms(mechanisms);
+    
+    abyssGame.setGameType(GameType.BASE);
+    
+    abyssGame.setAddDate(new Date (new Date().getTime() - 10000000));
+    
+    return abyssGame;
+  }
+
+  private static Game createRealCosmicEncounterGame() {
+    Game cosmicGame = new Game();
+    cosmicGame.setGameID(COSMIC_ENCOUNTER_ID);
+    cosmicGame.setBggID(BGG_COSMIC_ENCOUNTER_ID);
+    cosmicGame.setName("Cosmic Encounter");
+    cosmicGame.setYearPublished(2008);
+    cosmicGame.setMinPlayers(3);
+    cosmicGame.setMaxPlayers(5);
+    cosmicGame.setMinPlayingTime(60);
+    cosmicGame.setMaxPlayingTime(60);
+    cosmicGame.setImageURL("http://cf.geekdo-images.com/images/pic354780.jpg");
+    cosmicGame.setImageThumbnailURL("http://cf.geekdo-images.com/images/pic354780_t.jpg");
+    cosmicGame.setDescription("From the Manufacturer\n\nBuild a galactic empire... In the depths of space, the alien races of the Cosmos vie with each other for control of the universe. Alliances form and shift from moment to moment, while cataclysmic battles send starships screaming into the warp.  Players choose from dozens of alien races, each with its own unique power to further its efforts to build an empire that spans the galaxy.\n\nMany classic aliens from earlier editions of this beloved game return, such as the Oracle, the Loser, and the Clone. Newly discovered aliens also join the fray, including Remora, Mite, and Tick-Tock.  This classic game of alien politics returns from the warp once more.\n\nIn Cosmic Encounter, each player is the leader of an alien race. On a player's turn, he or she becomes the offense.  The offense encounters another player on a planet by moving a group of his or her ships through the hyperspace gate to that planet.  The offense draws from the destiny deck which contains colors, wilds and specials.  He or she then takes the hyperspace gate and points at one planet in the system indicated by the drawn destiny card.  The offense vs. the defenses ships are in the encounter and both sides are able to invite allies, play an encounter card as well as special cards to try and tip the encounter in their favor.\n\nThe object of the game is to establish colonies in other players' planetary systems. Players take turns trying to establish colonies. The winner(s) are the first player(s) to have five colonies on any planets outside his or her home system. A player does not need to have colonies in all of the systems, just colonies on five planets outside his or her home system. These colonies may all be in one system or scattered over multiple systems. The players must use force, cunning, and diplomacy to ensure their victory.");
+    
+    cosmicGame.setPrimaryPublisher("Fantasy Flight Games");
+    List<String> publishers = new ArrayList<String>(5);
+    publishers.add("Arclight");
+    publishers.add("Asterion Press");
+    publishers.add("Edge Entertainment");
+    publishers.add("Fantasy Flight Games");
+    publishers.add("Heidelberger Spieleverlag");
+    cosmicGame.setPublishers(publishers);
+    
+    List<String> designers = new ArrayList<String>(5);
+    designers.add("Bill Eberle");
+    designers.add("Jack Kittredge");
+    designers.add("Bill Norton");
+    designers.add("Peter Olotka");
+    designers.add("Kevin Wilson");
+    cosmicGame.setDesigners(designers);
+    
+    List<String> categories = new ArrayList<String>(4);
+    categories.add("Bluffing");
+    categories.add("Negotiation");
+    categories.add("Science Fiction");
+    categories.add("Space Exploration");
+    cosmicGame.setCategories(categories);
+    
+    List<String> mechanisms = new ArrayList<String>(3);
+    mechanisms.add("Hand Management");
+    mechanisms.add("Partnerships");
+    mechanisms.add("Variable Player Powers");
+    cosmicGame.setMechanisms(mechanisms);
+    
+    cosmicGame.setGameType(GameType.BASE);
+    
+    List<Long> expansions = new ArrayList<Long>(5);
+    expansions.add(114276L);
+    expansions.add(87507L);
+    expansions.add(153971L);
+    expansions.add(61001L);
+    expansions.add(143760L);
+    cosmicGame.setExpansionIDs(expansions);
+    
+    return cosmicGame;
+  }
+
+  private static Game createRealCosmicIncursionGame() {
+    Game cosmicGame = new Game();
+    cosmicGame.setGameID(COSMIC_INCURSION_ID);
+    cosmicGame.setBggID(BGG_COSMIC_INCURSION_ID);
+    cosmicGame.setName("Cosmic Encounter: Cosmic Incursion");
+    cosmicGame.setYearPublished(2010);
+    cosmicGame.setMinPlayers(3);
+    cosmicGame.setMaxPlayers(6);
+    cosmicGame.setMinPlayingTime(60);
+    cosmicGame.setMaxPlayingTime(60);
+    cosmicGame.setImageURL("http://cf.geekdo-images.com/images/pic657393.jpg");
+    cosmicGame.setImageThumbnailURL("http://cf.geekdo-images.com/images/pic657393_t.jpg");
+    cosmicGame.setDescription("Adapted from the Fantasy Flight web site:\n\nOver the years, alien empires have risen and fallen. The Vacuum has failed to eliminate the Zombie, the Virus has spread far and wide, and the Loser has turned defeat into victory. 50 different species have tried to conquer the galaxy, and each have made their mark on the universe. Their warring has not gone unnoticed.\n\n20 new alien cultures are now racing towards the site of the conflict. They each want to carve out their own piece of the galaxy for themselves. The aliens may be familiar to some of you (reprints of past favorites), or are aliens no one has ever seen before. The first on our list is a blast from the past; the Sniveler!\n\nIn addition, this expansion includes additions to the Cosmic Encounter universe. From the game-changing Cosmic Quakes to the bounties held within the Reward deck, these additions are sure to spice up your quest for galactic dominance.\n\nEvery game has seen five races converge to do battle for control of an empire. Now, the galaxy gets crowded. A sixth race appears to do battle, and the sixth member of your play group is able to join you. Cosmic Incursion allows a sixth player to get in on the fun.\n\nCosmic Encounter puts you in charge of the fate of an alien race. Each flavor of extraterrestrial strives to be the first to conquer five enemy colonies and establish themselves as the dominant life form. Every faction has a unique power, a power they intend to use to crush their enemies. With over 50 aliens to choose from no two games will be the same.");
+    
+    cosmicGame.setPrimaryPublisher("Fantasy Flight Games");
+    List<String> publishers = new ArrayList<String>(4);
+    publishers.add("Arclight");
+    publishers.add("Edge Entertainment");
+    publishers.add("Fantasy Flight Games");
+    publishers.add("Heidelberger Spieleverlag");
+    cosmicGame.setPublishers(publishers);
+    
+    List<String> designers = new ArrayList<String>(1);
+    designers.add("Kevin Wilson");
+    cosmicGame.setDesigners(designers);
+    
+    List<String> categories = new ArrayList<String>(5);
+    categories.add("Bluffing");
+    categories.add("Negotiation");
+    categories.add("Expansion for Base-game");
+    categories.add("Science Fiction");
+    categories.add("Space Exploration");
+    cosmicGame.setCategories(categories);
+    
+    List<String> mechanisms = new ArrayList<String>(3);
+    mechanisms.add("Hand Management");
+    mechanisms.add("Partnerships");
+    mechanisms.add("Variable Player Powers");
+    cosmicGame.setMechanisms(mechanisms);
+    
+    cosmicGame.setGameType(GameType.EXPANSION);
+    cosmicGame.setParentGameID(BGG_COSMIC_ENCOUNTER_ID);
+    
+    cosmicGame.setAddDate(new Date());
+    
+    return cosmicGame;
+  }
+  
+  /** Helper method to generate some game data to be used for validation */
+  public static GameReltn createGameReltnData(long reltnID) {
+    if (reltnID == ABYSS_ID)            return createAbyssGameReltn();
+    if (reltnID == COSMIC_ENCOUNTER_ID) return createCosmicEncounterGameReltn();
+    if (reltnID == COSMIC_INCURSION_ID) return createCosmicIncursionGameReltn();
+    
+    //Fail Case
+    return null;
+  }
+  
+  private static GameReltn createAbyssGameReltn() {
+    GameReltn reltn = new GameReltn();
+    
+    reltn.setReltnID(ABYSS_RELTN_ID);
+    reltn.setGameID(ABYSS_ID);
+    reltn.setBggID(BGG_ABYSS_ID);
+    reltn.setCsiID(CSI_ABYSS_ID);
+    reltn.setMmID(MM_ABYSS_ID);
+    
+    List<String> asinKeys = new ArrayList<String>(1);
+    asinKeys.add("B00KU10PH2");
+    reltn.setAsinKeys(asinKeys);
+    
+    //No other site data for this item
+    reltn.setOtherSites(null);
+    
+    return reltn;
+  }
+  
+  private static GameReltn createCosmicEncounterGameReltn() {
+    GameReltn reltn = new GameReltn();
+    
+    reltn.setReltnID(COSMIC_ENCOUNTER_RELTN_ID);
+    reltn.setGameID(COSMIC_ENCOUNTER_ID);
+    reltn.setBggID(BGG_COSMIC_ENCOUNTER_ID);
+    reltn.setCsiID(CSI_COSMIC_ENCOUNTER_ID);
+    reltn.setMmID(MM_COSMIC_ENCOUNTER_ID);
+    
+    List<String> asinKeys = new ArrayList<String>(2);
+    asinKeys.add("1589944968");
+    asinKeys.add("978-0874310412");
+    reltn.setAsinKeys(asinKeys);
+    
+    List<Long> otherSites = new ArrayList<Long>(2);
+    otherSites.add(111222L);
+    otherSites.add(222333L);
+    reltn.setOtherSites(otherSites);
+    
+    return reltn;
+  }
+  
+  private static GameReltn createCosmicIncursionGameReltn() {
+    GameReltn reltn = new GameReltn();
+    
+    reltn.setReltnID(COSMIC_INCURSION_RELTN_ID);
+    reltn.setGameID(COSMIC_INCURSION_ID);
+    reltn.setBggID(BGG_COSMIC_INCURSION_ID);
+    reltn.setCsiID(CSI_COSMIC_INCURSION_ID);
+    reltn.setMmID(MM_COSMIC_INCURSION_ID);
+    
+    List<String> asinKeys = new ArrayList<String>(1);
+    asinKeys.add("B008KKG4OI");
+    reltn.setAsinKeys(asinKeys);
+    
+    //No other site data for this item
+    reltn.setOtherSites(null);
+    
+    return reltn;
+  }
+  
 }
