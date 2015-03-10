@@ -517,9 +517,12 @@ public class MockDataFactory {
     reltn.setReltnID(ABYSS_RELTN_ID);
     reltn.setGameID(ABYSS_ID);
     reltn.setBggID(BGG_ABYSS_ID);
-    reltn.setCsiID(CSI_ABYSS_ID);
-    reltn.setMmID(MM_ABYSS_ID);
-    
+    List<Long> csiIDs = new ArrayList<Long>(1);
+    csiIDs.add(CSI_ABYSS_ID);
+    reltn.setCsiIDs(csiIDs);
+    List<Long> mmIDs = new ArrayList<Long>(1);
+    mmIDs.add(MM_ABYSS_ID);
+    reltn.setMmIDs(mmIDs);
     List<String> asinKeys = new ArrayList<String>(1);
     asinKeys.add("B00KU10PH2");
     reltn.setAsinKeys(asinKeys);
@@ -536,9 +539,12 @@ public class MockDataFactory {
     reltn.setReltnID(COSMIC_ENCOUNTER_RELTN_ID);
     reltn.setGameID(COSMIC_ENCOUNTER_ID);
     reltn.setBggID(BGG_COSMIC_ENCOUNTER_ID);
-    reltn.setCsiID(CSI_COSMIC_ENCOUNTER_ID);
-    reltn.setMmID(MM_COSMIC_ENCOUNTER_ID);
-    
+    List<Long> csiIDs = new ArrayList<Long>(1);
+    csiIDs.add(CSI_COSMIC_ENCOUNTER_ID);
+    reltn.setCsiIDs(csiIDs);
+    List<Long> mmIDs = new ArrayList<Long>(1);
+    mmIDs.add(MM_COSMIC_ENCOUNTER_ID);
+    reltn.setMmIDs(mmIDs);
     List<String> asinKeys = new ArrayList<String>(2);
     asinKeys.add("1589944968");
     asinKeys.add("978-0874310412");
@@ -558,9 +564,12 @@ public class MockDataFactory {
     reltn.setReltnID(COSMIC_INCURSION_RELTN_ID);
     reltn.setGameID(COSMIC_INCURSION_ID);
     reltn.setBggID(BGG_COSMIC_INCURSION_ID);
-    reltn.setCsiID(CSI_COSMIC_INCURSION_ID);
-    reltn.setMmID(MM_COSMIC_INCURSION_ID);
-    
+    List<Long> csiIDs = new ArrayList<Long>(1);
+    csiIDs.add(CSI_COSMIC_INCURSION_ID);
+    reltn.setCsiIDs(csiIDs);
+    List<Long> mmIDs = new ArrayList<Long>(1);
+    mmIDs.add(MM_COSMIC_INCURSION_ID);
+    reltn.setMmIDs(mmIDs);
     List<String> asinKeys = new ArrayList<String>(1);
     asinKeys.add("B008KKG4OI");
     reltn.setAsinKeys(asinKeys);

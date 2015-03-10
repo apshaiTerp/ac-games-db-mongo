@@ -776,8 +776,8 @@ public class TestMongoGamesDatabase extends TestCase {
       assertTrue("The reltnIDs are not equal", cosmicEncounter.getReltnID() == cosmicEncounter2.getReltnID());
       assertTrue("The gameIDs are not equal", cosmicEncounter.getGameID() == cosmicEncounter2.getGameID());
       assertTrue("The bggIDs are not equal", cosmicEncounter.getBggID() == cosmicEncounter2.getBggID());
-      assertTrue("The csiIDs are not equal", cosmicEncounter.getCsiID() == cosmicEncounter2.getCsiID());
-      assertTrue("The mmIDs are not equal", cosmicEncounter.getMmID() == cosmicEncounter2.getMmID());
+      assertTrue("The csiIDs are not equal", cosmicEncounter.getCsiIDs().size() == cosmicEncounter2.getCsiIDs().size());
+      assertTrue("The mmIDs are not equal", cosmicEncounter.getMmIDs().size() == cosmicEncounter2.getMmIDs().size());
       assertTrue("The publishers lists are not equal", cosmicEncounter.getAsinKeys().size() == cosmicEncounter2.getAsinKeys().size());
       assertTrue("The expansion lists are not equal", cosmicEncounter.getOtherSites().size() == cosmicEncounter2.getOtherSites().size());
       
@@ -790,8 +790,8 @@ public class TestMongoGamesDatabase extends TestCase {
       assertTrue("The reltnIDs are not equal", cosmicIncursion.getReltnID() == cosmicIncursion2.getReltnID());
       assertTrue("The gameIDs are not equal", cosmicIncursion.getGameID() == cosmicIncursion2.getGameID());
       assertTrue("The bggIDs are not equal", cosmicIncursion.getBggID() == cosmicIncursion2.getBggID());
-      assertTrue("The csiIDs are not equal", cosmicIncursion.getCsiID() == cosmicIncursion2.getCsiID());
-      assertTrue("The mmIDs are not equal", cosmicIncursion.getMmID() == cosmicIncursion2.getMmID());
+      assertTrue("The csiIDs are not equal", cosmicIncursion.getCsiIDs().size() == cosmicIncursion2.getCsiIDs().size());
+      assertTrue("The mmIDs are not equal", cosmicIncursion.getMmIDs().size() == cosmicIncursion2.getMmIDs().size());
       assertTrue("The publishers lists are not equal", cosmicIncursion.getAsinKeys().size() == cosmicIncursion2.getAsinKeys().size());
       //Should be null
       assertTrue("The expansion lists are not equal", cosmicIncursion.getOtherSites() == cosmicIncursion2.getOtherSites());
@@ -814,8 +814,8 @@ public class TestMongoGamesDatabase extends TestCase {
       assertTrue("The reltnIDs are not equal", cosmicEncounter.getReltnID() == cosmicEncounter3.getReltnID());
       assertTrue("The gameIDs are not equal", cosmicEncounter.getGameID() == cosmicEncounter3.getGameID());
       assertTrue("The bggIDs are not equal", cosmicEncounter.getBggID() == cosmicEncounter3.getBggID());
-      assertTrue("The csiIDs are not equal", cosmicEncounter.getCsiID() == cosmicEncounter3.getCsiID());
-      assertTrue("The mmIDs are not equal", cosmicEncounter.getMmID() == cosmicEncounter3.getMmID());
+      assertTrue("The csiIDs are not equal", cosmicEncounter.getCsiIDs().size() == cosmicEncounter3.getCsiIDs().size());
+      assertTrue("The mmIDs are not equal", cosmicEncounter.getMmIDs().size() == cosmicEncounter3.getMmIDs().size());
       assertTrue("The publishers lists are not equal", cosmicEncounter.getAsinKeys().size() == cosmicEncounter3.getAsinKeys().size());
       assertTrue("The expansion lists are not equal", cosmicEncounter.getOtherSites().size() == cosmicEncounter3.getOtherSites().size());
 
@@ -828,16 +828,21 @@ public class TestMongoGamesDatabase extends TestCase {
       assertTrue("The reltnIDs are not equal", abyss.getReltnID() == abyss2.getReltnID());
       assertTrue("The gameIDs are not equal", abyss.getGameID() == abyss2.getGameID());
       assertTrue("The bggIDs are not equal", abyss.getBggID() == abyss2.getBggID());
-      assertTrue("The csiIDs are not equal", abyss.getCsiID() == abyss2.getCsiID());
-      assertTrue("The mmIDs are not equal", abyss.getMmID() == abyss2.getMmID());
+      assertTrue("The csiIDs are not equal", abyss.getCsiIDs().size() == abyss2.getCsiIDs().size());
+      assertTrue("The mmIDs are not equal", abyss.getMmIDs().size() == abyss2.getMmIDs().size());
       assertTrue("The publishers lists are not equal", abyss.getAsinKeys().size() == abyss2.getAsinKeys().size());
       //Should be null
       assertTrue("The expansion lists are not equal", cosmicIncursion.getOtherSites() == abyss2.getOtherSites());
 
       //Modify Abyss Data and Update
       System.out.println ("===  Modify Abyss Data and Update  ===");
-      abyss.setCsiID(MockDataFactory.CSI_ABYSS_ID + 20);
-      abyss.setMmID(MockDataFactory.MM_ABYSS_ID + 20);
+      List<Long> csiList = abyss.getCsiIDs();
+      csiList.add(MockDataFactory.CSI_ABYSS_ID + 20);
+      List<Long> mmList = abyss.getMmIDs();
+      mmList.add(MockDataFactory.MM_ABYSS_ID + 20);
+      
+      abyss.setCsiIDs(csiList);
+      abyss.setMmIDs(mmList);
       
       //Update Abyss
       System.out.println ("===  Update Abyss  ===");
@@ -849,8 +854,8 @@ public class TestMongoGamesDatabase extends TestCase {
       
       //Spot checking as opposed to all possible values.
       assertNotNull("I didn't find my result", abyss3);
-      assertTrue("The csiIDs are not equal", abyss.getCsiID() == abyss3.getCsiID());
-      assertTrue("The mmIDs are not equal", abyss.getMmID() == abyss3.getMmID());
+      assertTrue("The csiIDs are not equal", abyss.getCsiIDs().size() == abyss3.getCsiIDs().size());
+      assertTrue("The mmIDs are not equal", abyss.getMmIDs().size() == abyss3.getMmIDs().size());
       
       //Run the IDs select and verify all three games found
       System.out.println ("===  Run the IDs select and verify all three games found  ===");

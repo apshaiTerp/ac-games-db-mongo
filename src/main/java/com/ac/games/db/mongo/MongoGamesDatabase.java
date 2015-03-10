@@ -1197,4 +1197,45 @@ public class MongoGamesDatabase implements GamesDatabase {
       throw new DatabaseOperationException("Something bad happened executing the select", t);
     }
   }
+
+  /*
+   * (non-Javadoc)
+   * @see com.ac.games.db.GamesDatabase#readAdHocBGGQuery(com.ac.games.data.BGGGame, int)
+   */
+  public List<BGGGame> readAdHocBGGQuery(BGGGame queryGame, int rowLimit) throws ConfigurationException,
+      DatabaseOperationException {
+    
+    
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  /*
+   * (non-Javadoc)
+   * @see com.ac.games.db.GamesDatabase#readAdHocCSIQuery(com.ac.games.data.CoolStuffIncPriceData, int)
+   */
+  public List<CoolStuffIncPriceData> readAdHocCSIQuery(CoolStuffIncPriceData queryData, int rowLimit)
+      throws ConfigurationException, DatabaseOperationException {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  /*
+   * (non-Javadoc)
+   * @see com.ac.games.db.GamesDatabase#readAdHocMMQuery(com.ac.games.data.MiniatureMarketPriceData, int)
+   */
+  public List<MiniatureMarketPriceData> readAdHocMMQuery(MiniatureMarketPriceData queryData, int rowLimit)
+      throws ConfigurationException, DatabaseOperationException {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  /*
+   * (non-Javadoc)
+   * @see com.ac.games.db.GamesDatabase#readAdHocGameQuery(com.ac.games.data.Game, int)
+   */
+  public List<Game> readAdHocGameQuery(Game queryGame, int rowLimit) throws ConfigurationException, DatabaseOperationException {
+    // TODO Auto-generated method stub
+    return null;
+  }
 }

@@ -73,8 +73,8 @@ public class GameReltnConverter {
     dbObject.append("gameID", gameReltn.getGameID());
     
     if (gameReltn.getBggID() != -1)        dbObject.append("bggID", gameReltn.getBggID());
-    if (gameReltn.getCsiID() != -1)        dbObject.append("csiID", gameReltn.getCsiID());
-    if (gameReltn.getMmID() != -1)         dbObject.append("mmID", gameReltn.getMmID());
+    if (gameReltn.getCsiIDs() != null)     dbObject.append("csiIDs", convertList(gameReltn.getCsiIDs()));
+    if (gameReltn.getMmIDs() != null)      dbObject.append("mmIDs", convertList(gameReltn.getMmIDs()));
     if (gameReltn.getAsinKeys() != null)   dbObject.append("asinKeys", convertList(gameReltn.getAsinKeys()));
     if (gameReltn.getOtherSites() != null) dbObject.append("otherSites", convertList(gameReltn.getOtherSites()));
     
@@ -96,9 +96,8 @@ public class GameReltnConverter {
     if (dbObject.containsField("reltnID"))    gameReltn.setReltnID((Long)dbObject.get("reltnID"));
     if (dbObject.containsField("gameID"))     gameReltn.setGameID((Long)dbObject.get("gameID"));
     if (dbObject.containsField("bggID"))      gameReltn.setBggID((Long)dbObject.get("bggID"));
-    if (dbObject.containsField("csiID"))      gameReltn.setCsiID((Long)dbObject.get("csiID"));
-    if (dbObject.containsField("mmID"))       gameReltn.setMmID((Long)dbObject.get("mmID"));
-
+    if (dbObject.containsField("csiIDs"))     gameReltn.setCsiIDs(convertDBListToLongList((BasicDBList)dbObject.get("csiIDs")));
+    if (dbObject.containsField("mmIDs"))      gameReltn.setMmIDs(convertDBListToLongList((BasicDBList)dbObject.get("mmIDs")));
     if (dbObject.containsField("asinKeys"))   gameReltn.setAsinKeys(convertDBListToStringList((BasicDBList)dbObject.get("asinKeys")));
     if (dbObject.containsField("otherSites")) gameReltn.setOtherSites(convertDBListToLongList((BasicDBList)dbObject.get("otherSites")));
 
