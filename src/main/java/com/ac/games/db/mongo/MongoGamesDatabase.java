@@ -7,10 +7,14 @@ import java.util.List;
 import org.bson.types.ObjectId;
 
 import com.ac.games.data.BGGGame;
+import com.ac.games.data.Collection;
+import com.ac.games.data.CollectionItem;
 import com.ac.games.data.CoolStuffIncPriceData;
 import com.ac.games.data.Game;
 import com.ac.games.data.GameReltn;
 import com.ac.games.data.MiniatureMarketPriceData;
+import com.ac.games.data.User;
+import com.ac.games.data.UserDetail;
 import com.ac.games.db.GamesDatabase;
 import com.ac.games.db.exception.ConfigurationException;
 import com.ac.games.db.exception.DatabaseOperationException;
@@ -1096,6 +1100,14 @@ public class MongoGamesDatabase implements GamesDatabase {
     return getGenericMaxID("game", "gameID");
   }
   
+  /*
+   * (non-Javadoc)
+   * @see com.ac.games.db.GamesDatabase#getMaxGameReltnID()
+   */
+  public long getMaxGameReltnID() throws ConfigurationException, DatabaseOperationException {
+    return getGenericMaxID("gamereltn", "reltnID");
+  }
+  
   /**
    * Generic Helper method to only perform this code once.
    * 
@@ -1112,7 +1124,7 @@ public class MongoGamesDatabase implements GamesDatabase {
     if (mongoClient == null || mongoDB == null)
       throw new ConfigurationException("There is a problem with the database connection.");
     
-    long result = -1;
+    long result = 0;
     try {
       DBCollection curCollection = mongoDB.getCollection(collection);
       
@@ -1237,5 +1249,733 @@ public class MongoGamesDatabase implements GamesDatabase {
   public List<Game> readAdHocGameQuery(Game queryGame, int rowLimit) throws ConfigurationException, DatabaseOperationException {
     // TODO Auto-generated method stub
     return null;
+  }
+
+  /*
+   * (non-Javadoc)
+   * @see com.ac.games.db.GamesDatabase#readUser(java.lang.String)
+   */
+  public User readUser(String userName) throws ConfigurationException, DatabaseOperationException {
+    //Check basic pre-conditions
+    if (userName == null)
+      throw new DatabaseOperationException("The provided user name was not valid.");
+    
+    if (mongoClient == null || mongoDB == null)
+      throw new ConfigurationException("There is a problem with the database connection.");
+    
+    //Run the operation
+    try {
+      //Open the collection, i.e. table
+      DBCollection userCollection = mongoDB.getCollection("user");
+      BasicDBObject searchObject  = UserConverter.convertUserToNameQuery(userName);
+      
+      DBCursor cursor = userCollection.find(searchObject);
+      
+      if (debugMode)
+        System.out.println ("Total documents found during this query:            " + cursor.size());
+      
+      User user = null;
+      while (cursor.hasNext()) {
+        DBObject object = cursor.next();
+        user = UserConverter.convertMongoToUser(object);
+      }
+      
+      if (debugMode)
+        System.out.println ("The user found by this query was:                   " + (user == null ? "Nothing Found" : user.getUserName()));
+      return user;
+      
+    } catch (MongoException me) {
+      throw new DatabaseOperationException("Mongo raised an exception to this select: " + me.getMessage(), me);
+    } catch (Throwable t) {
+      throw new DatabaseOperationException("Something bad happened executing the select", t);
+    }
+  }
+
+  /*
+   * (non-Javadoc)
+   * @see com.ac.games.db.GamesDatabase#readUser(java.lang.String)
+   */
+  public User readUser(long userID) throws ConfigurationException, DatabaseOperationException {
+    //Check basic pre-conditions
+    if (userID < 0)
+      throw new DatabaseOperationException("The provided user ID was not valid.");
+    
+    if (mongoClient == null || mongoDB == null)
+      throw new ConfigurationException("There is a problem with the database connection.");
+    
+    //Run the operation
+    try {
+      //Open the collection, i.e. table
+      DBCollection userCollection = mongoDB.getCollection("user");
+      BasicDBObject searchObject  = UserConverter.convertUserToIDQuery(userID);
+      
+      DBCursor cursor = userCollection.find(searchObject);
+      
+      if (debugMode)
+        System.out.println ("Total documents found during this query:            " + cursor.size());
+      
+      User user = null;
+      while (cursor.hasNext()) {
+        DBObject object = cursor.next();
+        user = UserConverter.convertMongoToUser(object);
+      }
+      
+      if (debugMode)
+        System.out.println ("The user found by this query was:                   " + (user == null ? "Nothing Found" : user.getUserName()));
+      return user;
+      
+    } catch (MongoException me) {
+      throw new DatabaseOperationException("Mongo raised an exception to this select: " + me.getMessage(), me);
+    } catch (Throwable t) {
+      throw new DatabaseOperationException("Something bad happened executing the select", t);
+    }
+  }
+
+  /*
+   * (non-Javadoc)
+   * @see com.ac.games.db.GamesDatabase#insertUser(com.ac.games.data.User)
+   */
+  public void insertUser(User user) throws ConfigurationException, DatabaseOperationException {
+    //Check basic pre-conditions
+    if (user == null)
+      throw new DatabaseOperationException("The provided user object was null.");
+    
+    if (mongoClient == null || mongoDB == null)
+      throw new ConfigurationException("There is a problem with the database connection.");
+    
+    //Run the operation
+    try {
+      //Because we are using non-Mongo based primary keys, we need to specifically check first to see if the object
+      //exists, and if it does, we need to do an update instead
+      ObjectId prevDocID = queryForExistingUserDocID(user.getUserID());
+      if (prevDocID != null) {
+        if (debugMode)
+          System.out.println ("Converting insert into update because of prior document");
+        updateUser(user);
+        return;
+      }
+      
+      //Open the collection, i.e. table
+      DBCollection userCollection = mongoDB.getCollection("user");
+      
+      BasicDBObject addObject = UserConverter.convertUserToMongo(user);
+      WriteResult result = userCollection.insert(addObject);
+      
+      if (debugMode) {
+        System.out.println ("The number of documents impacted by this operation: " + result.getN());
+        System.out.println ("Was this insert converted to an upsert?             " + result.isUpdateOfExisting());
+        System.out.println ("The new document _id value added:                   " + addObject.get("_id"));
+      }
+      
+    } catch (MongoException me) {
+      throw new DatabaseOperationException("Mongo raised an exception to this insert: " + me.getMessage(), me);
+    } catch (Throwable t) {
+      throw new DatabaseOperationException("Something bad happened executing the insert", t);
+    }
+  }
+
+  /*
+   * (non-Javadoc)
+   * @see com.ac.games.db.GamesDatabase#updateUser(com.ac.games.data.User)
+   */
+  public void updateUser(User user) throws ConfigurationException, DatabaseOperationException {
+    //Check basic pre-conditions
+    if (user == null)
+      throw new DatabaseOperationException("The provided user object was null.");
+    
+    if (mongoClient == null || mongoDB == null)
+      throw new ConfigurationException("There is a problem with the database connection.");
+    
+    //Run the operation
+    try {
+      //Open the collection, i.e. table
+      DBCollection userCollection = mongoDB.getCollection("user");
+      BasicDBObject queryObject  = UserConverter.convertUserToIDQuery(user);
+      BasicDBObject updateObject = UserConverter.convertUserToMongo(user);
+      WriteResult result = userCollection.update(queryObject, updateObject, true, false);
+      
+      if (debugMode) {
+        System.out.println ("The number of documents impacted by this operation: " + result.getN());
+        System.out.println ("Was this update converted to an insert?             " + !result.isUpdateOfExisting());
+      }
+      
+    } catch (MongoException me) {
+      throw new DatabaseOperationException("Mongo raised an exception to this update: " + me.getMessage(), me);
+    } catch (Throwable t) {
+      throw new DatabaseOperationException("Something bad happened executing the update", t);
+    }
+  }
+
+  /*
+   * (non-Javadoc)
+   * @see com.ac.games.db.GamesDatabase#deleteUser(long)
+   */
+  public void deleteUser(long userID) throws ConfigurationException, DatabaseOperationException {
+    //Check basic pre-conditions
+    if (userID < 0)
+      throw new DatabaseOperationException("The provided user object was not valid.");
+    
+    if (mongoClient == null || mongoDB == null)
+      throw new ConfigurationException("There is a problem with the database connection.");
+    
+    //Run the operation
+    try {
+      //Open the collection, i.e. table
+      DBCollection userCollection = mongoDB.getCollection("user");
+      BasicDBObject deleteObject  = UserConverter.convertUserToIDQuery(userID);
+      WriteResult result = userCollection.remove(deleteObject);
+      
+      if (debugMode)
+        System.out.println ("The number of documents impacted by this operation: " + result.getN());
+      
+    } catch (MongoException me) {
+      throw new DatabaseOperationException("Mongo raised an exception to this delete: " + me.getMessage(), me);
+    } catch (Throwable t) {
+      throw new DatabaseOperationException("Something bad happened executing the delete", t);
+    }
+  }
+
+  /*
+   * (non-Javadoc)
+   * @see com.ac.games.db.GamesDatabase#getMaxUserID()
+   */
+  public long getMaxUserID() throws ConfigurationException, DatabaseOperationException {
+    return getGenericMaxID("user", "userID");
+  }
+  
+  /**
+   * We're going to use this method to avoid the work of running our queries.  Because of reliance
+   * on this method in update and insert tasks, we can assume only one other version of this object
+   * can exist in the database.
+   * 
+   * @param userID The game we want to verify if it exists or not.
+   * 
+   * @return The "_id" key from our existing object, or null if not found
+   */
+  private ObjectId queryForExistingUserDocID(long userID) throws MongoException {
+    //Open the collection, i.e. table
+    DBCollection userCollection = mongoDB.getCollection("user");
+    BasicDBObject searchObject  = UserConverter.convertUserToIDQuery(userID);
+    
+    DBCursor cursor = userCollection.find(searchObject);
+    ObjectId docID = null;
+    while (cursor.hasNext()) {
+      docID = (ObjectId)cursor.next().get("_id");
+    }
+    return docID;
+  }
+  
+  /*
+   * (non-Javadoc)
+   * @see com.ac.games.db.GamesDatabase#readUserDetail(long)
+   */
+  public UserDetail readUserDetail(long userID) throws ConfigurationException, DatabaseOperationException {
+    //Check basic pre-conditions
+    if (userID < 0)
+      throw new DatabaseOperationException("The provided User Detail object was not valid.");
+    
+    if (mongoClient == null || mongoDB == null)
+      throw new ConfigurationException("There is a problem with the database connection.");
+    
+    //Run the operation
+    try {
+      //Open the collection, i.e. table
+      DBCollection userCollection = mongoDB.getCollection("userdetail");
+      BasicDBObject searchObject  = UserDetailConverter.convertUserDetailToIDQuery(userID);
+      
+      DBCursor cursor = userCollection.find(searchObject);
+      
+      if (debugMode)
+        System.out.println ("Total documents found during this query:            " + cursor.size());
+      
+      UserDetail user = null;
+      while (cursor.hasNext()) {
+        DBObject object = cursor.next();
+        user = UserDetailConverter.convertMongoToUserDetail(object);
+      }
+      
+      if (debugMode)
+        System.out.println ("The user found by this query was:                   " + (user == null ? "Nothing Found" : user.getUserID()));
+      return user;
+      
+    } catch (MongoException me) {
+      throw new DatabaseOperationException("Mongo raised an exception to this select: " + me.getMessage(), me);
+    } catch (Throwable t) {
+      throw new DatabaseOperationException("Something bad happened executing the select", t);
+    }
+  }
+
+  /*
+   * (non-Javadoc)
+   * @see com.ac.games.db.GamesDatabase#insertUserDetail(com.ac.games.data.UserDetail)
+   */
+  public void insertUserDetail(UserDetail userDetail) throws ConfigurationException, DatabaseOperationException {
+    //Check basic pre-conditions
+    if (userDetail == null)
+      throw new DatabaseOperationException("The provided user detail object was null.");
+    
+    if (mongoClient == null || mongoDB == null)
+      throw new ConfigurationException("There is a problem with the database connection.");
+    
+    //Run the operation
+    try {
+      //Because we are using non-Mongo based primary keys, we need to specifically check first to see if the object
+      //exists, and if it does, we need to do an update instead
+      ObjectId prevDocID = queryForExistingUserDetailDocID(userDetail.getUserID());
+      if (prevDocID != null) {
+        if (debugMode)
+          System.out.println ("Converting insert into update because of prior document");
+        updateUserDetail(userDetail);
+        return;
+      }
+      
+      //Open the collection, i.e. table
+      DBCollection userCollection = mongoDB.getCollection("userdetail");
+      
+      BasicDBObject addObject = UserDetailConverter.convertUserDetailToMongo(userDetail);
+      WriteResult result = userCollection.insert(addObject);
+      
+      if (debugMode) {
+        System.out.println ("The number of documents impacted by this operation: " + result.getN());
+        System.out.println ("Was this insert converted to an upsert?             " + result.isUpdateOfExisting());
+        System.out.println ("The new document _id value added:                   " + addObject.get("_id"));
+      }
+      
+    } catch (MongoException me) {
+      throw new DatabaseOperationException("Mongo raised an exception to this insert: " + me.getMessage(), me);
+    } catch (Throwable t) {
+      throw new DatabaseOperationException("Something bad happened executing the insert", t);
+    }
+  }
+
+  /*
+   * (non-Javadoc)
+   * @see com.ac.games.db.GamesDatabase#updateUserDetail(com.ac.games.data.UserDetail)
+   */
+  public void updateUserDetail(UserDetail userDetail) throws ConfigurationException, DatabaseOperationException {
+    //Check basic pre-conditions
+    if (userDetail == null)
+      throw new DatabaseOperationException("The provided game object was null.");
+    
+    if (mongoClient == null || mongoDB == null)
+      throw new ConfigurationException("There is a problem with the database connection.");
+    
+    //Run the operation
+    try {
+      //Open the collection, i.e. table
+      DBCollection userCollection = mongoDB.getCollection("userdetail");
+      BasicDBObject queryObject  = UserDetailConverter.convertUserDetailToIDQuery(userDetail);
+      BasicDBObject updateObject = UserDetailConverter.convertUserDetailToMongo(userDetail);
+      WriteResult result = userCollection.update(queryObject, updateObject, true, false);
+      
+      if (debugMode) {
+        System.out.println ("The number of documents impacted by this operation: " + result.getN());
+        System.out.println ("Was this update converted to an insert?             " + !result.isUpdateOfExisting());
+      }
+      
+    } catch (MongoException me) {
+      throw new DatabaseOperationException("Mongo raised an exception to this update: " + me.getMessage(), me);
+    } catch (Throwable t) {
+      throw new DatabaseOperationException("Something bad happened executing the update", t);
+    }
+  }
+
+  /*
+   * (non-Javadoc)
+   * @see com.ac.games.db.GamesDatabase#deleteUserDetail(long)
+   */
+  public void deleteUserDetail(long userID) throws ConfigurationException, DatabaseOperationException {
+    //Check basic pre-conditions
+    if (userID < 0)
+      throw new DatabaseOperationException("The provided user object was not valid.");
+    
+    if (mongoClient == null || mongoDB == null)
+      throw new ConfigurationException("There is a problem with the database connection.");
+    
+    //Run the operation
+    try {
+      //Open the collection, i.e. table
+      DBCollection userCollection = mongoDB.getCollection("userdetail");
+      BasicDBObject deleteObject  = UserDetailConverter.convertUserDetailToIDQuery(userID);
+      WriteResult result = userCollection.remove(deleteObject);
+      
+      if (debugMode)
+        System.out.println ("The number of documents impacted by this operation: " + result.getN());
+      
+    } catch (MongoException me) {
+      throw new DatabaseOperationException("Mongo raised an exception to this delete: " + me.getMessage(), me);
+    } catch (Throwable t) {
+      throw new DatabaseOperationException("Something bad happened executing the delete", t);
+    }
+  }
+
+  /**
+   * We're going to use this method to avoid the work of running our queries.  Because of reliance
+   * on this method in update and insert tasks, we can assume only one other version of this object
+   * can exist in the database.
+   * 
+   * @param userID The game we want to verify if it exists or not.
+   * 
+   * @return The "_id" key from our existing object, or null if not found
+   */
+  private ObjectId queryForExistingUserDetailDocID(long userID) throws MongoException {
+    //Open the collection, i.e. table
+    DBCollection userCollection = mongoDB.getCollection("userdetail");
+    BasicDBObject searchObject  = UserDetailConverter.convertUserDetailToIDQuery(userID);
+    
+    DBCursor cursor = userCollection.find(searchObject);
+    ObjectId docID = null;
+    while (cursor.hasNext()) {
+      docID = (ObjectId)cursor.next().get("_id");
+    }
+    return docID;
+  }
+  
+  /*
+   * (non-Javadoc)
+   * @see com.ac.games.db.GamesDatabase#readCollection(long)
+   */
+  public Collection readCollection(long collectionID) throws ConfigurationException, DatabaseOperationException {
+    //Check basic pre-conditions
+    if (collectionID < 0)
+      throw new DatabaseOperationException("The provided collection ID was not valid.");
+    
+    if (mongoClient == null || mongoDB == null)
+      throw new ConfigurationException("There is a problem with the database connection.");
+    
+    //Run the operation
+    try {
+      //Open the collection, i.e. table
+      DBCollection collectionCollection = mongoDB.getCollection("collection");
+      BasicDBObject searchObject        = CollectionConverter.convertCollectionToIDQuery(collectionID);
+      
+      DBCursor cursor = collectionCollection.find(searchObject);
+      
+      if (debugMode)
+        System.out.println ("Total documents found during this query:            " + cursor.size());
+      
+      Collection collection = null;
+      while (cursor.hasNext()) {
+        DBObject object = cursor.next();
+        collection = CollectionConverter.convertMongoToCollection(object);
+      }
+      
+      if (debugMode)
+        System.out.println ("The Collection found by this query was:             " + (collection == null ? "Nothing Found" : collection.getCollectionID()));
+      return collection;
+      
+    } catch (MongoException me) {
+      throw new DatabaseOperationException("Mongo raised an exception to this select: " + me.getMessage(), me);
+    } catch (Throwable t) {
+      throw new DatabaseOperationException("Something bad happened executing the select", t);
+    }
+  }
+
+  /*
+   * (non-Javadoc)
+   * @see com.ac.games.db.GamesDatabase#insertCollection(com.ac.games.data.Collection)
+   */
+  public void insertCollection(Collection collection) throws ConfigurationException, DatabaseOperationException {
+    //Check basic pre-conditions
+    if (collection == null)
+      throw new DatabaseOperationException("The provided collection object was null.");
+    
+    if (mongoClient == null || mongoDB == null)
+      throw new ConfigurationException("There is a problem with the database connection.");
+    
+    //Run the operation
+    try {
+      //Because we are using non-Mongo based primary keys, we need to specifically check first to see if the object
+      //exists, and if it does, we need to do an update instead
+      ObjectId prevDocID = queryForExistingCollectionDocID(collection.getCollectionID());
+      if (prevDocID != null) {
+        if (debugMode)
+          System.out.println ("Converting insert into update because of prior document");
+        updateCollection(collection);
+        return;
+      }
+      
+      //Open the collection, i.e. table
+      DBCollection collectionCollection = mongoDB.getCollection("collection");
+      
+      BasicDBObject addObject = CollectionConverter.convertCollectionToMongo(collection);
+      WriteResult result = collectionCollection.insert(addObject);
+      
+      if (debugMode) {
+        System.out.println ("The number of documents impacted by this operation: " + result.getN());
+        System.out.println ("Was this insert converted to an upsert?             " + result.isUpdateOfExisting());
+        System.out.println ("The new document _id value added:                   " + addObject.get("_id"));
+      }
+      
+    } catch (MongoException me) {
+      throw new DatabaseOperationException("Mongo raised an exception to this insert: " + me.getMessage(), me);
+    } catch (Throwable t) {
+      throw new DatabaseOperationException("Something bad happened executing the insert", t);
+    }
+  }
+
+  /*
+   * (non-Javadoc)
+   * @see com.ac.games.db.GamesDatabase#updateCollection(com.ac.games.data.Collection)
+   */
+  public void updateCollection(Collection collection) throws ConfigurationException, DatabaseOperationException {
+    //Check basic pre-conditions
+    if (collection == null)
+      throw new DatabaseOperationException("The provided collection object was null.");
+    
+    if (mongoClient == null || mongoDB == null)
+      throw new ConfigurationException("There is a problem with the database connection.");
+    
+    //Run the operation
+    try {
+      //Open the collection, i.e. table
+      DBCollection collectionCollection = mongoDB.getCollection("collection");
+      BasicDBObject queryObject  = CollectionConverter.convertCollectionToIDQuery(collection);
+      BasicDBObject updateObject = CollectionConverter.convertCollectionToMongo(collection);
+      WriteResult result = collectionCollection.update(queryObject, updateObject, true, false);
+      
+      if (debugMode) {
+        System.out.println ("The number of documents impacted by this operation: " + result.getN());
+        System.out.println ("Was this update converted to an insert?             " + !result.isUpdateOfExisting());
+      }
+      
+    } catch (MongoException me) {
+      throw new DatabaseOperationException("Mongo raised an exception to this update: " + me.getMessage(), me);
+    } catch (Throwable t) {
+      throw new DatabaseOperationException("Something bad happened executing the update", t);
+    }
+  }
+
+  /*
+   * (non-Javadoc)
+   * @see com.ac.games.db.GamesDatabase#deleteCollection(long)
+   */
+  public void deleteCollection(long collectionID) throws ConfigurationException, DatabaseOperationException {
+    //Check basic pre-conditions
+    if (collectionID < 0)
+      throw new DatabaseOperationException("The provided collection object was not valid.");
+    
+    if (mongoClient == null || mongoDB == null)
+      throw new ConfigurationException("There is a problem with the database connection.");
+    
+    //Run the operation
+    try {
+      //Open the collection, i.e. table
+      DBCollection collectionCollection = mongoDB.getCollection("collection");
+      BasicDBObject deleteObject  = CollectionConverter.convertCollectionToIDQuery(collectionID);
+      WriteResult result = collectionCollection.remove(deleteObject);
+      
+      if (debugMode)
+        System.out.println ("The number of documents impacted by this operation: " + result.getN());
+      
+    } catch (MongoException me) {
+      throw new DatabaseOperationException("Mongo raised an exception to this delete: " + me.getMessage(), me);
+    } catch (Throwable t) {
+      throw new DatabaseOperationException("Something bad happened executing the delete", t);
+    }
+  }
+
+  /*
+   * (non-Javadoc)
+   * @see com.ac.games.db.GamesDatabase#getMaxCollectionID()
+   */
+  public long getMaxCollectionID() throws ConfigurationException, DatabaseOperationException {
+    return getGenericMaxID("collection", "collectionID");
+  }
+
+  /**
+   * We're going to use this method to avoid the work of running our queries.  Because of reliance
+   * on this method in update and insert tasks, we can assume only one other version of this object
+   * can exist in the database.
+   * 
+   * @param userID The game we want to verify if it exists or not.
+   * 
+   * @return The "_id" key from our existing object, or null if not found
+   */
+  private ObjectId queryForExistingCollectionDocID(long collectionID) throws MongoException {
+    //Open the collection, i.e. table
+    DBCollection collectionCollection = mongoDB.getCollection("collection");
+    BasicDBObject searchObject  = CollectionConverter.convertCollectionToIDQuery(collectionID);
+    
+    DBCursor cursor = collectionCollection.find(searchObject);
+    ObjectId docID = null;
+    while (cursor.hasNext()) {
+      docID = (ObjectId)cursor.next().get("_id");
+    }
+    return docID;
+  }
+  
+  /*
+   * (non-Javadoc)
+   * @see com.ac.games.db.GamesDatabase#readCollectionItem(long)
+   */
+  public CollectionItem readCollectionItem(long itemID) throws ConfigurationException, DatabaseOperationException {
+    //Check basic pre-conditions
+    if (itemID < 0)
+      throw new DatabaseOperationException("The provided Collection Item object was not valid.");
+    
+    if (mongoClient == null || mongoDB == null)
+      throw new ConfigurationException("There is a problem with the database connection.");
+    
+    //Run the operation
+    try {
+      //Open the collection, i.e. table
+      DBCollection itemCollection = mongoDB.getCollection("collectionitem");
+      BasicDBObject searchObject  = CollectionItemConverter.convertCollectionItemToIDQuery(itemID);
+      
+      DBCursor cursor = itemCollection.find(searchObject);
+      
+      if (debugMode)
+        System.out.println ("Total documents found during this query:            " + cursor.size());
+      
+      CollectionItem item = null;
+      while (cursor.hasNext()) {
+        DBObject object = cursor.next();
+        item = CollectionItemConverter.convertMongoToCollectionItem(object);
+      }
+      
+      if (debugMode)
+        System.out.println ("The game found by this query was:                   " + (item == null ? "Nothing Found" : item.getItemID()));
+      return item;
+      
+    } catch (MongoException me) {
+      throw new DatabaseOperationException("Mongo raised an exception to this select: " + me.getMessage(), me);
+    } catch (Throwable t) {
+      throw new DatabaseOperationException("Something bad happened executing the select", t);
+    }
+  }
+
+  /*
+   * (non-Javadoc)
+   * @see com.ac.games.db.GamesDatabase#insertCollectionItem(com.ac.games.data.CollectionItem)
+   */
+  public void insertCollectionItem(CollectionItem item) throws ConfigurationException, DatabaseOperationException {
+    //Check basic pre-conditions
+    if (item == null)
+      throw new DatabaseOperationException("The provided collection item object was null.");
+    
+    if (mongoClient == null || mongoDB == null)
+      throw new ConfigurationException("There is a problem with the database connection.");
+    
+    //Run the operation
+    try {
+      //Because we are using non-Mongo based primary keys, we need to specifically check first to see if the object
+      //exists, and if it does, we need to do an update instead
+      ObjectId prevDocID = queryForExistingCollectionItemDocID(item.getItemID());
+      if (prevDocID != null) {
+        if (debugMode)
+          System.out.println ("Converting insert into update because of prior document");
+        updateCollectionItem(item);
+        return;
+      }
+      
+      //Open the collection, i.e. table
+      DBCollection collectionCollection = mongoDB.getCollection("collectionitem");
+      
+      BasicDBObject addObject = CollectionItemConverter.convertCollectionItemToMongo(item);
+      WriteResult result = collectionCollection.insert(addObject);
+      
+      if (debugMode) {
+        System.out.println ("The number of documents impacted by this operation: " + result.getN());
+        System.out.println ("Was this insert converted to an upsert?             " + result.isUpdateOfExisting());
+        System.out.println ("The new document _id value added:                   " + addObject.get("_id"));
+      }
+      
+    } catch (MongoException me) {
+      throw new DatabaseOperationException("Mongo raised an exception to this insert: " + me.getMessage(), me);
+    } catch (Throwable t) {
+      throw new DatabaseOperationException("Something bad happened executing the insert", t);
+    }
+  }
+
+  /*
+   * (non-Javadoc)
+   * @see com.ac.games.db.GamesDatabase#updateCollectionItem(com.ac.games.data.CollectionItem)
+   */
+  public void updateCollectionItem(CollectionItem item) throws ConfigurationException, DatabaseOperationException {
+    //Check basic pre-conditions
+    if (item == null)
+      throw new DatabaseOperationException("The provided collection item object was null.");
+    
+    if (mongoClient == null || mongoDB == null)
+      throw new ConfigurationException("There is a problem with the database connection.");
+    
+    //Run the operation
+    try {
+      //Open the collection, i.e. table
+      DBCollection collectionCollection = mongoDB.getCollection("collectionitem");
+      BasicDBObject queryObject  = CollectionItemConverter.convertCollectionItemToIDQuery(item);
+      BasicDBObject updateObject = CollectionItemConverter.convertCollectionItemToMongo(item);
+      WriteResult result = collectionCollection.update(queryObject, updateObject, true, false);
+      
+      if (debugMode) {
+        System.out.println ("The number of documents impacted by this operation: " + result.getN());
+        System.out.println ("Was this update converted to an insert?             " + !result.isUpdateOfExisting());
+      }
+      
+    } catch (MongoException me) {
+      throw new DatabaseOperationException("Mongo raised an exception to this update: " + me.getMessage(), me);
+    } catch (Throwable t) {
+      throw new DatabaseOperationException("Something bad happened executing the update", t);
+    }
+  }
+
+  /*
+   * (non-Javadoc)
+   * @see com.ac.games.db.GamesDatabase#deleteCollectionItem(long)
+   */
+  public void deleteCollectionItem(long itemID) throws ConfigurationException, DatabaseOperationException {
+    //Check basic pre-conditions
+    if (itemID < 0)
+      throw new DatabaseOperationException("The provided collection item object was not valid.");
+    
+    if (mongoClient == null || mongoDB == null)
+      throw new ConfigurationException("There is a problem with the database connection.");
+    
+    //Run the operation
+    try {
+      //Open the collection, i.e. table
+      DBCollection collectionCollection = mongoDB.getCollection("collectionitem");
+      BasicDBObject deleteObject  = CollectionItemConverter.convertCollectionItemToIDQuery(itemID);
+      WriteResult result = collectionCollection.remove(deleteObject);
+      
+      if (debugMode)
+        System.out.println ("The number of documents impacted by this operation: " + result.getN());
+      
+    } catch (MongoException me) {
+      throw new DatabaseOperationException("Mongo raised an exception to this delete: " + me.getMessage(), me);
+    } catch (Throwable t) {
+      throw new DatabaseOperationException("Something bad happened executing the delete", t);
+    }
+  }
+
+  /*
+   * (non-Javadoc)
+   * @see com.ac.games.db.GamesDatabase#getMaxCollectionItemID()
+   */
+  public long getMaxCollectionItemID() throws ConfigurationException, DatabaseOperationException {
+    return getGenericMaxID("collectionitem", "itemID");
+  }
+
+  /**
+   * We're going to use this method to avoid the work of running our queries.  Because of reliance
+   * on this method in update and insert tasks, we can assume only one other version of this object
+   * can exist in the database.
+   * 
+   * @param userID The game we want to verify if it exists or not.
+   * 
+   * @return The "_id" key from our existing object, or null if not found
+   */
+  private ObjectId queryForExistingCollectionItemDocID(long itemID) throws MongoException {
+    //Open the collection, i.e. table
+    DBCollection collectionCollection = mongoDB.getCollection("collectionitem");
+    BasicDBObject searchObject  = CollectionItemConverter.convertCollectionItemToIDQuery(itemID);
+    
+    DBCursor cursor = collectionCollection.find(searchObject);
+    ObjectId docID = null;
+    while (cursor.hasNext()) {
+      docID = (ObjectId)cursor.next().get("_id");
+    }
+    return docID;
   }
 }

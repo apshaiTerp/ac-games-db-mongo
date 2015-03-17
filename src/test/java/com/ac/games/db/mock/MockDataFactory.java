@@ -2,18 +2,25 @@ package com.ac.games.db.mock;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 
 import com.ac.games.data.BGGGame;
+import com.ac.games.data.Collection;
+import com.ac.games.data.CollectionItem;
 import com.ac.games.data.CoolStuffIncCategory;
 import com.ac.games.data.CoolStuffIncPriceData;
 import com.ac.games.data.Game;
 import com.ac.games.data.GameAvailability;
 import com.ac.games.data.GameReltn;
 import com.ac.games.data.GameType;
+import com.ac.games.data.GameWeight;
 import com.ac.games.data.MiniatureMarketCategory;
 import com.ac.games.data.MiniatureMarketPriceData;
 import com.ac.games.data.ReviewState;
+import com.ac.games.data.User;
+import com.ac.games.data.UserDetail;
+import com.ac.games.data.UserRole;
 
 /**
  * This class helps us create Mock Data in our test categories
@@ -55,6 +62,27 @@ public class MockDataFactory {
   public final static long COSMIC_ENCOUNTER_RELTN_ID = 2345L;
   /** Non-Intelligent ID for Cosmic Incursion Game Relation */
   public final static long COSMIC_INCURSION_RELTN_ID = 3456L;
+  
+  /** Non-Intelligent ID for Fake User 1 */
+  public final static long USER_ONE_ID   = 1122L;
+  /** Non-Intelligent ID for Fake User 2 */
+  public final static long USER_TWO_ID   = 1123L;
+  /** Non-Intelligent ID for Fake User 3 */
+  public final static long USER_THREE_ID = 1124L;
+  
+  /** Non-Intelligent ID for Fake Collection 1 */
+  public final static long COLLECTION_ONE_ID   = 2233L;
+  /** Non-Intelligent ID for Fake Collection 2 */
+  public final static long COLLECTION_TWO_ID   = 2234L;
+  /** Non-Intelligent ID for Fake Collection 3 */
+  public final static long COLLECTION_THREE_ID = 2235L;
+  
+  /** Non-Intelligent ID for Fake Collection 1 */
+  public final static long COLLECTION_ITEM_ONE_ID   = 4455L;
+  /** Non-Intelligent ID for Fake Collection 2 */
+  public final static long COLLECTION_ITEM_TWO_ID   = 4456L;
+  /** Non-Intelligent ID for Fake Collection 3 */
+  public final static long COLLECTION_ITEM_THREE_ID = 4457L;
   
   /** Helper method to generate some game data to be used for validation */
   public static BGGGame createBGGGame(long gameID) {
@@ -580,4 +608,178 @@ public class MockDataFactory {
     return reltn;
   }
   
+  /** Helper method to generate some game data to be used for validation */
+  public static User createUserData(long userID) {
+    if (userID == USER_ONE_ID)   return createUserOne();
+    if (userID == USER_TWO_ID)   return createUserTwo();
+    if (userID == USER_THREE_ID) return createUserThree();
+    
+    //Fail Case
+    return null;
+  }
+  
+  private static User createUserOne() {
+    User user = new User();
+    user.setUserID(USER_ONE_ID);
+    user.setUserName("user_one");
+    user.setFirstName("First");
+    user.setLastName("Bobert");
+    user.setEmailAddress("userone@test.com");
+    user.setCollectionID(COLLECTION_ONE_ID);
+    return user;
+  }
+  
+  private static User createUserTwo() {
+    User user = new User();
+    user.setUserID(USER_TWO_ID);
+    user.setUserName("user_two");
+    user.setFirstName("Second");
+    user.setLastName("Leopold");
+    user.setEmailAddress("usertwo@test.com");
+    user.setCollectionID(COLLECTION_TWO_ID);
+    return user;
+  }
+  
+  private static User createUserThree() {
+    User user = new User();
+    user.setUserID(USER_THREE_ID);
+    user.setUserName("user_three");
+    user.setFirstName("Third");
+    user.setLastName("Louie");
+    user.setEmailAddress("userthree@test.com");
+    user.setCollectionID(COLLECTION_THREE_ID);
+    return user;
+  }
+
+  /** Helper method to generate some game data to be used for validation */
+  public static UserDetail createUserDetailData(long userID) {
+    if (userID == USER_ONE_ID)   return createUserDetailOne();
+    if (userID == USER_TWO_ID)   return createUserDetailTwo();
+    if (userID == USER_THREE_ID) return createUserDetailThree();
+    
+    //Fail Case
+    return null;
+  }
+  
+  private static UserDetail createUserDetailOne() {
+    UserDetail user = new UserDetail();
+    user.setUserID(USER_ONE_ID);
+    user.setPass("asdf");
+    user.setUserRole(UserRole.USER);
+    user.setCreatedOnDate(new Date(10000000));
+    user.setLastLoginDate(new Date(10000000));
+    return user;
+  }
+  
+  private static UserDetail createUserDetailTwo() {
+    UserDetail user = new UserDetail();
+    user.setUserID(USER_TWO_ID);
+    user.setPass("sdfg");
+    user.setUserRole(UserRole.USER);
+    user.setCreatedOnDate(new Date(20000000));
+    user.setLastLoginDate(new Date(20000000));
+    return user;
+  }
+  
+  private static UserDetail createUserDetailThree() {
+    UserDetail user = new UserDetail();
+    user.setUserID(USER_THREE_ID);
+    user.setPass("dfgh");
+    user.setUserRole(UserRole.ADMIN);
+    user.setCreatedOnDate(new Date(30000000));
+    user.setLastLoginDate(new Date(30000000));
+    return user;
+  }
+
+  public static Collection createCollectionData(long collectionID) {
+    if (collectionID == COLLECTION_ONE_ID)   return createCollectionOne();
+    if (collectionID == COLLECTION_TWO_ID)   return createCollectionTwo();
+    if (collectionID == COLLECTION_THREE_ID) return createCollectionThree();
+    
+    //Fail Case
+    return null;
+  }
+  
+  private static Collection createCollectionOne() {
+    Collection collection = new Collection();
+    collection.setCollectionID(COLLECTION_ONE_ID);
+    collection.setGames(new LinkedList<CollectionItem>());
+    collection.setBaseGameCount(0);
+    collection.setCollectibleGameCount(0);
+    collection.setExpansionGameCount(0);
+    return collection;
+  }
+  
+  private static Collection createCollectionTwo() {
+    Collection collection = new Collection();
+    collection.setCollectionID(COLLECTION_TWO_ID);
+    List<CollectionItem> games = new LinkedList<CollectionItem>();
+    games.add(createCollectionItemThree());  //Abyss
+    collection.setGames(games);
+    collection.setBaseGameCount(1);
+    collection.setCollectibleGameCount(0);
+    collection.setExpansionGameCount(0);
+    return collection;
+  }
+  
+  private static Collection createCollectionThree() {
+    Collection collection = new Collection();
+    collection.setCollectionID(COLLECTION_THREE_ID);
+    List<CollectionItem> games = new LinkedList<CollectionItem>();
+    games.add(createCollectionItemOne());  //Cosmic Encounter
+    collection.setGames(games);
+    collection.setBaseGameCount(1);
+    collection.setCollectibleGameCount(0);
+    collection.setExpansionGameCount(0);
+    return collection;
+  }
+
+  public static CollectionItem createCollectionItemData(long itemID) {
+    if (itemID == COLLECTION_ITEM_ONE_ID)   return createCollectionItemOne();
+    if (itemID == COLLECTION_ITEM_TWO_ID)   return createCollectionItemTwo();
+    if (itemID == COLLECTION_ITEM_THREE_ID) return createCollectionItemThree();
+    
+    //Fail Case
+    return null;
+  }
+  
+  private static CollectionItem createCollectionItemOne() {
+    CollectionItem item = new CollectionItem();
+    item.setItemID(COLLECTION_ITEM_ONE_ID);
+    Game game = createRealCosmicEncounterGame();
+    item.setGameID(game.getGameID());
+    item.setGame(game);
+    List<GameWeight> weights = new ArrayList<GameWeight>(1);
+    weights.add(GameWeight.MEDIUM);
+    item.setWeights(weights);
+    item.setDateAcquired(null);
+    item.setWhereAcquired(null);
+    return item;
+  }
+  
+  private static CollectionItem createCollectionItemTwo() {
+    CollectionItem item = new CollectionItem();
+    item.setItemID(COLLECTION_ITEM_TWO_ID);
+    Game game = createRealCosmicIncursionGame();
+    item.setGameID(game.getGameID());
+    item.setGame(game);
+    List<GameWeight> weights = new ArrayList<GameWeight>(1);
+    weights.add(GameWeight.HEAVY);
+    item.setWeights(weights);
+    item.setDateAcquired(new Date(10000000));
+    item.setWhereAcquired("Amazon");
+    return item;
+  }
+  
+  private static CollectionItem createCollectionItemThree() {
+    CollectionItem item = new CollectionItem();
+    item.setItemID(COLLECTION_ITEM_THREE_ID);
+    Game game = createRealAbyssGame();
+    item.setGameID(game.getGameID());
+    item.setGame(game);
+    item.setWeights(null);
+    item.setDateAcquired(new Date(12345678));
+    item.setWhereAcquired(null);
+    return item;
+  }
 }
