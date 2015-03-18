@@ -1,14 +1,19 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!--AgileJ Ltd. (http://www.agilej.com)-->
 <ajsv>
-    <diagram creationDate="2015-Feb-25 03:23" filterScript="" licenseGrade="single" licenseeName="Adam_Carter" licenseeOrganization="Personal" version="1.7.17.v20140508-2136">
-        <class className="com.ac.games.db.MongoDBFactory" project="ac-games-db-mongo" xLocation="784" yLocation="466"/>
-        <class className="com.ac.games.db.mongo.BGGGameConverter" project="ac-games-db-mongo" xLocation="207" yLocation="512"/>
-        <class className="com.ac.games.db.mongo.CSIDataConverter" project="ac-games-db-mongo" xLocation="924" yLocation="175"/>
-        <class className="com.ac.games.db.mongo.MMDataConverter" project="ac-games-db-mongo" xLocation="100" yLocation="860"/>
-        <class className="com.ac.games.db.mongo.MongoGamesDatabase" project="ac-games-db-mongo" xLocation="741" yLocation="719"/>
-        <class className="com.ac.games.db.GamesDatabase" project="ac-games-db-mongo" xLocation="1727" yLocation="729"/>
-        <class className="com.ac.games.db.test.TestMongoGamesDatabase" project="ac-games-db-mongo" xLocation="1602" yLocation="346"/>
-        <class className="com.ac.games.db.mock.MockDataFactory" project="ac-games-db-mongo" xLocation="2063" yLocation="100"/>
+    <diagram creationDate="2015-Mar-18 02:45" filterScript="" licenseGrade="single" licenseeName="Adam_Carter" licenseeOrganization="Personal" version="1.7.17.v20140508-2136">
+        <class className="com.ac.games.db.mock.MockDataFactory" project="ac-games-db-mongo" xLocation="3468" yLocation="649"/>
+        <class className="com.ac.games.db.test.TestMongoGamesDatabase" project="ac-games-db-mongo" xLocation="2963" yLocation="645"/>
+        <class className="com.ac.games.db.MongoDBFactory" project="ac-games-db-mongo" xLocation="1907" yLocation="566"/>
+        <class className="com.ac.games.db.mongo.BGGGameConverter" project="ac-games-db-mongo" xLocation="1893" yLocation="915"/>
+        <class className="com.ac.games.db.mongo.CollectionConverter" project="ac-games-db-mongo" xLocation="835" yLocation="1904"/>
+        <class className="com.ac.games.db.mongo.CollectionItemConverter" project="ac-games-db-mongo" xLocation="1486" yLocation="1904"/>
+        <class className="com.ac.games.db.mongo.CSIDataConverter" project="ac-games-db-mongo" xLocation="134" yLocation="1026"/>
+        <class className="com.ac.games.db.mongo.GameConverter" project="ac-games-db-mongo" xLocation="1893" yLocation="1303"/>
+        <class className="com.ac.games.db.mongo.GameReltnConverter" project="ac-games-db-mongo" xLocation="123" yLocation="677"/>
+        <class className="com.ac.games.db.mongo.MMDataConverter" project="ac-games-db-mongo" xLocation="100" yLocation="370"/>
+        <class className="com.ac.games.db.mongo.MongoGamesDatabase" project="ac-games-db-mongo" xLocation="739" yLocation="100"/>
+        <class className="com.ac.games.db.mongo.UserConverter" project="ac-games-db-mongo" xLocation="2424" yLocation="843"/>
+        <class className="com.ac.games.db.mongo.UserDetailConverter" project="ac-games-db-mongo" xLocation="2426" yLocation="1154"/>
     </diagram>
 </ajsv>
