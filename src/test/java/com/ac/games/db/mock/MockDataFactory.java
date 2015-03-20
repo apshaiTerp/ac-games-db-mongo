@@ -6,6 +6,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.ac.games.data.BGGGame;
+import com.ac.games.data.BGGGameStats;
+import com.ac.games.data.CSIDataStats;
 import com.ac.games.data.Collection;
 import com.ac.games.data.CollectionItem;
 import com.ac.games.data.CoolStuffIncCategory;
@@ -15,6 +17,7 @@ import com.ac.games.data.GameAvailability;
 import com.ac.games.data.GameReltn;
 import com.ac.games.data.GameType;
 import com.ac.games.data.GameWeight;
+import com.ac.games.data.MMDataStats;
 import com.ac.games.data.MiniatureMarketCategory;
 import com.ac.games.data.MiniatureMarketPriceData;
 import com.ac.games.data.ReviewState;
@@ -781,5 +784,47 @@ public class MockDataFactory {
     item.setDateAcquired(new Date(12345678));
     item.setWhereAcquired(null);
     return item;
+  }
+  
+  public static BGGGameStats createBGGGameStats() {
+    BGGGameStats stats = new BGGGameStats();
+    stats.setBaseGameCount(22367);
+    stats.setExpansionGameCount(1243);
+    stats.setCollectibleGameCount(134);
+    stats.setApprovedCount(11111);
+    stats.setRejectedCount(22222);
+    stats.setPendingCount(3333);
+    return stats;
+  }
+  
+  public static CSIDataStats createCSIDataStats() {
+    CSIDataStats stats = new CSIDataStats();
+    stats.setBoardGameCount(13466);
+    stats.setCollectibleGameCount(1234);
+    stats.setDiceMastersCount(567);
+    stats.setRpgCount(347);
+    stats.setLcgCount(8315);
+    stats.setSuppliesCount(2341);
+    stats.setMiniatureCount(3567);
+    stats.setVideoGameCount(1788);
+    stats.setUnknownCount(1234);
+    stats.setApprovedCount(44444);
+    stats.setRejectedCount(55522);
+    stats.setPendingCount(6677);
+    return stats;
+  }
+  
+  public static MMDataStats createMMDataStats() {
+    MMDataStats stats = new MMDataStats();
+    stats.setBoardGameCount(1235);
+    stats.setTableTopCount(76724);
+    stats.setCcgCount(1345);
+    stats.setCollectiblesCount(6890);
+    stats.setRpgCount(684);
+    stats.setAccessoriesCount(834);
+    stats.setApprovedCount(88899);
+    stats.setRejectedCount(10112);
+    stats.setPendingCount(2067);
+    return stats;
   }
 }
