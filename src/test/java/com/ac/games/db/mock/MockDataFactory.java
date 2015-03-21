@@ -265,6 +265,7 @@ public class MockDataFactory {
     
     data.setCsiID(CSI_ABYSS_ID);
     data.setTitle("Abyss");
+    data.setPublisher("Asmodee Editions");
     data.setCategory(CoolStuffIncCategory.BOARDGAMES);
     data.setSku("ASMABY01US");
     data.setImageURL("http://a4.res.cloudinary.com/csicdn/image/upload/v1/Images/Products/Misc%20Art/Asmodee%20Editions/full/ASMABY01US.jpg");
@@ -285,6 +286,7 @@ public class MockDataFactory {
     
     data.setCsiID(CSI_COSMIC_ENCOUNTER_ID);
     data.setTitle("Cosmic Encounter Board Game");
+    data.setPublisher("Fantasy Flight Games");
     data.setCategory(CoolStuffIncCategory.BOARDGAMES);
     data.setSku("FFGCE01");
     data.setImageURL("http://a1.res.cloudinary.com/csicdn/image/upload/v1/Images/Products/Misc%20Art/Fantasy%20Flight%20Games/full/FFGCosmicEncounter.jpg");
@@ -301,6 +303,7 @@ public class MockDataFactory {
     
     data.setCsiID(CSI_COSMIC_INCURSION_ID);
     data.setTitle("Cosmic Encounter: Cosmic Incursion Expansion");
+    data.setPublisher("Fantasy Flight Games");
     data.setCategory(CoolStuffIncCategory.BOARDGAMES);
     data.setSku("FFGCE02");
     data.setImageURL("http://a5.res.cloudinary.com/csicdn/image/upload/v1/Images/Products/Misc%20Art/Fantasy%20Flight%20Games/full/ffg_cosmicencounterCosmicIncursion.jpg");
@@ -327,6 +330,7 @@ public class MockDataFactory {
     
     data.setMmID(MM_ABYSS_ID);
     data.setTitle("Abyss");
+    data.setManufacturer("Asmodee");
     data.setSku("ASMABY01US");
     data.setCategory(MiniatureMarketCategory.BOARDGAMES);
     data.setImageURL("http://a4.res.cloudinary.com/csicdn/image/upload/v1/Images/Products/Misc%20Art/Asmodee%20Editions/full/ASMABY01US.jpg");
@@ -346,6 +350,7 @@ public class MockDataFactory {
     
     data.setMmID(MM_COSMIC_ENCOUNTER_ID);
     data.setTitle("Cosmic Encounter");
+    data.setManufacturer("Fantasy Flight Games");
     data.setCategory(MiniatureMarketCategory.BOARDGAMES);
     data.setSku("FFGCE01");
     data.setImageURL("http://cdn.miniaturemarket.com/media/catalog/product/f/f/ffgce01.jpg");
@@ -361,6 +366,7 @@ public class MockDataFactory {
     
     data.setMmID(MM_COSMIC_INCURSION_ID);
     data.setTitle("Cosmic Encounter Cosmic Incursion Expansion");
+    data.setManufacturer("Fantasy Flight Games");
     data.setCategory(MiniatureMarketCategory.BOARDGAMES);
     data.setSku("FFGCE02");
     data.setImageURL("http://cdn.miniaturemarket.com/media/catalog/product/F/F/FFGCE02.jpg");

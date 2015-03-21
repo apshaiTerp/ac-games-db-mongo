@@ -285,6 +285,7 @@ public class TestMongoGamesDatabase extends TestCase {
       assertNotNull("I didn't find my result", cosmicEncounter2);
       assertTrue("The csiIDs are not equal", cosmicEncounter.getCsiID() == cosmicEncounter2.getCsiID());
       assertTrue("The titles are not equal", cosmicEncounter.getTitle().equalsIgnoreCase(cosmicEncounter2.getTitle()));
+      assertTrue("The publishers are not equal", cosmicEncounter.getPublisher().equalsIgnoreCase(cosmicEncounter2.getPublisher()));
       assertTrue("The categories are not equal", cosmicEncounter.getCategory() == cosmicEncounter2.getCategory());
       assertTrue("The skus are not equal", cosmicEncounter.getSku().equalsIgnoreCase(cosmicEncounter2.getSku()));
       assertTrue("The curPrices are not equal", cosmicEncounter.getCurPrice() == cosmicEncounter2.getCurPrice());
@@ -298,6 +299,7 @@ public class TestMongoGamesDatabase extends TestCase {
       assertNotNull("I didn't find my result", cosmicIncursion2);
       assertTrue("The csiIDs are not equal", cosmicIncursion.getCsiID() == cosmicIncursion2.getCsiID());
       assertTrue("The titles are not equal", cosmicIncursion.getTitle().equalsIgnoreCase(cosmicIncursion2.getTitle()));
+      assertTrue("The publishers are not equal", cosmicIncursion.getPublisher().equalsIgnoreCase(cosmicIncursion2.getPublisher()));
       assertTrue("The categories are not equal", cosmicIncursion.getCategory() == cosmicIncursion2.getCategory());
       assertTrue("The skus are not equal", cosmicIncursion.getSku().equalsIgnoreCase(cosmicIncursion2.getSku()));
       assertTrue("The curPrices are not equal", cosmicIncursion.getCurPrice() == cosmicIncursion2.getCurPrice());
@@ -320,6 +322,7 @@ public class TestMongoGamesDatabase extends TestCase {
       assertNotNull("I didn't find my result", cosmicEncounter3);
       assertTrue("The csiIDs are not equal", cosmicEncounter.getCsiID() == cosmicEncounter3.getCsiID());
       assertTrue("The titles are not equal", cosmicEncounter.getTitle().equalsIgnoreCase(cosmicEncounter3.getTitle()));
+      assertTrue("The publishers are not equal", cosmicEncounter.getPublisher().equalsIgnoreCase(cosmicEncounter3.getPublisher()));
       assertTrue("The categories are not equal", cosmicEncounter.getCategory() == cosmicEncounter3.getCategory());
       assertTrue("The skus are not equal", cosmicEncounter.getSku().equalsIgnoreCase(cosmicEncounter3.getSku()));
       assertTrue("The curPrices are not equal", cosmicEncounter.getCurPrice() == cosmicEncounter3.getCurPrice());
@@ -333,6 +336,7 @@ public class TestMongoGamesDatabase extends TestCase {
       assertNotNull("I didn't find my result", abyss2);
       assertTrue("The csiIDs are not equal", abyss.getCsiID() == abyss2.getCsiID());
       assertTrue("The titles are not equal", abyss.getTitle().equalsIgnoreCase(abyss2.getTitle()));
+      assertTrue("The publishers are not equal", abyss.getPublisher().equalsIgnoreCase(abyss2.getPublisher()));
       assertTrue("The skus are not equal", abyss.getSku().equalsIgnoreCase(abyss2.getSku()));
       assertTrue("The categories are not equal", abyss.getCategory() == abyss2.getCategory());
       assertTrue("The curPrices are not equal", abyss.getCurPrice() == abyss2.getCurPrice());
@@ -452,6 +456,7 @@ public class TestMongoGamesDatabase extends TestCase {
       assertNotNull("I didn't find my result", cosmicEncounter2);
       assertTrue("The mmIDs are not equal", cosmicEncounter.getMmID() == cosmicEncounter2.getMmID());
       assertTrue("The titles are not equal", cosmicEncounter.getTitle().equalsIgnoreCase(cosmicEncounter2.getTitle()));
+      assertTrue("The manufacturers are not equal", cosmicEncounter.getManufacturer().equalsIgnoreCase(cosmicEncounter2.getManufacturer()));
       assertTrue("The categories are not equal", cosmicEncounter.getCategory() == cosmicEncounter2.getCategory());
       assertTrue("The skus are not equal", cosmicEncounter.getSku().equalsIgnoreCase(cosmicEncounter2.getSku()));
       assertTrue("The curPrices are not equal", cosmicEncounter.getCurPrice() == cosmicEncounter2.getCurPrice());
@@ -465,6 +470,7 @@ public class TestMongoGamesDatabase extends TestCase {
       assertNotNull("I didn't find my result", cosmicIncursion2);
       assertTrue("The mmIDs are not equal", cosmicIncursion.getMmID() == cosmicIncursion2.getMmID());
       assertTrue("The titles are not equal", cosmicIncursion.getTitle().equalsIgnoreCase(cosmicIncursion2.getTitle()));
+      assertTrue("The manufacturers are not equal", cosmicIncursion.getManufacturer().equalsIgnoreCase(cosmicIncursion2.getManufacturer()));
       assertTrue("The categories are not equal", cosmicIncursion.getCategory() == cosmicIncursion2.getCategory());
       assertTrue("The skus are not equal", cosmicIncursion.getSku().equalsIgnoreCase(cosmicIncursion2.getSku()));
       assertTrue("The curPrices are not equal", cosmicIncursion.getCurPrice() == cosmicIncursion2.getCurPrice());
@@ -487,6 +493,7 @@ public class TestMongoGamesDatabase extends TestCase {
       assertNotNull("I didn't find my result", cosmicEncounter3);
       assertTrue("The mmIDs are not equal", cosmicEncounter.getMmID() == cosmicEncounter3.getMmID());
       assertTrue("The titles are not equal", cosmicEncounter.getTitle().equalsIgnoreCase(cosmicEncounter3.getTitle()));
+      assertTrue("The manufacturers are not equal", cosmicEncounter.getManufacturer().equalsIgnoreCase(cosmicEncounter3.getManufacturer()));
       assertTrue("The categories are not equal", cosmicEncounter.getCategory() == cosmicEncounter3.getCategory());
       assertTrue("The skus are not equal", cosmicEncounter.getSku().equalsIgnoreCase(cosmicEncounter3.getSku()));
       assertTrue("The curPrices are not equal", cosmicEncounter.getCurPrice() == cosmicEncounter3.getCurPrice());
@@ -500,6 +507,7 @@ public class TestMongoGamesDatabase extends TestCase {
       assertNotNull("I didn't find my result", abyss2);
       assertTrue("The mmIDs are not equal", abyss.getMmID() == abyss2.getMmID());
       assertTrue("The titles are not equal", abyss.getTitle().equalsIgnoreCase(abyss2.getTitle()));
+      assertTrue("The manufacturers are not equal", abyss.getManufacturer().equalsIgnoreCase(abyss2.getManufacturer()));
       assertTrue("The categories are not equal", abyss.getCategory() == abyss2.getCategory());
       assertTrue("The skus are not equal", abyss.getSku().equalsIgnoreCase(abyss2.getSku()));
       assertTrue("The curPrices are not equal", abyss.getCurPrice() == abyss2.getCurPrice());
