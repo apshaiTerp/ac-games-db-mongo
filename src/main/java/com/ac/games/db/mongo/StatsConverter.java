@@ -76,6 +76,7 @@ public class StatsConverter {
     dbObject.append("boardGameCount", stats.getBoardGameCount());
     dbObject.append("tableTopCount", stats.getTableTopCount());
     dbObject.append("ccgCount", stats.getCcgCount());
+    dbObject.append("lcgCount", stats.getLcgCount());
     dbObject.append("collectiblesCount", stats.getCollectiblesCount());
     dbObject.append("rpgCount", stats.getRpgCount());
     dbObject.append("accessoriesCount", stats.getAccessoriesCount());
@@ -129,6 +130,7 @@ public class StatsConverter {
     stats.setBoardGameCount((Integer)dbObject.get("boardGameCount"));
     stats.setTableTopCount((Integer)dbObject.get("tableTopCount"));
     stats.setCcgCount((Integer)dbObject.get("ccgCount"));
+    stats.setLcgCount((Integer)dbObject.get("lcgCount"));
     stats.setCollectiblesCount((Integer)dbObject.get("collectiblesCount"));
     stats.setRpgCount((Integer)dbObject.get("rpgCount"));
     stats.setAccessoriesCount((Integer)dbObject.get("accessoriesCount"));
