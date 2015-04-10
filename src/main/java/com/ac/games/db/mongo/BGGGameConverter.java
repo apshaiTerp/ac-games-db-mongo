@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 import com.ac.games.data.BGGGame;
+import com.ac.games.data.CompactSearchData;
 import com.ac.games.data.GameTypeConverter;
 import com.ac.games.data.ReviewStateConverter;
 import com.mongodb.BasicDBList;
@@ -115,6 +116,25 @@ public class BGGGameConverter {
     if (dbObject.containsField("reviewDate"))        game.setReviewDate((Date)dbObject.get("reviewDate"));
     
     return game;
+  }
+  
+  public static CompactSearchData convertMongoToCompact(DBObject dbObject) {
+    if (dbObject == null) return null;
+      
+    CompactSearchData data = new CompactSearchData();
+    
+    if (dbObject.containsField("bggID")) {
+      data.setSourceID((Long)dbObject.get("bggID"));  
+      data.setSourceField("bggID");
+    }
+    String nameText = "Unavailable";
+    if (dbObject.containsField("name")) nameText = (String)dbObject.get("name");
+    if (dbObject.containsField("yearPublished")) nameText += " (" + (Integer)dbObject.get("yearPublished") + ")";
+    data.setDisplayString(nameText);
+    
+    if (dbObject.containsField("imageThumbnailURL")) data.setThumbnailURL((String)dbObject.get("imageThumbnailURL"));
+
+    return data;  
   }
   
   /**

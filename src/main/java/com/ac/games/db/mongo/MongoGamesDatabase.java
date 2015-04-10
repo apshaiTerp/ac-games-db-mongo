@@ -11,13 +11,18 @@ import com.ac.games.data.BGGGameStats;
 import com.ac.games.data.CSIDataStats;
 import com.ac.games.data.Collection;
 import com.ac.games.data.CollectionItem;
+import com.ac.games.data.CompactSearchData;
 import com.ac.games.data.CoolStuffIncPriceData;
 import com.ac.games.data.Game;
 import com.ac.games.data.GameReltn;
+import com.ac.games.data.GameType;
+import com.ac.games.data.GameTypeConverter;
 import com.ac.games.data.MMDataStats;
 import com.ac.games.data.MediaItem;
 import com.ac.games.data.MiniatureMarketPriceData;
 import com.ac.games.data.PlaythruItem;
+import com.ac.games.data.ReviewState;
+import com.ac.games.data.ReviewStateConverter;
 import com.ac.games.data.User;
 import com.ac.games.data.UserDetail;
 import com.ac.games.data.WishlistItem;
@@ -25,6 +30,7 @@ import com.ac.games.db.GamesDatabase;
 import com.ac.games.db.exception.ConfigurationException;
 import com.ac.games.db.exception.DatabaseOperationException;
 import com.mongodb.AggregationOutput;
+import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
@@ -706,6 +712,46 @@ public class MongoGamesDatabase implements GamesDatabase {
       //Open the collection, i.e. table
       DBCollection gameCollection = mongoDB.getCollection("game");
       BasicDBObject searchObject  = GameConverter.convertGameToIDQuery(gameID);
+      
+      DBCursor cursor = gameCollection.find(searchObject);
+      
+      if (debugMode)
+        System.out.println ("Total documents found during this query:            " + cursor.size());
+      
+      Game game = null;
+      while (cursor.hasNext()) {
+        DBObject object = cursor.next();
+        game = GameConverter.convertMongoToGame(object);
+      }
+      
+      if (debugMode)
+        System.out.println ("The game found by this query was:                   " + (game == null ? "Nothing Found" : game.getName()));
+      return game;
+      
+    } catch (MongoException me) {
+      throw new DatabaseOperationException("Mongo raised an exception to this select: " + me.getMessage(), me);
+    } catch (Throwable t) {
+      throw new DatabaseOperationException("Something bad happened executing the select", t);
+    }
+  }
+
+  /*
+   * (non-Javadoc)
+   * @see com.ac.games.db.GamesDatabase#readGame(long)
+   */
+  public Game readGameByBGGID(long bggID) throws ConfigurationException, DatabaseOperationException {
+    //Check basic pre-conditions
+    if (bggID < 0)
+      throw new DatabaseOperationException("The provided game object was not valid.");
+    
+    if (mongoClient == null || mongoDB == null)
+      throw new ConfigurationException("There is a problem with the database connection.");
+    
+    //Run the operation
+    try {
+      //Open the collection, i.e. table
+      DBCollection gameCollection = mongoDB.getCollection("game");
+      BasicDBObject searchObject  = GameConverter.convertGameToBGGIDQuery(bggID);
       
       DBCursor cursor = gameCollection.find(searchObject);
       
@@ -2792,5 +2838,373 @@ public class MongoGamesDatabase implements GamesDatabase {
     } catch (Throwable t) {
       throw new DatabaseOperationException("Something bad happened executing the insert", t);
     }
+  }
+
+  /*
+   * (non-Javadoc)
+   * @see com.ac.games.db.GamesDatabase#readBGGGameByName(java.lang.String, boolean)
+   */
+  public List<BGGGame> readBGGGameByName(String gameName, boolean addWildCard, GameType gameTypeFilter) throws ConfigurationException, DatabaseOperationException {
+    //Check basic pre-conditions
+    if (gameName == null)
+      throw new DatabaseOperationException("The provided gameName object was not valid.");
+    
+    if (mongoClient == null || mongoDB == null)
+      throw new ConfigurationException("There is a problem with the database connection.");
+    
+    //Run the operation
+    try {
+      //Open the collection, i.e. table
+      DBCollection gameCollection = mongoDB.getCollection("bgggame");
+      
+      BasicDBObject regexObject = new BasicDBObject();
+      if (addWildCard)   regexObject.append("$regex", "(?i)" + gameName.trim() + ".*");
+      else               regexObject.append("$regex", "(?i)" + gameName.trim());
+      
+      BasicDBObject searchObject  = new BasicDBObject("name", regexObject);
+      BasicDBList ignoreRejectList = new BasicDBList();
+      ignoreRejectList.add(new Integer(ReviewStateConverter.convertReviewStateToFlag(ReviewState.REVIEWED)));
+      ignoreRejectList.add(new Integer(ReviewStateConverter.convertReviewStateToFlag(ReviewState.PENDING)));
+      searchObject.append("reviewState", new BasicDBObject("$in", ignoreRejectList));
+      
+      if ((gameTypeFilter == null) || (gameTypeFilter == GameType.BASE_AND_COLLECTIBLE)) {
+        BasicDBList filterList = new BasicDBList();
+        filterList.add(GameTypeConverter.convertGameTypeToFlag(GameType.BASE));
+        filterList.add(GameTypeConverter.convertGameTypeToFlag(GameType.COLLECTIBLE));
+        searchObject.append("gameType", new BasicDBObject("$in", filterList));
+      } else {
+        searchObject.append("gameType", GameTypeConverter.convertGameTypeToFlag(gameTypeFilter));
+      }
+      
+      //TODO - DEBUG
+      System.out.println ("The query I'm about to run is: db.bgggame.find(" + searchObject + ")");
+      debugMode = true;
+      
+      DBCursor cursor = gameCollection.find(searchObject);
+      
+      if (debugMode)
+        System.out.println ("Total documents found during this query:            " + cursor.size());
+      
+      List<BGGGame> games = new ArrayList<BGGGame>(cursor.size());
+      while (cursor.hasNext()) {
+        DBObject object = cursor.next();
+        games.add(BGGGameConverter.convertMongoToGame(object));
+      }
+
+      debugMode = false;
+      System.out.println ("games.size(): " + games.size());
+      
+      return games;
+      
+    } catch (MongoException me) {
+      throw new DatabaseOperationException("Mongo raised an exception to this select: " + me.getMessage(), me);
+    } catch (Throwable t) {
+      throw new DatabaseOperationException("Something bad happened executing the select", t);
+    }
+  }
+
+  /*
+   * (non-Javadoc)
+   * @see com.ac.games.db.GamesDatabase#readBGGGameForReview(java.lang.String)
+   */
+  public BGGGame readBGGGameForReview(String reviewType) throws ConfigurationException, DatabaseOperationException {
+    //Check basic pre-conditions
+    if (reviewType == null)
+      throw new DatabaseOperationException("The provided reviewType object was not valid.");
+    
+    if (mongoClient == null || mongoDB == null)
+      throw new ConfigurationException("There is a problem with the database connection.");
+    
+    //Run the operation
+    try {
+      //Open the collection, i.e. table
+      DBCollection gameCollection = mongoDB.getCollection("bgggame");
+      
+      BasicDBObject findObject = new BasicDBObject("reviewState", ReviewStateConverter.convertReviewStateToFlag(ReviewState.PENDING));
+      BasicDBObject sortObject = new BasicDBObject("gameType", 1);
+      if (reviewType.equalsIgnoreCase("new")) sortObject.append("bggID", -1);
+      else                                    sortObject.append("bggID", 1);
+      
+      DBCursor cursor = gameCollection.find(findObject).sort(sortObject).limit(1);
+      
+      if (debugMode)
+        System.out.println ("Total documents found during this query:            " + cursor.size());
+      
+      BGGGame game = null;
+      while (cursor.hasNext()) {
+        DBObject object = cursor.next();
+        game = BGGGameConverter.convertMongoToGame(object);
+      }
+      
+      return game;
+      
+    } catch (MongoException me) {
+      throw new DatabaseOperationException("Mongo raised an exception to this select: " + me.getMessage(), me);
+    } catch (Throwable t) {
+      throw new DatabaseOperationException("Something bad happened executing the select", t);
+    }
+  }
+
+  /*
+   * (non-Javadoc)
+   * @see com.ac.games.db.GamesDatabase#readCSIDataByTitle(java.lang.String, boolean)
+   */
+  public List<CoolStuffIncPriceData> readCSIDataByTitle(String title, boolean addWildCard) throws ConfigurationException, DatabaseOperationException {
+    //Check basic pre-conditions
+    if (title == null)
+      throw new DatabaseOperationException("The provided title object was not valid.");
+    
+    if (mongoClient == null || mongoDB == null)
+      throw new ConfigurationException("There is a problem with the database connection.");
+    
+    //Run the operation
+    try {
+      //Open the collection, i.e. table
+      DBCollection csiCollection = mongoDB.getCollection("csidata");
+      
+      BasicDBObject regexObject = new BasicDBObject();
+      if (addWildCard)   regexObject.append("$regex", "(?i)" + title.trim() + ".*");
+      else               regexObject.append("$regex", "(?i)" + title.trim());
+      
+      BasicDBObject searchObject  = new BasicDBObject("name", regexObject);
+      BasicDBList ignoreRejectList = new BasicDBList();
+      ignoreRejectList.add(ReviewStateConverter.convertReviewStateToFlag(ReviewState.REVIEWED));
+      ignoreRejectList.add(ReviewStateConverter.convertReviewStateToFlag(ReviewState.PENDING));
+      searchObject.append("reviewState", new BasicDBObject("$in", ignoreRejectList));
+      
+      DBCursor cursor = csiCollection.find(searchObject);
+      
+      if (debugMode)
+        System.out.println ("Total documents found during this query:            " + cursor.size());
+      
+      List<CoolStuffIncPriceData> games = new ArrayList<CoolStuffIncPriceData>(cursor.size());
+      while (cursor.hasNext()) {
+        DBObject object = cursor.next();
+        games.add(CSIDataConverter.convertMongoToCSI(object));
+      }
+      
+      return games;
+      
+    } catch (MongoException me) {
+      throw new DatabaseOperationException("Mongo raised an exception to this select: " + me.getMessage(), me);
+    } catch (Throwable t) {
+      throw new DatabaseOperationException("Something bad happened executing the select", t);
+    }
+  }
+
+  /*
+   * (non-Javadoc)
+   * @see com.ac.games.db.GamesDatabase#readCSIDataForReview(java.lang.String)
+   */
+  public CoolStuffIncPriceData readCSIDataForReview(String reviewType) throws ConfigurationException, DatabaseOperationException {
+    //Check basic pre-conditions
+    if (reviewType == null)
+      throw new DatabaseOperationException("The provided reviewType object was not valid.");
+    
+    if (mongoClient == null || mongoDB == null)
+      throw new ConfigurationException("There is a problem with the database connection.");
+    
+    //Run the operation
+    try {
+      //Open the collection, i.e. table
+      DBCollection csiCollection = mongoDB.getCollection("csidata");
+      
+      BasicDBObject findObject = new BasicDBObject("reviewState", ReviewStateConverter.convertReviewStateToFlag(ReviewState.PENDING));
+      BasicDBObject sortObject = new BasicDBObject("csiID", -1);
+      
+      DBCursor cursor = csiCollection.find(findObject).sort(sortObject).limit(1);
+      
+      if (debugMode)
+        System.out.println ("Total documents found during this query:            " + cursor.size());
+      
+      CoolStuffIncPriceData game = null;
+      while (cursor.hasNext()) {
+        DBObject object = cursor.next();
+        game = CSIDataConverter.convertMongoToCSI(object);
+      }
+      
+      return game;
+      
+    } catch (MongoException me) {
+      throw new DatabaseOperationException("Mongo raised an exception to this select: " + me.getMessage(), me);
+    } catch (Throwable t) {
+      throw new DatabaseOperationException("Something bad happened executing the select", t);
+    }
+  }
+
+  /*
+   * (non-Javadoc)
+   * @see com.ac.games.db.GamesDatabase#readMMDataByTitle(java.lang.String, boolean)
+   */
+  public List<MiniatureMarketPriceData> readMMDataByTitle(String title, boolean addWildCard) throws ConfigurationException, DatabaseOperationException {
+    //Check basic pre-conditions
+    if (title == null)
+      throw new DatabaseOperationException("The provided title object was not valid.");
+    
+    if (mongoClient == null || mongoDB == null)
+      throw new ConfigurationException("There is a problem with the database connection.");
+    
+    //Run the operation
+    try {
+      //Open the collection, i.e. table
+      DBCollection mmCollection = mongoDB.getCollection("mmdata");
+      
+      BasicDBObject regexObject = new BasicDBObject();
+      if (addWildCard)   regexObject.append("$regex", "(?i)" + title.trim() + ".*");
+      else               regexObject.append("$regex", "(?i)" + title.trim());
+      
+      BasicDBObject searchObject  = new BasicDBObject("name", regexObject);
+      BasicDBList ignoreRejectList = new BasicDBList();
+      ignoreRejectList.add(ReviewStateConverter.convertReviewStateToFlag(ReviewState.REVIEWED));
+      ignoreRejectList.add(ReviewStateConverter.convertReviewStateToFlag(ReviewState.PENDING));
+      searchObject.append("reviewState", new BasicDBObject("$in", ignoreRejectList));
+      
+      DBCursor cursor = mmCollection.find(searchObject);
+      
+      if (debugMode)
+        System.out.println ("Total documents found during this query:            " + cursor.size());
+      
+      List<MiniatureMarketPriceData> games = new ArrayList<MiniatureMarketPriceData>(cursor.size());
+      while (cursor.hasNext()) {
+        DBObject object = cursor.next();
+        games.add(MMDataConverter.convertMongoToMM(object));
+      }
+      
+      return games;
+      
+    } catch (MongoException me) {
+      throw new DatabaseOperationException("Mongo raised an exception to this select: " + me.getMessage(), me);
+    } catch (Throwable t) {
+      throw new DatabaseOperationException("Something bad happened executing the select", t);
+    }
+  }
+
+  /*
+   * (non-Javadoc)
+   * @see com.ac.games.db.GamesDatabase#readMMDataForReview(java.lang.String)
+   */
+  public MiniatureMarketPriceData readMMDataForReview(String reviewType) throws ConfigurationException, DatabaseOperationException {
+    //Check basic pre-conditions
+    if (reviewType == null)
+      throw new DatabaseOperationException("The provided reviewType object was not valid.");
+    
+    if (mongoClient == null || mongoDB == null)
+      throw new ConfigurationException("There is a problem with the database connection.");
+    
+    //Run the operation
+    try {
+      //Open the collection, i.e. table
+      DBCollection mmCollection = mongoDB.getCollection("mmdata");
+      
+      BasicDBObject findObject = new BasicDBObject("reviewState", ReviewStateConverter.convertReviewStateToFlag(ReviewState.PENDING));
+      BasicDBObject sortObject = new BasicDBObject("mmID", -1);
+      
+      DBCursor cursor = mmCollection.find(findObject).sort(sortObject).limit(1);
+      
+      if (debugMode)
+        System.out.println ("Total documents found during this query:            " + cursor.size());
+      
+      MiniatureMarketPriceData game = null;
+      while (cursor.hasNext()) {
+        DBObject object = cursor.next();
+        game = MMDataConverter.convertMongoToMM(object);
+      }
+      
+      return game;
+      
+    } catch (MongoException me) {
+      throw new DatabaseOperationException("Mongo raised an exception to this select: " + me.getMessage(), me);
+    } catch (Throwable t) {
+      throw new DatabaseOperationException("Something bad happened executing the select", t);
+    }
+  }
+
+  public List<Game> readGameByName(String gameName, boolean addWildCard, GameType gameTypeFilter) throws ConfigurationException,
+      DatabaseOperationException {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  public List<CompactSearchData> readGameByName(String gameName, boolean addWildCard, GameType gameTypeFilter, int rowLimit)
+      throws ConfigurationException, DatabaseOperationException {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  public List<CompactSearchData> readBGGGameByName(String gameName, boolean addWildCard, GameType gameTypeFilter, int resultLimit)
+      throws ConfigurationException, DatabaseOperationException {
+    //Check basic pre-conditions
+    if (gameName == null)
+      throw new DatabaseOperationException("The provided gameName object was not valid.");
+    
+    if (mongoClient == null || mongoDB == null)
+      throw new ConfigurationException("There is a problem with the database connection.");
+    
+    //Run the operation
+    try {
+      //Open the collection, i.e. table
+      DBCollection gameCollection = mongoDB.getCollection("bgggame");
+      
+      BasicDBObject regexObject = new BasicDBObject();
+      if (addWildCard)   regexObject.append("$regex", "(?i)" + gameName.trim() + ".*");
+      else               regexObject.append("$regex", "(?i)" + gameName.trim());
+      
+      BasicDBObject searchObject  = new BasicDBObject("name", regexObject);
+      BasicDBList ignoreRejectList = new BasicDBList();
+      ignoreRejectList.add(new Integer(ReviewStateConverter.convertReviewStateToFlag(ReviewState.REVIEWED)));
+      ignoreRejectList.add(new Integer(ReviewStateConverter.convertReviewStateToFlag(ReviewState.PENDING)));
+      searchObject.append("reviewState", new BasicDBObject("$in", ignoreRejectList));
+      
+      if ((gameTypeFilter == null) || (gameTypeFilter == GameType.BASE_AND_COLLECTIBLE)) {
+        BasicDBList filterList = new BasicDBList();
+        filterList.add(GameTypeConverter.convertGameTypeToFlag(GameType.BASE));
+        filterList.add(GameTypeConverter.convertGameTypeToFlag(GameType.COLLECTIBLE));
+        searchObject.append("gameType", new BasicDBObject("$in", filterList));
+      } else {
+        searchObject.append("gameType", GameTypeConverter.convertGameTypeToFlag(gameTypeFilter));
+      }
+      
+      BasicDBObject columnsObject = new BasicDBObject("bggID", 1);
+      columnsObject.append("name", 1);
+      columnsObject.append("yearPublished", 1);
+      columnsObject.append("imageThumbnailURL", 1);
+      
+      //TODO - DEBUG
+      System.out.println ("The query I'm about to run is: db.bgggame.find({" + searchObject + "}, {" + columnsObject + "})");
+      debugMode = true;
+      
+      DBCursor cursor = gameCollection.find(searchObject, columnsObject).limit(resultLimit);
+      
+      if (debugMode)
+        System.out.println ("Total documents found during this query:            " + cursor.size());
+      
+      List<CompactSearchData> games = new ArrayList<CompactSearchData>(cursor.size());
+      while (cursor.hasNext()) {
+        DBObject object = cursor.next();
+        games.add(BGGGameConverter.convertMongoToCompact(object));
+      }
+
+      debugMode = false;
+      System.out.println ("games.size(): " + games.size());
+      
+      return games;
+      
+    } catch (MongoException me) {
+      throw new DatabaseOperationException("Mongo raised an exception to this select: " + me.getMessage(), me);
+    } catch (Throwable t) {
+      throw new DatabaseOperationException("Something bad happened executing the select", t);
+    }
+  }
+
+  public List<CompactSearchData> readCSIDataByTitle(String title, boolean addWildCard, int rowLimit)
+      throws ConfigurationException, DatabaseOperationException {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  public List<CompactSearchData> readMMDataByTitle(String title, boolean addWildCard, int rowLimit)
+      throws ConfigurationException, DatabaseOperationException {
+    // TODO Auto-generated method stub
+    return null;
   }
 }

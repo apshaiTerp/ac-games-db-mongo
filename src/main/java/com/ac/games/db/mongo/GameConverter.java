@@ -34,7 +34,7 @@ public class GameConverter {
   /**
    * Helper method that will construct a basic query using the gameID representing the provided game.
    * 
-   * @param bggID The game ID we want to build a query for.
+   * @param gameID The game ID we want to build a query for.
    * 
    * @return Returns a {@link BasicDBObject} object that represents this query, or null if no game was provided
    */
@@ -42,6 +42,20 @@ public class GameConverter {
     if (gameID < 0) return null;
     
     BasicDBObject dbObject = new BasicDBObject("gameID", new Long(gameID));
+    return dbObject;
+  }
+
+  /**
+   * Helper method that will construct a basic query using the gameID representing the provided game.
+   * 
+   * @param bggID The bggID used to create this game that we want to build a query for.
+   * 
+   * @return Returns a {@link BasicDBObject} object that represents this query, or null if no game was provided
+   */
+  public static BasicDBObject convertGameToBGGIDQuery(long bggID) {
+    if (bggID < 0) return null;
+    
+    BasicDBObject dbObject = new BasicDBObject("bggID", new Long(bggID));
     return dbObject;
   }
 
