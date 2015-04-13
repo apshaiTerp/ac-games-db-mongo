@@ -3010,7 +3010,13 @@ public class MongoGamesDatabase implements GamesDatabase {
       DBCollection csiCollection = mongoDB.getCollection("csidata");
       
       BasicDBObject findObject = new BasicDBObject("reviewState", ReviewStateConverter.convertReviewStateToFlag(ReviewState.PENDING));
-      BasicDBObject sortObject = new BasicDBObject("csiID", -1);
+      BasicDBObject sortObject = null;
+      if (reviewType.equalsIgnoreCase("new"))
+        sortObject = new BasicDBObject("csiID", -1);
+      else sortObject = new BasicDBObject("csiID", 1);
+      
+      //DEBUG
+      System.out.println ("The query that is being run is db.csidata.find(" + findObject + ".sort(" + sortObject + ").limit(1)");
       
       DBCursor cursor = csiCollection.find(findObject).sort(sortObject).limit(1);
       
@@ -3097,7 +3103,10 @@ public class MongoGamesDatabase implements GamesDatabase {
       DBCollection mmCollection = mongoDB.getCollection("mmdata");
       
       BasicDBObject findObject = new BasicDBObject("reviewState", ReviewStateConverter.convertReviewStateToFlag(ReviewState.PENDING));
-      BasicDBObject sortObject = new BasicDBObject("mmID", -1);
+      BasicDBObject sortObject = null;
+      if (reviewType.equalsIgnoreCase("new"))
+        sortObject = new BasicDBObject("mmID", -1);
+      else sortObject = new BasicDBObject("mmID", 1);
       
       DBCursor cursor = mmCollection.find(findObject).sort(sortObject).limit(1);
       
@@ -3124,11 +3133,53 @@ public class MongoGamesDatabase implements GamesDatabase {
     // TODO Auto-generated method stub
     return null;
   }
-
-  public List<CompactSearchData> readGameByName(String gameName, boolean addWildCard, GameType gameTypeFilter, int rowLimit)
+  
+  /*
+   * (non-Javadoc)
+   * @see com.ac.games.db.GamesDatabase#readGameFromAutoName(java.lang.String, java.lang.String, int)
+   */
+  public CompactSearchData readGameFromAutoName(String gameName, String primaryPublisher, int yearPublished)
       throws ConfigurationException, DatabaseOperationException {
-    // TODO Auto-generated method stub
-    return null;
+    //Check basic pre-conditions
+    if (gameName == null)
+      throw new DatabaseOperationException("The provided gameName object was not valid.");
+    
+    if (mongoClient == null || mongoDB == null)
+      throw new ConfigurationException("There is a problem with the database connection.");
+    
+    //Run the operation
+    try {
+      //Open the collection, i.e. table
+      DBCollection gameCollection = mongoDB.getCollection("game");
+      
+      BasicDBObject queryObject = new BasicDBObject("name", gameName);
+      if (primaryPublisher != null)
+        queryObject.append("primaryPublisher", primaryPublisher);
+      if (yearPublished != -1)
+        queryObject.append("yearPublished", yearPublished);
+      
+      BasicDBObject columnsObject = new BasicDBObject("gameID", 1);
+      columnsObject.append("name", 1);
+      columnsObject.append("yearPublished", 1);
+      columnsObject.append("imageThumbnailURL", 1);
+      
+      //DEBUG
+      System.out.println ("The query we are about to run is: db.game.find({" + queryObject + "}, {" + columnsObject + "})");
+      
+      DBCursor cursor = gameCollection.find(queryObject, columnsObject);
+      CompactSearchData data = null;
+      
+      while (cursor.hasNext()) {
+        DBObject object = cursor.next();
+        data = GameConverter.convertMongoToCompact(object);
+      }
+      
+      return data;
+    } catch (MongoException me) {
+      throw new DatabaseOperationException("Mongo raised an exception to this select: " + me.getMessage(), me);
+    } catch (Throwable t) {
+      throw new DatabaseOperationException("Something bad happened executing the select", t);
+    }
   }
 
   public List<CompactSearchData> readBGGGameByName(String gameName, boolean addWildCard, GameType gameTypeFilter, int resultLimit)
@@ -3206,5 +3257,56 @@ public class MongoGamesDatabase implements GamesDatabase {
       throws ConfigurationException, DatabaseOperationException {
     // TODO Auto-generated method stub
     return null;
+  }
+
+  public List<String> readGameNamesForAutoComplete() throws ConfigurationException, DatabaseOperationException {
+    if (mongoClient == null || mongoDB == null)
+      throw new ConfigurationException("There is a problem with the database connection.");
+    
+    //Run the operation
+    try {
+      //Open the collection, i.e. table
+      DBCollection gameCollection = mongoDB.getCollection("game");
+      
+      BasicDBObject searchObject = new BasicDBObject("gameID", new BasicDBObject("$gt", 0));
+      
+      BasicDBObject columnsObject = new BasicDBObject("name", 1);
+      columnsObject.append("primaryPublisher", 1);
+      columnsObject.append("yearPublished", 1);
+      
+      DBCursor cursor = gameCollection.find(searchObject, columnsObject);
+      List<String> results = new LinkedList<String>();
+      
+      while (cursor.hasNext()) {
+        DBObject object = cursor.next();
+        
+        String gameName   = (String)object.get("name");
+        String primaryPub = (String)object.get("primaryPublisher");
+        int yearPublished = -1;
+        if (object.containsField("yearPublished"))
+          yearPublished = (Integer)object.get("yearPublished");
+        
+        boolean writePub  = !primaryPub.startsWith("(");
+        boolean writeYear = (yearPublished > 1);
+        
+        String searchResult = gameName;
+        
+        if (writePub && writeYear)
+          searchResult += " (" + primaryPub + " - " + yearPublished + ")";
+        else if (writePub && !writeYear)
+          searchResult += " (" + primaryPub + ")";
+        else if (!writePub && writeYear)
+          searchResult += " (" + writeYear + ")";
+        
+        results.add(searchResult);
+      }
+      try { cursor.close(); } catch (Throwable t) { /** Ignore Me */ }
+      return results;
+      
+    } catch (MongoException me) {
+      throw new DatabaseOperationException("Mongo raised an exception to this select: " + me.getMessage(), me);
+    } catch (Throwable t) {
+      throw new DatabaseOperationException("Something bad happened executing the select", t);
+    }
   }
 }

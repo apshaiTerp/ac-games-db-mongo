@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.ac.games.data.CompactSearchData;
 import com.ac.games.data.Game;
 import com.ac.games.data.GameTypeConverter;
 import com.mongodb.BasicDBList;
@@ -130,6 +131,28 @@ public class GameConverter {
     if (dbObject.containsField("addDate"))           game.setAddDate((Date)dbObject.get("addDate"));
     
     return game;
+  }
+  
+  public static CompactSearchData convertMongoToCompact(DBObject dbObject) {
+    if (dbObject == null) return null;
+      
+    CompactSearchData data = new CompactSearchData();
+    
+    if (dbObject.containsField("gameID")) {
+      data.setSourceID((Long)dbObject.get("gameID"));  
+      data.setSourceField("gameID");
+    }
+    String nameText = "Unavailable";
+    if (dbObject.containsField("name")) nameText = (String)dbObject.get("name");
+    int yearPublished = -1;
+    if (dbObject.containsField("yearPublished")) yearPublished = (Integer)dbObject.get("yearPublished");
+    if (yearPublished > 0)
+      nameText += " (" + (Integer)dbObject.get("yearPublished") + ")";
+    data.setDisplayString(nameText);
+    
+    if (dbObject.containsField("imageThumbnailURL")) data.setThumbnailURL((String)dbObject.get("imageThumbnailURL"));
+
+    return data;  
   }
   
   /**
