@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.ac.games.data.CompactSearchData;
 import com.ac.games.data.Game;
 import com.ac.games.data.GameTypeConverter;
 import com.mongodb.BasicDBList;
@@ -34,7 +35,7 @@ public class GameConverter {
   /**
    * Helper method that will construct a basic query using the gameID representing the provided game.
    * 
-   * @param bggID The game ID we want to build a query for.
+   * @param gameID The game ID we want to build a query for.
    * 
    * @return Returns a {@link BasicDBObject} object that represents this query, or null if no game was provided
    */
@@ -42,6 +43,20 @@ public class GameConverter {
     if (gameID < 0) return null;
     
     BasicDBObject dbObject = new BasicDBObject("gameID", new Long(gameID));
+    return dbObject;
+  }
+
+  /**
+   * Helper method that will construct a basic query using the gameID representing the provided game.
+   * 
+   * @param bggID The bggID used to create this game that we want to build a query for.
+   * 
+   * @return Returns a {@link BasicDBObject} object that represents this query, or null if no game was provided
+   */
+  public static BasicDBObject convertGameToBGGIDQuery(long bggID) {
+    if (bggID < 0) return null;
+    
+    BasicDBObject dbObject = new BasicDBObject("bggID", new Long(bggID));
     return dbObject;
   }
 
@@ -116,6 +131,28 @@ public class GameConverter {
     if (dbObject.containsField("addDate"))           game.setAddDate((Date)dbObject.get("addDate"));
     
     return game;
+  }
+  
+  public static CompactSearchData convertMongoToCompact(DBObject dbObject) {
+    if (dbObject == null) return null;
+      
+    CompactSearchData data = new CompactSearchData();
+    
+    if (dbObject.containsField("gameID")) {
+      data.setSourceID((Long)dbObject.get("gameID"));  
+      data.setSourceField("gameID");
+    }
+    String nameText = "Unavailable";
+    if (dbObject.containsField("name")) nameText = (String)dbObject.get("name");
+    int yearPublished = -1;
+    if (dbObject.containsField("yearPublished")) yearPublished = (Integer)dbObject.get("yearPublished");
+    if (yearPublished > 0)
+      nameText += " (" + (Integer)dbObject.get("yearPublished") + ")";
+    data.setDisplayString(nameText);
+    
+    if (dbObject.containsField("imageThumbnailURL")) data.setThumbnailURL((String)dbObject.get("imageThumbnailURL"));
+
+    return data;  
   }
   
   /**

@@ -9,6 +9,8 @@ import junit.framework.TestCase;
 import org.junit.Test;
 
 import com.ac.games.data.BGGGame;
+import com.ac.games.data.BGGGameStats;
+import com.ac.games.data.CSIDataStats;
 import com.ac.games.data.Collection;
 import com.ac.games.data.CollectionItem;
 import com.ac.games.data.CoolStuffIncPriceData;
@@ -16,6 +18,7 @@ import com.ac.games.data.Game;
 import com.ac.games.data.GameAvailability;
 import com.ac.games.data.GameReltn;
 import com.ac.games.data.GameWeight;
+import com.ac.games.data.MMDataStats;
 import com.ac.games.data.MiniatureMarketPriceData;
 import com.ac.games.data.User;
 import com.ac.games.data.UserDetail;
@@ -282,6 +285,7 @@ public class TestMongoGamesDatabase extends TestCase {
       assertNotNull("I didn't find my result", cosmicEncounter2);
       assertTrue("The csiIDs are not equal", cosmicEncounter.getCsiID() == cosmicEncounter2.getCsiID());
       assertTrue("The titles are not equal", cosmicEncounter.getTitle().equalsIgnoreCase(cosmicEncounter2.getTitle()));
+      assertTrue("The publishers are not equal", cosmicEncounter.getPublisher().equalsIgnoreCase(cosmicEncounter2.getPublisher()));
       assertTrue("The categories are not equal", cosmicEncounter.getCategory() == cosmicEncounter2.getCategory());
       assertTrue("The skus are not equal", cosmicEncounter.getSku().equalsIgnoreCase(cosmicEncounter2.getSku()));
       assertTrue("The curPrices are not equal", cosmicEncounter.getCurPrice() == cosmicEncounter2.getCurPrice());
@@ -295,6 +299,7 @@ public class TestMongoGamesDatabase extends TestCase {
       assertNotNull("I didn't find my result", cosmicIncursion2);
       assertTrue("The csiIDs are not equal", cosmicIncursion.getCsiID() == cosmicIncursion2.getCsiID());
       assertTrue("The titles are not equal", cosmicIncursion.getTitle().equalsIgnoreCase(cosmicIncursion2.getTitle()));
+      assertTrue("The publishers are not equal", cosmicIncursion.getPublisher().equalsIgnoreCase(cosmicIncursion2.getPublisher()));
       assertTrue("The categories are not equal", cosmicIncursion.getCategory() == cosmicIncursion2.getCategory());
       assertTrue("The skus are not equal", cosmicIncursion.getSku().equalsIgnoreCase(cosmicIncursion2.getSku()));
       assertTrue("The curPrices are not equal", cosmicIncursion.getCurPrice() == cosmicIncursion2.getCurPrice());
@@ -317,6 +322,7 @@ public class TestMongoGamesDatabase extends TestCase {
       assertNotNull("I didn't find my result", cosmicEncounter3);
       assertTrue("The csiIDs are not equal", cosmicEncounter.getCsiID() == cosmicEncounter3.getCsiID());
       assertTrue("The titles are not equal", cosmicEncounter.getTitle().equalsIgnoreCase(cosmicEncounter3.getTitle()));
+      assertTrue("The publishers are not equal", cosmicEncounter.getPublisher().equalsIgnoreCase(cosmicEncounter3.getPublisher()));
       assertTrue("The categories are not equal", cosmicEncounter.getCategory() == cosmicEncounter3.getCategory());
       assertTrue("The skus are not equal", cosmicEncounter.getSku().equalsIgnoreCase(cosmicEncounter3.getSku()));
       assertTrue("The curPrices are not equal", cosmicEncounter.getCurPrice() == cosmicEncounter3.getCurPrice());
@@ -330,6 +336,7 @@ public class TestMongoGamesDatabase extends TestCase {
       assertNotNull("I didn't find my result", abyss2);
       assertTrue("The csiIDs are not equal", abyss.getCsiID() == abyss2.getCsiID());
       assertTrue("The titles are not equal", abyss.getTitle().equalsIgnoreCase(abyss2.getTitle()));
+      assertTrue("The publishers are not equal", abyss.getPublisher().equalsIgnoreCase(abyss2.getPublisher()));
       assertTrue("The skus are not equal", abyss.getSku().equalsIgnoreCase(abyss2.getSku()));
       assertTrue("The categories are not equal", abyss.getCategory() == abyss2.getCategory());
       assertTrue("The curPrices are not equal", abyss.getCurPrice() == abyss2.getCurPrice());
@@ -449,6 +456,7 @@ public class TestMongoGamesDatabase extends TestCase {
       assertNotNull("I didn't find my result", cosmicEncounter2);
       assertTrue("The mmIDs are not equal", cosmicEncounter.getMmID() == cosmicEncounter2.getMmID());
       assertTrue("The titles are not equal", cosmicEncounter.getTitle().equalsIgnoreCase(cosmicEncounter2.getTitle()));
+      assertTrue("The manufacturers are not equal", cosmicEncounter.getManufacturer().equalsIgnoreCase(cosmicEncounter2.getManufacturer()));
       assertTrue("The categories are not equal", cosmicEncounter.getCategory() == cosmicEncounter2.getCategory());
       assertTrue("The skus are not equal", cosmicEncounter.getSku().equalsIgnoreCase(cosmicEncounter2.getSku()));
       assertTrue("The curPrices are not equal", cosmicEncounter.getCurPrice() == cosmicEncounter2.getCurPrice());
@@ -462,6 +470,7 @@ public class TestMongoGamesDatabase extends TestCase {
       assertNotNull("I didn't find my result", cosmicIncursion2);
       assertTrue("The mmIDs are not equal", cosmicIncursion.getMmID() == cosmicIncursion2.getMmID());
       assertTrue("The titles are not equal", cosmicIncursion.getTitle().equalsIgnoreCase(cosmicIncursion2.getTitle()));
+      assertTrue("The manufacturers are not equal", cosmicIncursion.getManufacturer().equalsIgnoreCase(cosmicIncursion2.getManufacturer()));
       assertTrue("The categories are not equal", cosmicIncursion.getCategory() == cosmicIncursion2.getCategory());
       assertTrue("The skus are not equal", cosmicIncursion.getSku().equalsIgnoreCase(cosmicIncursion2.getSku()));
       assertTrue("The curPrices are not equal", cosmicIncursion.getCurPrice() == cosmicIncursion2.getCurPrice());
@@ -484,6 +493,7 @@ public class TestMongoGamesDatabase extends TestCase {
       assertNotNull("I didn't find my result", cosmicEncounter3);
       assertTrue("The mmIDs are not equal", cosmicEncounter.getMmID() == cosmicEncounter3.getMmID());
       assertTrue("The titles are not equal", cosmicEncounter.getTitle().equalsIgnoreCase(cosmicEncounter3.getTitle()));
+      assertTrue("The manufacturers are not equal", cosmicEncounter.getManufacturer().equalsIgnoreCase(cosmicEncounter3.getManufacturer()));
       assertTrue("The categories are not equal", cosmicEncounter.getCategory() == cosmicEncounter3.getCategory());
       assertTrue("The skus are not equal", cosmicEncounter.getSku().equalsIgnoreCase(cosmicEncounter3.getSku()));
       assertTrue("The curPrices are not equal", cosmicEncounter.getCurPrice() == cosmicEncounter3.getCurPrice());
@@ -497,6 +507,7 @@ public class TestMongoGamesDatabase extends TestCase {
       assertNotNull("I didn't find my result", abyss2);
       assertTrue("The mmIDs are not equal", abyss.getMmID() == abyss2.getMmID());
       assertTrue("The titles are not equal", abyss.getTitle().equalsIgnoreCase(abyss2.getTitle()));
+      assertTrue("The manufacturers are not equal", abyss.getManufacturer().equalsIgnoreCase(abyss2.getManufacturer()));
       assertTrue("The categories are not equal", abyss.getCategory() == abyss2.getCategory());
       assertTrue("The skus are not equal", abyss.getSku().equalsIgnoreCase(abyss2.getSku()));
       assertTrue("The curPrices are not equal", abyss.getCurPrice() == abyss2.getCurPrice());
@@ -1330,23 +1341,23 @@ public class TestMongoGamesDatabase extends TestCase {
   }
 
   /**
-   * Method to test features of BGG Data operations.  The basic steps of this test are:
+   * Method to test features of Collection operations.  The basic steps of this test are:
    * <ol>
-   * <li>Insert UserDetail One</li>
-   * <li>Insert UserDetail Two</li>
-   * <li>Read UserDetail One and Verify</li>
-   * <li>Read UserDetail Two and Verify</li>
-   * <li>Reinsert UserDetail One</li>
-   * <li>Upsert UserDetail Three</li>
-   * <li>Read UserDetail One and Verify</li>
-   * <li>Read UserDetail Three and Verify</li>
-   * <li>Modify UserDetail Three Data</li>
-   * <li>Update UserDetail Three</li>
-   * <li>Read UserDetail Three and Verify</li>
+   * <li>Insert Collection One</li>
+   * <li>Insert Collection Two</li>
+   * <li>Read Collection One and Verify</li>
+   * <li>Read Collection Two and Verify</li>
+   * <li>Reinsert Collection One</li>
+   * <li>Upsert Collection Three</li>
+   * <li>Read Collection One and Verify</li>
+   * <li>Read Collection Three and Verify</li>
+   * <li>Modify Collection Three Data</li>
+   * <li>Update Collection Three</li>
+   * <li>Read Collection Three and Verify</li>
    * <li>Run the IDs select and verify all three games found</li>
-   * <li>Delete UserDetail One and UserDetail Two</li>
-   * <li>Read Nothing for two games, verify UserDetail Three still exists</li>
-   * <li>Delete UserDetail Three</li>
+   * <li>Delete Collection One and UserDetail Two</li>
+   * <li>Read Nothing for two games, verify Collection Three still exists</li>
+   * <li>Delete Collection Three</li>
    * <li>Test Complete</li></ol>
    */
   @Test
@@ -1458,6 +1469,125 @@ public class TestMongoGamesDatabase extends TestCase {
       //Delete Collection Three
       System.out.println ("===  Delete Collection Three  ===");
       database.deleteCollection(collectionThree.getCollectionID());
+      
+    } catch (ConfigurationException ce) {
+      ce.printStackTrace();
+      fail("I failed with a ConfigurationException: " + ce.getLocalizedMessage());
+    } catch (DatabaseOperationException doe) {
+      doe.printStackTrace();
+      fail("I failed with a DatabaseOperationException: " + doe.getLocalizedMessage());
+    } catch (Throwable t) {
+      t.printStackTrace();
+      fail("I failed for some gorram reason: " + t.getLocalizedMessage());
+    }
+  }
+  
+  /**
+   * This method is going to work a little different.  We're going to test adding each stat type, but
+   * this test is simpler than the others, because there is no update method to support
+   */
+  @Test
+  public void testStats() {
+    try {
+      //Insert BGGGameStats
+      System.out.println ("===  Insert BGGGameStats  ===");
+      BGGGameStats bggStats = MockDataFactory.createBGGGameStats();
+      database.insertBGGGameStats(bggStats);
+      
+      //Insert CSIDataStats
+      System.out.println ("===  Insert CSIDataStats  ===");
+      CSIDataStats csiStats = MockDataFactory.createCSIDataStats();
+      database.insertCSIDataStats(csiStats);
+
+      //Read CSIDataStats and Verify
+      System.out.println ("===  Read BGGGameStats and Verify  ===");
+      BGGGameStats bggStats2 = database.readBGGGameStats();
+      
+      //Spot checking as opposed to all possible values.
+      assertNotNull("I didn't find my result", bggStats2);
+      assertTrue("The baseGameCounts are not equal", bggStats.getBaseGameCount() == bggStats2.getBaseGameCount());
+      assertTrue("The expansionGameCounts are not equal", bggStats.getExpansionGameCount() == bggStats2.getExpansionGameCount());
+      assertTrue("The collectibleGameCounts are not equal", bggStats.getCollectibleGameCount() == bggStats2.getCollectibleGameCount());
+      assertTrue("The approvedCounts are not equal", bggStats.getApprovedCount() == bggStats2.getApprovedCount());
+      assertTrue("The rejectedCounts are not equal", bggStats.getRejectedCount() == bggStats2.getRejectedCount());
+      assertTrue("The pendingCounts are not equal", bggStats.getPendingCount() == bggStats2.getPendingCount());
+      
+      //Read CSIDataStats and Verify
+      System.out.println ("===  Read CSIDataStats and Verify  ===");
+      CSIDataStats csiStats2 = database.readCSIDataStats();
+      
+      //Spot checking as opposed to all possible values.
+      assertNotNull("I didn't find my result", csiStats2);
+      assertTrue("The boardGameCounts are not equal", csiStats.getBoardGameCount() == csiStats2.getBoardGameCount());
+      assertTrue("The collectibleGameCounts are not equal", csiStats.getCollectibleGameCount() == csiStats2.getCollectibleGameCount());
+      assertTrue("The diceMastersCounts are not equal", csiStats.getDiceMastersCount() == csiStats2.getDiceMastersCount());
+      assertTrue("The rpgCounts are not equal", csiStats.getRpgCount() == csiStats2.getRpgCount());
+      assertTrue("The lcgCounts are not equal", csiStats.getLcgCount() == csiStats2.getLcgCount());
+      assertTrue("The suppliesCounts are not equal", csiStats.getSuppliesCount() == csiStats2.getSuppliesCount());
+      assertTrue("The miniatureCounts are not equal", csiStats.getMiniatureCount() == csiStats2.getMiniatureCount());
+      assertTrue("The videoGameCounts are not equal", csiStats.getVideoGameCount() == csiStats2.getVideoGameCount());
+      assertTrue("The unknownCounts are not equal", csiStats.getUnknownCount() == csiStats2.getUnknownCount());
+      assertTrue("The approvedCounts are not equal", csiStats.getApprovedCount() == csiStats2.getApprovedCount());
+      assertTrue("The rejectedCounts are not equal", csiStats.getRejectedCount() == csiStats2.getRejectedCount());
+      assertTrue("The pendingCounts are not equal", csiStats.getPendingCount() == csiStats2.getPendingCount());
+      
+      //Reinsert BGGGameStats
+      System.out.println ("===  Reinsert BGGGameStats  ===");
+      database.insertBGGGameStats(bggStats);
+      
+      //Upsert MMDataStats
+      System.out.println ("===  Upsert MMDataStats  ===");
+      MMDataStats mmStats = MockDataFactory.createMMDataStats();
+      database.insertMMDataStats(mmStats);
+      
+      //Read BGGGameStats and Verify
+      System.out.println ("===  Read BGGGameStats and Verify  ===");
+      BGGGameStats bggStats3 = database.readBGGGameStats();
+      
+      //Spot checking as opposed to all possible values.
+      assertNotNull("I didn't find my result", bggStats3);
+      assertTrue("The baseGameCounts are not equal", bggStats.getBaseGameCount() == bggStats3.getBaseGameCount());
+      assertTrue("The expansionGameCounts are not equal", bggStats.getExpansionGameCount() == bggStats3.getExpansionGameCount());
+      assertTrue("The collectibleGameCounts are not equal", bggStats.getCollectibleGameCount() == bggStats3.getCollectibleGameCount());
+      assertTrue("The approvedCounts are not equal", bggStats.getApprovedCount() == bggStats3.getApprovedCount());
+      assertTrue("The rejectedCounts are not equal", bggStats.getRejectedCount() == bggStats3.getRejectedCount());
+      assertTrue("The pendingCounts are not equal", bggStats.getPendingCount() == bggStats3.getPendingCount());
+
+      //Read MMDataStats and Verify
+      System.out.println ("===  Read MMDataStats and Verify  ===");
+      MMDataStats mmStats2 = database.readMMDataStats();
+      
+      //Spot checking as opposed to all possible values.
+      assertNotNull("I didn't find my result", mmStats2);
+      assertTrue("The boardGameCounts are not equal", mmStats.getBoardGameCount() == mmStats2.getBoardGameCount());
+      assertTrue("The tableTopCounts are not equal", mmStats.getTableTopCount() == mmStats2.getTableTopCount());
+      assertTrue("The ccgCounts are not equal", mmStats.getCcgCount() == mmStats2.getCcgCount());
+      assertTrue("The collectiblesCounts are not equal", mmStats.getCollectiblesCount() == mmStats2.getCollectiblesCount());
+      assertTrue("The rpgCounts are not equal", mmStats.getRpgCount() == mmStats2.getRpgCount());
+      assertTrue("The accessoriesCounts are not equal", mmStats.getAccessoriesCount() == mmStats2.getAccessoriesCount());
+      assertTrue("The unknownCounts are not equal", mmStats.getUnknownCount() == mmStats2.getUnknownCount());
+      assertTrue("The approvedCounts are not equal", mmStats.getApprovedCount() == mmStats2.getApprovedCount());
+      assertTrue("The rejectedCounts are not equal", mmStats.getRejectedCount() == mmStats2.getRejectedCount());
+      assertTrue("The pendingCounts are not equal", mmStats.getPendingCount() == mmStats2.getPendingCount());
+
+      //Delete BGGGameStats and CSIDataStats
+      System.out.println ("===  Delete BGGGameStats and CSIDataStats  ===");
+      database.deleteStatsRow(BGGGameStats.BGG_GAME_STATS);
+      database.deleteStatsRow(CSIDataStats.CSI_DATA_STATS);
+      
+      //Read Nothing for two games, verify MMDataStats still exists
+      System.out.println ("===  Read Nothing for two games, verify MMDataStats still exists  ===");
+      BGGGameStats notFound1 = database.readBGGGameStats();
+      CSIDataStats notFound2 = database.readCSIDataStats();
+      MMDataStats foundThree = database.readMMDataStats();
+      
+      assertNull("I shouldn't have found BGGGameStats, but did.", notFound1);
+      assertNull("I shouldn't have found CSIDataStats, but did.", notFound2);
+      assertNotNull("I should have found MMDataStats, but didn't.", foundThree);
+      
+      //Delete Collection Three
+      System.out.println ("===  Delete MMDataStats  ===");
+      database.deleteStatsRow(MMDataStats.MM_DATA_STATS);
       
     } catch (ConfigurationException ce) {
       ce.printStackTrace();

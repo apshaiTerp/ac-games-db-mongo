@@ -57,6 +57,7 @@ public class MMDataConverter {
     
     if (data.getSku() != null)          dbObject.append("sku", data.getSku());
     if (data.getTitle() != null)        dbObject.append("title", data.getTitle());
+    if (data.getManufacturer() != null) dbObject.append("manufacturer", data.getManufacturer());
     if (data.getCategory() != null)     dbObject.append("category", MiniatureMarketCategoryConverter.convertMMCategoryToFlag(data.getCategory()));
     if (data.getImageURL() != null)     dbObject.append("imageURL", data.getImageURL());
     if (data.getAvailability() != null) dbObject.append("availability", GameAvailabilityConverter.convertGameAvailabilityToFlag(data.getAvailability()));
@@ -77,6 +78,7 @@ public class MMDataConverter {
     if (dbObject.containsField("mmID"))         data.setMmID((Long)dbObject.get("mmID"));
     if (dbObject.containsField("sku"))          data.setSku((String)dbObject.get("sku"));
     if (dbObject.containsField("title"))        data.setTitle((String)dbObject.get("title"));
+    if (dbObject.containsField("manufacturer")) data.setManufacturer((String)dbObject.get("manufacturer"));
     if (dbObject.containsField("category"))     data.setCategory(MiniatureMarketCategoryConverter.convertFlagToMMCategory((Integer)dbObject.get("category")));
     if (dbObject.containsField("imageURL"))     data.setImageURL((String)dbObject.get("imageURL"));
     if (dbObject.containsField("availability")) data.setAvailability(GameAvailabilityConverter.convertFlagToGameAvailability((Integer)dbObject.get("availability")));
