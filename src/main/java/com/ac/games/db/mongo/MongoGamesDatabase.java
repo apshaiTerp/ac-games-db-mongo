@@ -1,6 +1,7 @@
 package com.ac.games.db.mongo;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -12,6 +13,7 @@ import com.ac.games.data.CSIDataStats;
 import com.ac.games.data.Collection;
 import com.ac.games.data.CollectionItem;
 import com.ac.games.data.CompactSearchData;
+import com.ac.games.data.CoolStuffIncCategoryConverter;
 import com.ac.games.data.CoolStuffIncPriceData;
 import com.ac.games.data.Game;
 import com.ac.games.data.GameReltn;
@@ -19,6 +21,7 @@ import com.ac.games.data.GameType;
 import com.ac.games.data.GameTypeConverter;
 import com.ac.games.data.MMDataStats;
 import com.ac.games.data.MediaItem;
+import com.ac.games.data.MiniatureMarketCategoryConverter;
 import com.ac.games.data.MiniatureMarketPriceData;
 import com.ac.games.data.PlaythruItem;
 import com.ac.games.data.ReviewState;
@@ -3301,6 +3304,162 @@ public class MongoGamesDatabase implements GamesDatabase {
         results.add(searchResult);
       }
       try { cursor.close(); } catch (Throwable t) { /** Ignore Me */ }
+      Collections.sort(results);
+      return results;
+      
+    } catch (MongoException me) {
+      throw new DatabaseOperationException("Mongo raised an exception to this select: " + me.getMessage(), me);
+    } catch (Throwable t) {
+      throw new DatabaseOperationException("Something bad happened executing the select", t);
+    }
+  }
+
+  public List<String> readBGGGameNamesForAutoComplete() throws ConfigurationException, DatabaseOperationException {
+    if (mongoClient == null || mongoDB == null)
+      throw new ConfigurationException("There is a problem with the database connection.");
+    
+    //Run the operation
+    try {
+      //Open the collection, i.e. table
+      DBCollection gameCollection = mongoDB.getCollection("bgggame");
+      
+      BasicDBObject searchObject = new BasicDBObject("bggID", new BasicDBObject("$gt", 0));
+      
+      BasicDBObject columnsObject = new BasicDBObject("name", 1);
+      columnsObject.append("bggID", 1);
+      columnsObject.append("yearPublished", 1);
+      
+      DBCursor cursor = gameCollection.find(searchObject, columnsObject);
+      List<String> results = new LinkedList<String>();
+      
+      while (cursor.hasNext()) {
+        DBObject object = cursor.next();
+        
+        String gameName   = (String)object.get("name");
+        long bggID        = (Long)object.get("bggID");
+        
+        int yearPublished = -1;
+        if (object.containsField("yearPublished"))
+          yearPublished = (Integer)object.get("yearPublished");
+        
+        boolean writeYear = (yearPublished > 1);
+        
+        String searchResult = gameName;
+        
+        if (writeYear)
+          searchResult += " (" + bggID + " - " + yearPublished + ")";
+        else 
+          searchResult += " (" + bggID + ")";
+        
+        results.add(searchResult);
+      }
+      try { cursor.close(); } catch (Throwable t) { /** Ignore Me */ }
+      Collections.sort(results);
+      return results;
+      
+    } catch (MongoException me) {
+      throw new DatabaseOperationException("Mongo raised an exception to this select: " + me.getMessage(), me);
+    } catch (Throwable t) {
+      throw new DatabaseOperationException("Something bad happened executing the select", t);
+    }
+  }
+
+  public List<String> readCSITitlesForAutoComplete() throws ConfigurationException, DatabaseOperationException {
+    if (mongoClient == null || mongoDB == null)
+      throw new ConfigurationException("There is a problem with the database connection.");
+    
+    //Run the operation
+    try {
+      //Open the collection, i.e. table
+      DBCollection gameCollection = mongoDB.getCollection("csidata");
+      
+      BasicDBObject searchObject = new BasicDBObject("csiID", new BasicDBObject("$gt", 0));
+      
+      BasicDBObject columnsObject = new BasicDBObject("title", 1);
+      columnsObject.append("csiID", 1);
+      columnsObject.append("category", 1);
+      
+      DBCursor cursor = gameCollection.find(searchObject, columnsObject);
+      List<String> results = new LinkedList<String>();
+      
+      while (cursor.hasNext()) {
+        DBObject object = cursor.next();
+        
+        String gameName   = (String)object.get("title");
+        long csiID        = (Long)object.get("csiID");
+        int catValue      = (Integer)object.get("category");
+        String category   = null;
+        
+        switch (catValue) {
+        case CoolStuffIncCategoryConverter.COLLECTIBLE_FLAG : category = "Collectible"; break;
+        case CoolStuffIncCategoryConverter.DICEMASTERS_FLAG : category = "Dice Masters"; break;
+        case CoolStuffIncCategoryConverter.BOARDGAMES_FLAG  : category = "Board Game"; break;
+        case CoolStuffIncCategoryConverter.RPGS_FLAG        : category = "RPG"; break;
+        case CoolStuffIncCategoryConverter.LCGS_FLAG        : category = "LCG"; break;
+        case CoolStuffIncCategoryConverter.SUPPLIES_FLAG    : category = "Supplies"; break;
+        case CoolStuffIncCategoryConverter.MINIATURES_FLAG  : category = "Miniature"; break;
+        case CoolStuffIncCategoryConverter.VIDEOGAMES_FLAG  : category = "Video Game"; break;
+        case CoolStuffIncCategoryConverter.UNKNOWN_FLAG     : category = "Unknown"; break;
+        default : category = null;
+        }
+        
+        String searchResult = gameName + " (" + csiID + " - " + category + ")";
+        results.add(searchResult);
+      }
+      try { cursor.close(); } catch (Throwable t) { /** Ignore Me */ }
+      Collections.sort(results);
+      return results;
+      
+    } catch (MongoException me) {
+      throw new DatabaseOperationException("Mongo raised an exception to this select: " + me.getMessage(), me);
+    } catch (Throwable t) {
+      throw new DatabaseOperationException("Something bad happened executing the select", t);
+    }
+  }
+
+  public List<String> readMMTitlesForAutoComplete() throws ConfigurationException, DatabaseOperationException {
+    if (mongoClient == null || mongoDB == null)
+      throw new ConfigurationException("There is a problem with the database connection.");
+    
+    //Run the operation
+    try {
+      //Open the collection, i.e. table
+      DBCollection gameCollection = mongoDB.getCollection("mmdata");
+      
+      BasicDBObject searchObject = new BasicDBObject("mmID", new BasicDBObject("$gt", 0));
+      
+      BasicDBObject columnsObject = new BasicDBObject("title", 1);
+      columnsObject.append("mmID", 1);
+      columnsObject.append("category", 1);
+      
+      DBCursor cursor = gameCollection.find(searchObject, columnsObject);
+      List<String> results = new LinkedList<String>();
+      
+      while (cursor.hasNext()) {
+        DBObject object = cursor.next();
+        
+        String gameName   = (String)object.get("title");
+        long mmID         = (Long)object.get("mmID");
+        int catValue      = (Integer)object.get("category");
+        String category   = null;
+        
+        switch (catValue) {
+        case MiniatureMarketCategoryConverter.BOARDGAMES_FLAG   : category = "Board Game"; break;
+        case MiniatureMarketCategoryConverter.TABLETOP_FLAG     : category = "Table Top"; break;
+        case MiniatureMarketCategoryConverter.CCGS_FLAG         : category = "CCG"; break;
+        case MiniatureMarketCategoryConverter.LCGS_FLAG         : category = "LCG"; break;
+        case MiniatureMarketCategoryConverter.COLLECTIBLES_FLAG : category = "Collectibles"; break;
+        case MiniatureMarketCategoryConverter.RPGS_FLAG         : category = "RPG"; break;
+        case MiniatureMarketCategoryConverter.ACCESSORIES_FLAG  : category = "Accessories"; break;
+        case MiniatureMarketCategoryConverter.UNKNOWN_FLAG      : category = "Unknown"; break;
+        default : category = null;
+        }
+        
+        String searchResult = gameName + " (" + mmID + " - " + category + ")";
+        results.add(searchResult);
+      }
+      try { cursor.close(); } catch (Throwable t) { /** Ignore Me */ }
+      Collections.sort(results);
       return results;
       
     } catch (MongoException me) {
