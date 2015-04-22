@@ -3378,8 +3378,12 @@ public class MongoGamesDatabase implements GamesDatabase {
       //Open the collection, i.e. table
       DBCollection gameCollection = mongoDB.getCollection("csidata");
       
-      BasicDBObject searchObject = new BasicDBObject("csiID", new BasicDBObject("$gt", 0));
-      
+      BasicDBObject searchObject = new BasicDBObject();
+      BasicDBList ignoreRejectList = new BasicDBList();
+      ignoreRejectList.add(new Integer(ReviewStateConverter.convertReviewStateToFlag(ReviewState.REVIEWED)));
+      ignoreRejectList.add(new Integer(ReviewStateConverter.convertReviewStateToFlag(ReviewState.PENDING)));
+      searchObject.append("reviewState", new BasicDBObject("$in", ignoreRejectList));
+
       BasicDBObject columnsObject = new BasicDBObject("title", 1);
       columnsObject.append("csiID", 1);
       columnsObject.append("category", 1);
@@ -3431,8 +3435,12 @@ public class MongoGamesDatabase implements GamesDatabase {
       //Open the collection, i.e. table
       DBCollection gameCollection = mongoDB.getCollection("mmdata");
       
-      BasicDBObject searchObject = new BasicDBObject("mmID", new BasicDBObject("$gt", 0));
-      
+      BasicDBObject searchObject = new BasicDBObject();
+      BasicDBList ignoreRejectList = new BasicDBList();
+      ignoreRejectList.add(new Integer(ReviewStateConverter.convertReviewStateToFlag(ReviewState.REVIEWED)));
+      ignoreRejectList.add(new Integer(ReviewStateConverter.convertReviewStateToFlag(ReviewState.PENDING)));
+      searchObject.append("reviewState", new BasicDBObject("$in", ignoreRejectList));
+
       BasicDBObject columnsObject = new BasicDBObject("title", 1);
       columnsObject.append("mmID", 1);
       columnsObject.append("category", 1);
