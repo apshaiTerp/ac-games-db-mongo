@@ -3358,7 +3358,7 @@ public class MongoGamesDatabase implements GamesDatabase {
         results.add(searchResult);
       }
       try { cursor.close(); } catch (Throwable t) { /** Ignore Me */ }
-      //Collections.sort(results);
+      Collections.sort(results);
       return results;
       
     } catch (MongoException me) {
