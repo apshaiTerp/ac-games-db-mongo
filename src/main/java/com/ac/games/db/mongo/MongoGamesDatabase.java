@@ -3323,8 +3323,12 @@ public class MongoGamesDatabase implements GamesDatabase {
       //Open the collection, i.e. table
       DBCollection gameCollection = mongoDB.getCollection("bgggame");
       
-      BasicDBObject searchObject = new BasicDBObject("bggID", new BasicDBObject("$gt", 0));
-      
+      BasicDBObject searchObject = new BasicDBObject();
+      BasicDBList ignoreRejectList = new BasicDBList();
+      ignoreRejectList.add(new Integer(ReviewStateConverter.convertReviewStateToFlag(ReviewState.REVIEWED)));
+      ignoreRejectList.add(new Integer(ReviewStateConverter.convertReviewStateToFlag(ReviewState.PENDING)));
+      searchObject.append("reviewState", new BasicDBObject("$in", ignoreRejectList));
+
       BasicDBObject columnsObject = new BasicDBObject("name", 1);
       columnsObject.append("bggID", 1);
       columnsObject.append("yearPublished", 1);
