@@ -3354,12 +3354,13 @@ public class MongoGamesDatabase implements GamesDatabase {
         results.add(searchResult);
       }
       try { cursor.close(); } catch (Throwable t) { /** Ignore Me */ }
-      Collections.sort(results);
+      //Collections.sort(results);
       return results;
       
     } catch (MongoException me) {
       throw new DatabaseOperationException("Mongo raised an exception to this select: " + me.getMessage(), me);
     } catch (Throwable t) {
+      t.printStackTrace();
       throw new DatabaseOperationException("Something bad happened executing the select", t);
     }
   }
