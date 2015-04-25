@@ -3176,6 +3176,7 @@ public class MongoGamesDatabase implements GamesDatabase {
         DBObject object = cursor.next();
         data = GameConverter.convertMongoToCompact(object);
       }
+      try { cursor.close(); } catch (Throwable t) { /** Ignore Errors */ }
       
       return data;
     } catch (MongoException me) {
@@ -3475,6 +3476,80 @@ public class MongoGamesDatabase implements GamesDatabase {
       Collections.sort(results);
       return results;
       
+    } catch (MongoException me) {
+      throw new DatabaseOperationException("Mongo raised an exception to this select: " + me.getMessage(), me);
+    } catch (Throwable t) {
+      throw new DatabaseOperationException("Something bad happened executing the select", t);
+    }
+  }
+
+  public List<CompactSearchData> readGamesCompact(String gameIDs) throws ConfigurationException, DatabaseOperationException {
+    if (mongoClient == null || mongoDB == null)
+      throw new ConfigurationException("There is a problem with the database connection.");
+    
+    //DEBUG
+    System.out.println ("The gameIDs list: " + gameIDs);
+    
+    List<Long> processIDs = new LinkedList<Long>();
+    if (gameIDs.indexOf(",") != -1) {
+      String processString = new String(gameIDs);
+      while (true) {
+        int commaPos = processString.indexOf(",");
+        if (commaPos == -1) {
+          try {
+            processIDs.add(Long.parseLong(processString));
+            break;
+          } catch (NumberFormatException nfe) {
+            throw new ConfigurationException("The gameIDs list provided is not in the correct format.");
+          }
+        } else {
+          String singleTerm = processString.substring(0, commaPos);
+          processString = processString.substring(commaPos + 1);
+          try {
+            processIDs.add(Long.parseLong(singleTerm));
+          } catch (NumberFormatException nfe) {
+            throw new ConfigurationException("The gameIDs list provided is not in the correct format.");
+          }
+        }
+      }
+    } else {
+      try {
+        processIDs.add(Long.parseLong(gameIDs));
+      } catch (NumberFormatException nfe) {
+        throw new ConfigurationException("The gameIDs list provided is not in the correct format.");
+      }
+    }
+    
+    //DEBUG
+    System.out.println ("The number of IDs we want to process is: " + processIDs.size());
+    
+    try {
+      //Open the collection, i.e. table
+      DBCollection gameCollection = mongoDB.getCollection("game");
+      
+      List<CompactSearchData> results = new ArrayList<CompactSearchData>(processIDs.size());
+      for (long curID : processIDs) {
+        BasicDBObject searchObject = new BasicDBObject("gameID", curID);
+        
+        BasicDBObject columnsObject = new BasicDBObject("gameID", 1);
+        columnsObject.append("name", 1);
+        columnsObject.append("yearPublished", 1);
+        columnsObject.append("imageThumbnailURL", 1);
+        
+        CompactSearchData data = null;
+        DBCursor cursor = gameCollection.find(searchObject, columnsObject);
+        
+        while (cursor.hasNext()) {
+          DBObject object = cursor.next();
+          data = GameConverter.convertMongoToCompact(object);
+        }
+        try { cursor.close(); } catch (Throwable t) { /** Ignore Errors */ }
+        
+        if (data != null)
+          results.add(data);
+      }
+      
+      return results;
     } catch (MongoException me) {
       throw new DatabaseOperationException("Mongo raised an exception to this select: " + me.getMessage(), me);
     } catch (Throwable t) {
