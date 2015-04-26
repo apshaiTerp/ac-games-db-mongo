@@ -3589,12 +3589,12 @@ public class MongoGamesDatabase implements GamesDatabase {
         }
         
         //Note: we count the primary publisher twice to help weight those higher
-        List<String> publishers = game.getDesigners();
+        List<String> publishers = game.getPublishers();
         if (publishers != null) {
           publishers.add(game.getPrimaryPublisher());
           for (String pub : publishers) {
             boolean found = false;
-            for (SimpleSortable simple : desList) {
+            for (SimpleSortable simple : pubList) {
               if (simple.getContent().equalsIgnoreCase(pub)) {
                 found = true;
                 simple.setHits(simple.getHits() + 1);
@@ -3609,7 +3609,7 @@ public class MongoGamesDatabase implements GamesDatabase {
           }
         } else {
           boolean found = false;
-          for (SimpleSortable simple : desList) {
+          for (SimpleSortable simple : pubList) {
             if (simple.getContent().equalsIgnoreCase(game.getPrimaryPublisher())) {
               found = true;
               simple.setHits(simple.getHits() + 1);
@@ -3627,17 +3627,6 @@ public class MongoGamesDatabase implements GamesDatabase {
       Collections.sort(mechList);
       Collections.sort(desList);
       Collections.sort(pubList);
-      
-      //DEBUG
-      System.out.println ("Mechanics: ");
-      for (SimpleSortable simple : mechList)
-        System.out.println ("  " + simple.getContent() + " (" + simple.getHits() + ")");
-      System.out.println ("Designers: ");
-      for (SimpleSortable simple : desList)
-        System.out.println ("  " + simple.getContent() + " (" + simple.getHits() + ")");
-      System.out.println ("Publishers: ");
-      for (SimpleSortable simple : pubList)
-        System.out.println ("  " + simple.getContent() + " (" + simple.getHits() + ")");
       
       if (mechList.size() >= 3) stats.setMech3(mechList.get(2).getContent() + " (" + mechList.get(2).getHits() + ")");
       if (mechList.size() >= 2) stats.setMech2(mechList.get(1).getContent() + " (" + mechList.get(1).getHits() + ")");
