@@ -3612,6 +3612,7 @@ public class MongoGamesDatabase implements GamesDatabase {
           for (SimpleSortable simple : desList) {
             if (simple.getContent().equalsIgnoreCase(game.getPrimaryPublisher())) {
               found = true;
+              simple.setHits(simple.getHits() + 1);
               break;
             }
           }
@@ -3627,17 +3628,28 @@ public class MongoGamesDatabase implements GamesDatabase {
       Collections.sort(desList);
       Collections.sort(pubList);
       
-      if (mechList.size() >= 3) stats.setMech3(mechList.get(2).getContent());
-      if (mechList.size() >= 2) stats.setMech2(mechList.get(1).getContent());
-      if (mechList.size() >= 1) stats.setMech1(mechList.get(0).getContent());
+      //DEBUG
+      System.out.println ("Mechanics: ");
+      for (SimpleSortable simple : mechList)
+        System.out.println ("  " + simple.getContent() + " (" + simple.getHits() + ")");
+      System.out.println ("Designers: ");
+      for (SimpleSortable simple : desList)
+        System.out.println ("  " + simple.getContent() + " (" + simple.getHits() + ")");
+      System.out.println ("Publishers: ");
+      for (SimpleSortable simple : pubList)
+        System.out.println ("  " + simple.getContent() + " (" + simple.getHits() + ")");
       
-      if (desList.size() >= 3) stats.setDes3(desList.get(2).getContent());
-      if (desList.size() >= 2) stats.setDes2(desList.get(1).getContent());
-      if (desList.size() >= 1) stats.setDes1(desList.get(0).getContent());
+      if (mechList.size() >= 3) stats.setMech3(mechList.get(2).getContent() + " (" + mechList.get(2).getHits() + ")");
+      if (mechList.size() >= 2) stats.setMech2(mechList.get(1).getContent() + " (" + mechList.get(1).getHits() + ")");
+      if (mechList.size() >= 1) stats.setMech1(mechList.get(0).getContent() + " (" + mechList.get(0).getHits() + ")");
+      
+      if (desList.size() >= 3) stats.setDes3(desList.get(2).getContent() + " (" + desList.get(2).getHits() + ")");
+      if (desList.size() >= 2) stats.setDes2(desList.get(1).getContent() + " (" + desList.get(1).getHits() + ")");
+      if (desList.size() >= 1) stats.setDes1(desList.get(0).getContent() + " (" + desList.get(0).getHits() + ")");
 
-      if (pubList.size() >= 3) stats.setPub3(pubList.get(2).getContent());
-      if (pubList.size() >= 2) stats.setPub2(pubList.get(1).getContent());
-      if (pubList.size() >= 1) stats.setPub1(pubList.get(0).getContent());
+      if (pubList.size() >= 3) stats.setPub3(pubList.get(2).getContent() + " (" + pubList.get(2).getHits() + ")");
+      if (pubList.size() >= 2) stats.setPub2(pubList.get(1).getContent() + " (" + pubList.get(1).getHits() + ")");
+      if (pubList.size() >= 1) stats.setPub1(pubList.get(0).getContent() + " (" + pubList.get(0).getHits() + ")");
       
       return stats;
     } catch (MongoException me) {
