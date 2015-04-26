@@ -26,7 +26,9 @@ import com.ac.games.data.MiniatureMarketPriceData;
 import com.ac.games.data.PlaythruItem;
 import com.ac.games.data.ReviewState;
 import com.ac.games.data.ReviewStateConverter;
+import com.ac.games.data.SimpleSortable;
 import com.ac.games.data.User;
+import com.ac.games.data.UserCollectionStats;
 import com.ac.games.data.UserDetail;
 import com.ac.games.data.WishlistItem;
 import com.ac.games.db.GamesDatabase;
@@ -1263,47 +1265,6 @@ public class MongoGamesDatabase implements GamesDatabase {
     } catch (Throwable t) {
       throw new DatabaseOperationException("Something bad happened executing the select", t);
     }
-  }
-
-  /*
-   * (non-Javadoc)
-   * @see com.ac.games.db.GamesDatabase#readAdHocBGGQuery(com.ac.games.data.BGGGame, int)
-   */
-  public List<BGGGame> readAdHocBGGQuery(BGGGame queryGame, int rowLimit) throws ConfigurationException,
-      DatabaseOperationException {
-    
-    
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  /*
-   * (non-Javadoc)
-   * @see com.ac.games.db.GamesDatabase#readAdHocCSIQuery(com.ac.games.data.CoolStuffIncPriceData, int)
-   */
-  public List<CoolStuffIncPriceData> readAdHocCSIQuery(CoolStuffIncPriceData queryData, int rowLimit)
-      throws ConfigurationException, DatabaseOperationException {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  /*
-   * (non-Javadoc)
-   * @see com.ac.games.db.GamesDatabase#readAdHocMMQuery(com.ac.games.data.MiniatureMarketPriceData, int)
-   */
-  public List<MiniatureMarketPriceData> readAdHocMMQuery(MiniatureMarketPriceData queryData, int rowLimit)
-      throws ConfigurationException, DatabaseOperationException {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  /*
-   * (non-Javadoc)
-   * @see com.ac.games.db.GamesDatabase#readAdHocGameQuery(com.ac.games.data.Game, int)
-   */
-  public List<Game> readAdHocGameQuery(Game queryGame, int rowLimit) throws ConfigurationException, DatabaseOperationException {
-    // TODO Auto-generated method stub
-    return null;
   }
 
   /*
@@ -2879,7 +2840,7 @@ public class MongoGamesDatabase implements GamesDatabase {
         searchObject.append("gameType", GameTypeConverter.convertGameTypeToFlag(gameTypeFilter));
       }
       
-      //TODO - DEBUG
+      //DEBUG
       System.out.println ("The query I'm about to run is: db.bgggame.find(" + searchObject + ")");
       debugMode = true;
       
@@ -3555,5 +3516,140 @@ public class MongoGamesDatabase implements GamesDatabase {
     } catch (Throwable t) {
       throw new DatabaseOperationException("Something bad happened executing the select", t);
     }
+  }
+
+  public UserCollectionStats readCollectionStats(long userID) throws ConfigurationException, DatabaseOperationException {
+    if (mongoClient == null || mongoDB == null)
+      throw new ConfigurationException("There is a problem with the database connection.");
+    
+    if (userID <= 0)
+      throw new DatabaseOperationException("The provided userID was invalid");
+    
+    try {
+      User user = readUser(userID);
+      if (user == null)
+        return new UserCollectionStats();
+      
+      Collection collection = readCollection(user.getCollectionID());
+      if (collection == null)
+        return new UserCollectionStats();
+      
+      //We have a valid user and a valid collection.
+      UserCollectionStats stats = new UserCollectionStats();
+      stats.setBaseOwned(collection.getBaseGameCount());
+      stats.setExpOwned(collection.getExpansionGameCount());
+      stats.setColOwned(collection.getCollectibleGameCount());
+      
+      List<CollectionItem> items = collection.getGames();
+      
+      List<SimpleSortable> mechList = new LinkedList<SimpleSortable>();
+      List<SimpleSortable> desList  = new LinkedList<SimpleSortable>();
+      List<SimpleSortable> pubList  = new LinkedList<SimpleSortable>();
+      
+      for (CollectionItem item : items) {
+        Game game = item.getGame();
+        
+        //Start with mechanisms
+        List<String> mechanisms = game.getMechanisms();
+        if (mechanisms != null) {
+          for (String mech : mechanisms) {
+            boolean found = false;
+            for (SimpleSortable simple : mechList) {
+              if (simple.getContent().equalsIgnoreCase(mech)) {
+                found = true;
+                simple.setHits(simple.getHits() + 1);
+                break;
+              }
+            }
+            if (!found) {
+              SimpleSortable simple = new SimpleSortable(mech);
+              simple.setHits(simple.getHits() + 1);
+              mechList.add(simple);
+            }
+          }
+        }
+        
+        List<String> designers = game.getDesigners();
+        if (designers != null) {
+          for (String des : designers) {
+            boolean found = false;
+            for (SimpleSortable simple : desList) {
+              if (simple.getContent().equalsIgnoreCase(des)) {
+                found = true;
+                simple.setHits(simple.getHits() + 1);
+                break;
+              }
+            }
+            if (!found) {
+              SimpleSortable simple = new SimpleSortable(des);
+              simple.setHits(simple.getHits() + 1);
+              desList.add(simple);
+            }
+          }
+        }
+        
+        //Note: we count the primary publisher twice to help weight those higher
+        List<String> publishers = game.getDesigners();
+        if (publishers != null) {
+          publishers.add(game.getPrimaryPublisher());
+          for (String pub : publishers) {
+            boolean found = false;
+            for (SimpleSortable simple : desList) {
+              if (simple.getContent().equalsIgnoreCase(pub)) {
+                found = true;
+                simple.setHits(simple.getHits() + 1);
+                break;
+              }
+            }
+            if (!found) {
+              SimpleSortable simple = new SimpleSortable(pub);
+              simple.setHits(simple.getHits() + 1);
+              pubList.add(simple);
+            }
+          }
+        } else {
+          boolean found = false;
+          for (SimpleSortable simple : desList) {
+            if (simple.getContent().equalsIgnoreCase(game.getPrimaryPublisher())) {
+              found = true;
+              break;
+            }
+          }
+          if (!found) {
+            SimpleSortable simple = new SimpleSortable(game.getPrimaryPublisher());
+            simple.setHits(simple.getHits() + 1);
+            pubList.add(simple);
+          }
+        }
+      }//end for all items
+      
+      Collections.sort(mechList);
+      Collections.sort(desList);
+      Collections.sort(pubList);
+      
+      if (mechList.size() >= 3) stats.setMech3(mechList.get(2).getContent());
+      if (mechList.size() >= 2) stats.setMech2(mechList.get(1).getContent());
+      if (mechList.size() >= 1) stats.setMech1(mechList.get(0).getContent());
+      
+      if (desList.size() >= 3) stats.setDes3(desList.get(2).getContent());
+      if (desList.size() >= 2) stats.setDes2(desList.get(1).getContent());
+      if (desList.size() >= 1) stats.setDes1(desList.get(0).getContent());
+
+      if (pubList.size() >= 3) stats.setPub3(pubList.get(2).getContent());
+      if (pubList.size() >= 2) stats.setPub2(pubList.get(1).getContent());
+      if (pubList.size() >= 1) stats.setPub1(pubList.get(0).getContent());
+      
+      return stats;
+    } catch (MongoException me) {
+      throw new DatabaseOperationException("Mongo raised an exception to this select: " + me.getMessage(), me);
+    } catch (Throwable t) {
+      throw new DatabaseOperationException("Something bad happened executing the select", t);
+    }
+  }
+
+  public List<CollectionItem> getNewestCollectionItems(long userID, int topX) throws ConfigurationException,
+      DatabaseOperationException {
+    // TODO Auto-generated method stub
+    return null;
   }
 }
