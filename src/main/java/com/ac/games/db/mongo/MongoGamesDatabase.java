@@ -3588,41 +3588,41 @@ public class MongoGamesDatabase implements GamesDatabase {
           }
         }
         
+        //Note: we count only the primary publisher first
+        boolean found = false;
+        for (SimpleSortable simple : pubList) {
+          if (simple.getContent().equalsIgnoreCase(game.getPrimaryPublisher())) {
+            found = true;
+            simple.setHits(simple.getHits() + 1);
+            break;
+          }
+        }
+        if (!found) {
+          SimpleSortable simple = new SimpleSortable(game.getPrimaryPublisher());
+          simple.setHits(simple.getHits() + 1);
+          pubList.add(simple);
+        }
+      }//end for all items
+      
+      //We want a second pass through the publishers to see if we can make this count smarter
+      for (CollectionItem item : items) {
+        Game game = item.getGame();
+        
         //Note: we count the primary publisher twice to help weight those higher
         List<String> publishers = game.getPublishers();
         if (publishers != null) {
-          publishers.add(game.getPrimaryPublisher());
+          publishers.remove(game.getPrimaryPublisher());
           for (String pub : publishers) {
-            boolean found = false;
+            //Unlike other models, we aren't adding new entries, only incrementing existing hits
             for (SimpleSortable simple : pubList) {
               if (simple.getContent().equalsIgnoreCase(pub)) {
-                found = true;
                 simple.setHits(simple.getHits() + 1);
                 break;
               }
             }
-            if (!found) {
-              SimpleSortable simple = new SimpleSortable(pub);
-              simple.setHits(simple.getHits() + 1);
-              pubList.add(simple);
-            }
-          }
-        } else {
-          boolean found = false;
-          for (SimpleSortable simple : pubList) {
-            if (simple.getContent().equalsIgnoreCase(game.getPrimaryPublisher())) {
-              found = true;
-              simple.setHits(simple.getHits() + 1);
-              break;
-            }
-          }
-          if (!found) {
-            SimpleSortable simple = new SimpleSortable(game.getPrimaryPublisher());
-            simple.setHits(simple.getHits() + 1);
-            pubList.add(simple);
           }
         }
-      }//end for all items
+      }
       
       Collections.sort(mechList);
       Collections.sort(desList);
