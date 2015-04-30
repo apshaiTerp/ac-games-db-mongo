@@ -89,9 +89,9 @@ public class CollectionItemConverter {
     if (dbObject.containsField("whereAcquired")) item.setWhereAcquired((String)dbObject.get("whereAcquired"));
     
     if (dbObject.containsField("overrideMinPlayers")) item.setOverrideMinPlayers((Integer)dbObject.get("overrideMinPlayers"));
-    if (dbObject.containsField("overrideMaxPlayers")) item.setOverrideMinPlayers((Integer)dbObject.get("overrideMaxPlayers"));
-    if (dbObject.containsField("overrideMinTime"))    item.setOverrideMinPlayers((Integer)dbObject.get("overrideMinTime"));
-    if (dbObject.containsField("overrideMaxTime"))    item.setOverrideMinPlayers((Integer)dbObject.get("overrideMaxTime"));
+    if (dbObject.containsField("overrideMaxPlayers")) item.setOverrideMaxPlayers((Integer)dbObject.get("overrideMaxPlayers"));
+    if (dbObject.containsField("overrideMinTime"))    item.setOverrideMinTime((Integer)dbObject.get("overrideMinTime"));
+    if (dbObject.containsField("overrideMaxTime"))    item.setOverrideMaxTime((Integer)dbObject.get("overrideMaxTime"));
     
     return item;
   }
