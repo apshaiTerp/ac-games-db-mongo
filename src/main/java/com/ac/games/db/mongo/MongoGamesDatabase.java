@@ -3653,4 +3653,98 @@ public class MongoGamesDatabase implements GamesDatabase {
     // TODO Auto-generated method stub
     return null;
   }
+  
+  /*
+   * (non-Javadoc)
+   * @see com.ac.games.db.GamesDatabase#readWishlistForUser(long)
+   */
+  public List<WishlistItem> readWishlistForUser(long userID) throws ConfigurationException, DatabaseOperationException {
+    if (mongoClient == null || mongoDB == null)
+      throw new ConfigurationException("There is a problem with the database connection.");
+    
+    if (userID <= 0)
+      throw new DatabaseOperationException("The provided userID was invalid");
+      
+    try {
+      DBCollection wishCollection = mongoDB.getCollection("wishlist");
+      
+      BasicDBObject searchObject = new BasicDBObject("userID", userID);
+      DBCursor cursor = wishCollection.find(searchObject);
+      List<WishlistItem> wishlist = new LinkedList<WishlistItem>();
+      while (cursor.hasNext()) {
+        wishlist.add(WishlistItemConverter.convertMongoToWishlistItem(cursor.next()));
+      }
+      try { cursor.close(); } catch (Throwable t) { /** Ignore Errors */ }
+      
+      return wishlist;
+    } catch (MongoException me) {
+      throw new DatabaseOperationException("Mongo raised an exception to this select: " + me.getMessage(), me);
+    } catch (Throwable t) {
+      throw new DatabaseOperationException("Something bad happened executing the select", t);
+    }
+  }
+
+  /*
+   * (non-Javadoc)
+   * @see com.ac.games.db.GamesDatabase#readWishlistByGame(long)
+   */
+  public List<WishlistItem> readWishlistByGame(long gameID) throws ConfigurationException, DatabaseOperationException {
+    if (mongoClient == null || mongoDB == null)
+      throw new ConfigurationException("There is a problem with the database connection.");
+    
+    if (gameID <= 0)
+      throw new DatabaseOperationException("The provided gameID was invalid");
+      
+    try {
+      DBCollection wishCollection = mongoDB.getCollection("wishlist");
+      
+      BasicDBObject searchObject = new BasicDBObject("gameID", gameID);
+      DBCursor cursor = wishCollection.find(searchObject);
+      List<WishlistItem> wishlist = new LinkedList<WishlistItem>();
+      while (cursor.hasNext()) {
+        wishlist.add(WishlistItemConverter.convertMongoToWishlistItem(cursor.next()));
+      }
+      try { cursor.close(); } catch (Throwable t) { /** Ignore Errors */ }
+      
+      return wishlist;
+    } catch (MongoException me) {
+      throw new DatabaseOperationException("Mongo raised an exception to this select: " + me.getMessage(), me);
+    } catch (Throwable t) {
+      throw new DatabaseOperationException("Something bad happened executing the select", t);
+    }
+  }
+
+  /*
+   * (non-Javadoc)
+   * @see com.ac.games.db.GamesDatabase#readWishlistItem(long, long)
+   */
+  public WishlistItem readWishlistItem(long userID, long gameID)  throws ConfigurationException, DatabaseOperationException {
+    if (mongoClient == null || mongoDB == null)
+      throw new ConfigurationException("There is a problem with the database connection.");
+    
+    if (userID <= 0)
+      throw new DatabaseOperationException("The provided userID was invalid");
+    if (gameID <= 0)
+      throw new DatabaseOperationException("The provided gameID was invalid");
+      
+    try {
+      DBCollection wishCollection = mongoDB.getCollection("wishlist");
+      
+      BasicDBObject searchObject = new BasicDBObject("userID", userID);
+      searchObject.append("gameID", gameID);
+      
+      DBCursor cursor = wishCollection.find(searchObject);
+      WishlistItem wishlist = null;
+      while (cursor.hasNext()) {
+        wishlist = WishlistItemConverter.convertMongoToWishlistItem(cursor.next());
+      }
+      try { cursor.close(); } catch (Throwable t) { /** Ignore Errors */ }
+      
+      return wishlist;
+    } catch (MongoException me) {
+      throw new DatabaseOperationException("Mongo raised an exception to this select: " + me.getMessage(), me);
+    } catch (Throwable t) {
+      throw new DatabaseOperationException("Something bad happened executing the select", t);
+    }
+  }
 }
