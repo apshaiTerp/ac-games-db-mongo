@@ -207,6 +207,7 @@ public class MongoGamesDatabase implements GamesDatabase {
         DBObject object = cursor.next();
         game = BGGGameConverter.convertMongoToGame(object);
       }
+      try { cursor.close(); } catch (Throwable t) { /** Ignore Errors */ }
       
       if (debugMode)
         System.out.println ("The game found by this query was:                   " + (game == null ? "Nothing Found" : game.getName()));
@@ -342,6 +343,8 @@ public class MongoGamesDatabase implements GamesDatabase {
     while (cursor.hasNext()) {
       docID = (ObjectId)cursor.next().get("_id");
     }
+    try { cursor.close(); } catch (Throwable t) { /** Ignore Errors */ }
+
     return docID;
   }
   
@@ -373,7 +376,8 @@ public class MongoGamesDatabase implements GamesDatabase {
         DBObject object = cursor.next();
         data = CSIDataConverter.convertMongoToCSI(object);
       }
-      
+      try { cursor.close(); } catch (Throwable t) { /** Ignore Errors */ }
+
       if (debugMode)
         System.out.println ("The game found by this query was:                   " + (data == null ? "Nothing Found" : data.getTitle()));
       return data;
@@ -508,6 +512,8 @@ public class MongoGamesDatabase implements GamesDatabase {
     while (cursor.hasNext()) {
       docID = (ObjectId)cursor.next().get("_id");
     }
+    try { cursor.close(); } catch (Throwable t) { /** Ignore Errors */ }
+
     return docID;
   }
   
@@ -539,6 +545,8 @@ public class MongoGamesDatabase implements GamesDatabase {
         DBObject object = cursor.next();
         data = MMDataConverter.convertMongoToMM(object);
       }
+      try { cursor.close(); } catch (Throwable t) { /** Ignore Errors */ }
+
       
       if (debugMode)
         System.out.println ("The game found by this query was:                   " + (data == null ? "Nothing Found" : data.getTitle()));
@@ -674,6 +682,8 @@ public class MongoGamesDatabase implements GamesDatabase {
     while (cursor.hasNext()) {
       docID = (ObjectId)cursor.next().get("_id");
     }
+    try { cursor.close(); } catch (Throwable t) { /** Ignore Errors */ }
+
     return docID;
   }
 
@@ -729,7 +739,8 @@ public class MongoGamesDatabase implements GamesDatabase {
         DBObject object = cursor.next();
         game = GameConverter.convertMongoToGame(object);
       }
-      
+      try { cursor.close(); } catch (Throwable t) { /** Ignore Errors */ }
+
       if (debugMode)
         System.out.println ("The game found by this query was:                   " + (game == null ? "Nothing Found" : game.getName()));
       return game;
@@ -769,7 +780,8 @@ public class MongoGamesDatabase implements GamesDatabase {
         DBObject object = cursor.next();
         game = GameConverter.convertMongoToGame(object);
       }
-      
+      try { cursor.close(); } catch (Throwable t) { /** Ignore Errors */ }
+
       if (debugMode)
         System.out.println ("The game found by this query was:                   " + (game == null ? "Nothing Found" : game.getName()));
       return game;
@@ -912,6 +924,8 @@ public class MongoGamesDatabase implements GamesDatabase {
     while (cursor.hasNext()) {
       docID = (ObjectId)cursor.next().get("_id");
     }
+    try { cursor.close(); } catch (Throwable t) { /** Ignore Errors */ }
+
     return docID;
   }
   
@@ -943,7 +957,8 @@ public class MongoGamesDatabase implements GamesDatabase {
         DBObject object = cursor.next();
         gameReltn = GameReltnConverter.convertMongoToGameReltn(object);
       }
-      
+      try { cursor.close(); } catch (Throwable t) { /** Ignore Errors */ }
+
       if (debugMode)
         System.out.println ("The game found by this query was:                   " + (gameReltn == null ? "Nothing Found" : gameReltn.getReltnID()));
       return gameReltn;
@@ -1078,6 +1093,8 @@ public class MongoGamesDatabase implements GamesDatabase {
     while (cursor.hasNext()) {
       docID = (ObjectId)cursor.next().get("_id");
     }
+    try { cursor.close(); } catch (Throwable t) { /** Ignore Errors */ }
+
     return docID;
   }
 
@@ -1117,6 +1134,8 @@ public class MongoGamesDatabase implements GamesDatabase {
         if (!resultList.contains(curID))
           resultList.add(curID);
       }
+      try { cursor.close(); } catch (Throwable t) { /** Ignore Errors */ }
+
     } catch (MongoException me) {
       throw new DatabaseOperationException("Mongo raised an exception to this select: " + me.getMessage(), me);
     } catch (Throwable t) {
@@ -1201,6 +1220,7 @@ public class MongoGamesDatabase implements GamesDatabase {
       for (DBObject object : output.results()) {
         if (object.containsField("maxValue")) result = (Long)object.get("maxValue");
       }
+
       return result;
     } catch (MongoException me) {
       throw new DatabaseOperationException("Mongo raised an exception to this select: " + me.getMessage(), me);
@@ -1296,6 +1316,7 @@ public class MongoGamesDatabase implements GamesDatabase {
         DBObject object = cursor.next();
         user = UserConverter.convertMongoToUser(object);
       }
+      try { cursor.close(); } catch (Throwable t) { /** Ignore Errors */ }
       
       if (debugMode)
         System.out.println ("The user found by this query was:                   " + (user == null ? "Nothing Found" : user.getUserName()));
@@ -1336,6 +1357,7 @@ public class MongoGamesDatabase implements GamesDatabase {
         DBObject object = cursor.next();
         user = UserConverter.convertMongoToUser(object);
       }
+      try { cursor.close(); } catch (Throwable t) { /** Ignore Errors */ }
       
       if (debugMode)
         System.out.println ("The user found by this query was:                   " + (user == null ? "Nothing Found" : user.getUserName()));
@@ -1479,6 +1501,8 @@ public class MongoGamesDatabase implements GamesDatabase {
     while (cursor.hasNext()) {
       docID = (ObjectId)cursor.next().get("_id");
     }
+    try { cursor.close(); } catch (Throwable t) { /** Ignore Errors */ }
+
     return docID;
   }
   
@@ -1510,7 +1534,8 @@ public class MongoGamesDatabase implements GamesDatabase {
         DBObject object = cursor.next();
         user = UserDetailConverter.convertMongoToUserDetail(object);
       }
-      
+      try { cursor.close(); } catch (Throwable t) { /** Ignore Errors */ }
+
       if (debugMode)
         System.out.println ("The user found by this query was:                   " + (user == null ? "Nothing Found" : user.getUserID()));
       return user;
@@ -1645,6 +1670,8 @@ public class MongoGamesDatabase implements GamesDatabase {
     while (cursor.hasNext()) {
       docID = (ObjectId)cursor.next().get("_id");
     }
+    try { cursor.close(); } catch (Throwable t) { /** Ignore Errors */ }
+
     return docID;
   }
   
@@ -1676,7 +1703,8 @@ public class MongoGamesDatabase implements GamesDatabase {
         DBObject object = cursor.next();
         collection = CollectionConverter.convertMongoToCollection(object);
       }
-      
+      try { cursor.close(); } catch (Throwable t) { /** Ignore Errors */ }
+
       if (debugMode)
         System.out.println ("The Collection found by this query was:             " + (collection == null ? "Nothing Found" : collection.getCollectionID()));
       return collection;
@@ -1819,6 +1847,8 @@ public class MongoGamesDatabase implements GamesDatabase {
     while (cursor.hasNext()) {
       docID = (ObjectId)cursor.next().get("_id");
     }
+    try { cursor.close(); } catch (Throwable t) { /** Ignore Errors */ }
+
     return docID;
   }
   
@@ -1850,7 +1880,8 @@ public class MongoGamesDatabase implements GamesDatabase {
         DBObject object = cursor.next();
         item = CollectionItemConverter.convertMongoToCollectionItem(object);
       }
-      
+      try { cursor.close(); } catch (Throwable t) { /** Ignore Errors */ }
+
       if (debugMode)
         System.out.println ("The game found by this query was:                   " + (item == null ? "Nothing Found" : item.getItemID()));
       return item;
@@ -1993,6 +2024,8 @@ public class MongoGamesDatabase implements GamesDatabase {
     while (cursor.hasNext()) {
       docID = (ObjectId)cursor.next().get("_id");
     }
+    try { cursor.close(); } catch (Throwable t) { /** Ignore Errors */ }
+
     return docID;
   }
 
@@ -2059,6 +2092,8 @@ public class MongoGamesDatabase implements GamesDatabase {
         DBObject object = cursor.next();
         items.add(MediaItemConverter.convertMongoToMediaItem(object));
       }
+      try { cursor.close(); } catch (Throwable t) { /** Ignore Errors */ }
+
       return items;
       
     } catch (MongoException me) {
@@ -2095,6 +2130,8 @@ public class MongoGamesDatabase implements GamesDatabase {
         DBObject object = cursor.next();
         items.add(MediaItemConverter.convertMongoToMediaItem(object));
       }
+      try { cursor.close(); } catch (Throwable t) { /** Ignore Errors */ }
+
       return items;
       
     } catch (MongoException me) {
@@ -2235,6 +2272,8 @@ public class MongoGamesDatabase implements GamesDatabase {
     while (cursor.hasNext()) {
       docID = (ObjectId)cursor.next().get("_id");
     }
+    try { cursor.close(); } catch (Throwable t) { /** Ignore Errors */ }
+
     return docID;
   }
 
@@ -2265,6 +2304,8 @@ public class MongoGamesDatabase implements GamesDatabase {
         DBObject object = cursor.next();
         item = WishlistItemConverter.convertMongoToWishlistItem(object);
       }
+      try { cursor.close(); } catch (Throwable t) { /** Ignore Errors */ }
+
       return item;
       
     } catch (MongoException me) {
@@ -2405,6 +2446,8 @@ public class MongoGamesDatabase implements GamesDatabase {
     while (cursor.hasNext()) {
       docID = (ObjectId)cursor.next().get("_id");
     }
+    try { cursor.close(); } catch (Throwable t) { /** Ignore Errors */ }
+
     return docID;
   }
 
@@ -2435,6 +2478,8 @@ public class MongoGamesDatabase implements GamesDatabase {
         DBObject object = cursor.next();
         item = PlaythruItemConverter.convertMongoToPlaythruItem(object);
       }
+      try { cursor.close(); } catch (Throwable t) { /** Ignore Errors */ }
+
       return item;
       
     } catch (MongoException me) {
@@ -2575,6 +2620,8 @@ public class MongoGamesDatabase implements GamesDatabase {
     while (cursor.hasNext()) {
       docID = (ObjectId)cursor.next().get("_id");
     }
+    try { cursor.close(); } catch (Throwable t) { /** Ignore Errors */ }
+
     return docID;
   }
 
@@ -2630,6 +2677,8 @@ public class MongoGamesDatabase implements GamesDatabase {
         DBObject object = cursor.next();
         stats = StatsConverter.convertMongoToBGGGameStats(object);
       }
+      try { cursor.close(); } catch (Throwable t) { /** Ignore Errors */ }
+
       return stats;
       
     } catch (MongoException me) {
@@ -2696,6 +2745,8 @@ public class MongoGamesDatabase implements GamesDatabase {
         DBObject object = cursor.next();
         stats = StatsConverter.convertMongoToCSIDataStats(object);
       }
+      try { cursor.close(); } catch (Throwable t) { /** Ignore Errors */ }
+
       return stats;
       
     } catch (MongoException me) {
@@ -2762,6 +2813,8 @@ public class MongoGamesDatabase implements GamesDatabase {
         DBObject object = cursor.next();
         stats = StatsConverter.convertMongoToMMDataStats(object);
       }
+      try { cursor.close(); } catch (Throwable t) { /** Ignore Errors */ }
+
       return stats;
       
     } catch (MongoException me) {
@@ -2855,6 +2908,7 @@ public class MongoGamesDatabase implements GamesDatabase {
         DBObject object = cursor.next();
         games.add(BGGGameConverter.convertMongoToGame(object));
       }
+      try { cursor.close(); } catch (Throwable t) { /** Ignore Errors */ }
 
       debugMode = false;
       System.out.println ("games.size(): " + games.size());
@@ -2900,7 +2954,8 @@ public class MongoGamesDatabase implements GamesDatabase {
         DBObject object = cursor.next();
         game = BGGGameConverter.convertMongoToGame(object);
       }
-      
+      try { cursor.close(); } catch (Throwable t) { /** Ignore Errors */ }
+
       return game;
       
     } catch (MongoException me) {
@@ -2947,7 +3002,8 @@ public class MongoGamesDatabase implements GamesDatabase {
         DBObject object = cursor.next();
         games.add(CSIDataConverter.convertMongoToCSI(object));
       }
-      
+      try { cursor.close(); } catch (Throwable t) { /** Ignore Errors */ }
+
       return games;
       
     } catch (MongoException me) {
@@ -2993,7 +3049,8 @@ public class MongoGamesDatabase implements GamesDatabase {
         DBObject object = cursor.next();
         game = CSIDataConverter.convertMongoToCSI(object);
       }
-      
+      try { cursor.close(); } catch (Throwable t) { /** Ignore Errors */ }
+
       return game;
       
     } catch (MongoException me) {
@@ -3040,7 +3097,8 @@ public class MongoGamesDatabase implements GamesDatabase {
         DBObject object = cursor.next();
         games.add(MMDataConverter.convertMongoToMM(object));
       }
-      
+      try { cursor.close(); } catch (Throwable t) { /** Ignore Errors */ }
+
       return games;
       
     } catch (MongoException me) {
@@ -3083,7 +3141,8 @@ public class MongoGamesDatabase implements GamesDatabase {
         DBObject object = cursor.next();
         game = MMDataConverter.convertMongoToMM(object);
       }
-      
+      try { cursor.close(); } catch (Throwable t) { /** Ignore Errors */ }
+
       return game;
       
     } catch (MongoException me) {
@@ -3200,6 +3259,7 @@ public class MongoGamesDatabase implements GamesDatabase {
         DBObject object = cursor.next();
         games.add(BGGGameConverter.convertMongoToCompact(object));
       }
+      try { cursor.close(); } catch (Throwable t) { /** Ignore Errors */ }
 
       debugMode = false;
       System.out.println ("games.size(): " + games.size());
