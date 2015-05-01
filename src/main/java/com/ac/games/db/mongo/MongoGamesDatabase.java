@@ -139,7 +139,7 @@ public class MongoGamesDatabase implements GamesDatabase {
   public void initializeDBConnection() throws ConfigurationException {
     //Checking to see if connection is already open...
     if (mongoClient != null) {
-      System.out.println ("The connection is already open, do not reset.");
+      //System.out.println ("The connection is already open, do not reset.");
       return;
     }
     
