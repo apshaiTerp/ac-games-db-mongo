@@ -51,8 +51,8 @@ public class WishlistItemConverter {
     if (item == null) return null;
     
     BasicDBObject dbObject = new BasicDBObject("wishID", item.getWishID());
-    if (item.getUserID() <= -1)      dbObject.append("userID", item.getUserID());
-    if (item.getGameID() <= -1)      dbObject.append("gameID", item.getGameID());
+    if (item.getUserID() >= -1)      dbObject.append("userID", item.getUserID());
+    if (item.getGameID() >= -1)      dbObject.append("gameID", item.getGameID());
     if (item.getDateAdded() != null) dbObject.append("dateAdded", item.getDateAdded());
     dbObject.append("notifyUser", item.isNotifyUser());
     
