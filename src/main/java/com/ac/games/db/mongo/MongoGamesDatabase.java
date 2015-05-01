@@ -171,11 +171,12 @@ public class MongoGamesDatabase implements GamesDatabase {
     try {
       if (mongoClient != null)
         mongoClient.close();
-      mongoClient = null;
-      mongoDB     = null;
     } catch (Throwable t) {
-      throw new ConfigurationException("This operation has not yet been implemented");
+      t.printStackTrace();
     }
+    
+    mongoClient = null;
+    mongoDB     = null;
   }
 
   /*
