@@ -4,7 +4,7 @@
   
   <groupId>com.ac.games</groupId>
   <artifactId>ac-games-db-mongo</artifactId>
-  <version>0.3.0-SNAPSHOT</version>
+  <version>1.0</version>
   <packaging>jar</packaging>
 
   <name>MongoDB Database Implementation</name>
@@ -32,8 +32,8 @@
   
   <properties>
     <!--  Depedency Versions  -->  
-    <games.pojo.version>0.3.0-SNAPSHOT</games.pojo.version>
-    <games.db.version>0.3.0-SNAPSHOT</games.db.version>
+    <games.pojo.version>1.0</games.pojo.version>
+    <games.db.version>1.0</games.db.version>
     <mongo.javadriver.version>2.13.0</mongo.javadriver.version>
     <junit.version>4.11</junit.version>
     <!--  Plugin Versions  -->
@@ -103,7 +103,7 @@
           <detectLinks>true</detectLinks>
           <docencoding>UTF-8</docencoding>
           <docfilessubdirs>true</docfilessubdirs>
-          <source>1.6</source>
+          <source>1.7</source>
         </configuration>
         <executions>
           <execution>
@@ -162,7 +162,7 @@
           <detectLinks>true</detectLinks>
           <docencoding>UTF-8</docencoding>
           <docfilessubdirs>true</docfilessubdirs>
-          <source>1.6</source>
+          <source>1.7</source>
         </configuration>
       </plugin>
       <plugin>

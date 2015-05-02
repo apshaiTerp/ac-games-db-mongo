@@ -1,6 +1,7 @@
 package com.ac.games.db.mongo;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -12,6 +13,7 @@ import com.ac.games.data.CSIDataStats;
 import com.ac.games.data.Collection;
 import com.ac.games.data.CollectionItem;
 import com.ac.games.data.CompactSearchData;
+import com.ac.games.data.CoolStuffIncCategoryConverter;
 import com.ac.games.data.CoolStuffIncPriceData;
 import com.ac.games.data.Game;
 import com.ac.games.data.GameReltn;
@@ -19,11 +21,14 @@ import com.ac.games.data.GameType;
 import com.ac.games.data.GameTypeConverter;
 import com.ac.games.data.MMDataStats;
 import com.ac.games.data.MediaItem;
+import com.ac.games.data.MiniatureMarketCategoryConverter;
 import com.ac.games.data.MiniatureMarketPriceData;
 import com.ac.games.data.PlaythruItem;
 import com.ac.games.data.ReviewState;
 import com.ac.games.data.ReviewStateConverter;
+import com.ac.games.data.SimpleSortable;
 import com.ac.games.data.User;
+import com.ac.games.data.UserCollectionStats;
 import com.ac.games.data.UserDetail;
 import com.ac.games.data.WishlistItem;
 import com.ac.games.db.GamesDatabase;
@@ -166,11 +171,12 @@ public class MongoGamesDatabase implements GamesDatabase {
     try {
       if (mongoClient != null)
         mongoClient.close();
-      mongoClient = null;
-      mongoDB     = null;
     } catch (Throwable t) {
-      throw new ConfigurationException("This operation has not yet been implemented");
+      t.printStackTrace();
     }
+    
+    mongoClient = null;
+    mongoDB     = null;
   }
 
   /*
@@ -201,6 +207,7 @@ public class MongoGamesDatabase implements GamesDatabase {
         DBObject object = cursor.next();
         game = BGGGameConverter.convertMongoToGame(object);
       }
+      try { cursor.close(); } catch (Throwable t) { /** Ignore Errors */ }
       
       if (debugMode)
         System.out.println ("The game found by this query was:                   " + (game == null ? "Nothing Found" : game.getName()));
@@ -336,6 +343,8 @@ public class MongoGamesDatabase implements GamesDatabase {
     while (cursor.hasNext()) {
       docID = (ObjectId)cursor.next().get("_id");
     }
+    try { cursor.close(); } catch (Throwable t) { /** Ignore Errors */ }
+
     return docID;
   }
   
@@ -367,7 +376,8 @@ public class MongoGamesDatabase implements GamesDatabase {
         DBObject object = cursor.next();
         data = CSIDataConverter.convertMongoToCSI(object);
       }
-      
+      try { cursor.close(); } catch (Throwable t) { /** Ignore Errors */ }
+
       if (debugMode)
         System.out.println ("The game found by this query was:                   " + (data == null ? "Nothing Found" : data.getTitle()));
       return data;
@@ -502,6 +512,8 @@ public class MongoGamesDatabase implements GamesDatabase {
     while (cursor.hasNext()) {
       docID = (ObjectId)cursor.next().get("_id");
     }
+    try { cursor.close(); } catch (Throwable t) { /** Ignore Errors */ }
+
     return docID;
   }
   
@@ -533,6 +545,8 @@ public class MongoGamesDatabase implements GamesDatabase {
         DBObject object = cursor.next();
         data = MMDataConverter.convertMongoToMM(object);
       }
+      try { cursor.close(); } catch (Throwable t) { /** Ignore Errors */ }
+
       
       if (debugMode)
         System.out.println ("The game found by this query was:                   " + (data == null ? "Nothing Found" : data.getTitle()));
@@ -668,6 +682,8 @@ public class MongoGamesDatabase implements GamesDatabase {
     while (cursor.hasNext()) {
       docID = (ObjectId)cursor.next().get("_id");
     }
+    try { cursor.close(); } catch (Throwable t) { /** Ignore Errors */ }
+
     return docID;
   }
 
@@ -723,7 +739,8 @@ public class MongoGamesDatabase implements GamesDatabase {
         DBObject object = cursor.next();
         game = GameConverter.convertMongoToGame(object);
       }
-      
+      try { cursor.close(); } catch (Throwable t) { /** Ignore Errors */ }
+
       if (debugMode)
         System.out.println ("The game found by this query was:                   " + (game == null ? "Nothing Found" : game.getName()));
       return game;
@@ -763,7 +780,8 @@ public class MongoGamesDatabase implements GamesDatabase {
         DBObject object = cursor.next();
         game = GameConverter.convertMongoToGame(object);
       }
-      
+      try { cursor.close(); } catch (Throwable t) { /** Ignore Errors */ }
+
       if (debugMode)
         System.out.println ("The game found by this query was:                   " + (game == null ? "Nothing Found" : game.getName()));
       return game;
@@ -906,6 +924,8 @@ public class MongoGamesDatabase implements GamesDatabase {
     while (cursor.hasNext()) {
       docID = (ObjectId)cursor.next().get("_id");
     }
+    try { cursor.close(); } catch (Throwable t) { /** Ignore Errors */ }
+
     return docID;
   }
   
@@ -937,7 +957,8 @@ public class MongoGamesDatabase implements GamesDatabase {
         DBObject object = cursor.next();
         gameReltn = GameReltnConverter.convertMongoToGameReltn(object);
       }
-      
+      try { cursor.close(); } catch (Throwable t) { /** Ignore Errors */ }
+
       if (debugMode)
         System.out.println ("The game found by this query was:                   " + (gameReltn == null ? "Nothing Found" : gameReltn.getReltnID()));
       return gameReltn;
@@ -1072,6 +1093,8 @@ public class MongoGamesDatabase implements GamesDatabase {
     while (cursor.hasNext()) {
       docID = (ObjectId)cursor.next().get("_id");
     }
+    try { cursor.close(); } catch (Throwable t) { /** Ignore Errors */ }
+
     return docID;
   }
 
@@ -1111,6 +1134,8 @@ public class MongoGamesDatabase implements GamesDatabase {
         if (!resultList.contains(curID))
           resultList.add(curID);
       }
+      try { cursor.close(); } catch (Throwable t) { /** Ignore Errors */ }
+
     } catch (MongoException me) {
       throw new DatabaseOperationException("Mongo raised an exception to this select: " + me.getMessage(), me);
     } catch (Throwable t) {
@@ -1195,6 +1220,7 @@ public class MongoGamesDatabase implements GamesDatabase {
       for (DBObject object : output.results()) {
         if (object.containsField("maxValue")) result = (Long)object.get("maxValue");
       }
+
       return result;
     } catch (MongoException me) {
       throw new DatabaseOperationException("Mongo raised an exception to this select: " + me.getMessage(), me);
@@ -1264,47 +1290,6 @@ public class MongoGamesDatabase implements GamesDatabase {
 
   /*
    * (non-Javadoc)
-   * @see com.ac.games.db.GamesDatabase#readAdHocBGGQuery(com.ac.games.data.BGGGame, int)
-   */
-  public List<BGGGame> readAdHocBGGQuery(BGGGame queryGame, int rowLimit) throws ConfigurationException,
-      DatabaseOperationException {
-    
-    
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  /*
-   * (non-Javadoc)
-   * @see com.ac.games.db.GamesDatabase#readAdHocCSIQuery(com.ac.games.data.CoolStuffIncPriceData, int)
-   */
-  public List<CoolStuffIncPriceData> readAdHocCSIQuery(CoolStuffIncPriceData queryData, int rowLimit)
-      throws ConfigurationException, DatabaseOperationException {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  /*
-   * (non-Javadoc)
-   * @see com.ac.games.db.GamesDatabase#readAdHocMMQuery(com.ac.games.data.MiniatureMarketPriceData, int)
-   */
-  public List<MiniatureMarketPriceData> readAdHocMMQuery(MiniatureMarketPriceData queryData, int rowLimit)
-      throws ConfigurationException, DatabaseOperationException {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  /*
-   * (non-Javadoc)
-   * @see com.ac.games.db.GamesDatabase#readAdHocGameQuery(com.ac.games.data.Game, int)
-   */
-  public List<Game> readAdHocGameQuery(Game queryGame, int rowLimit) throws ConfigurationException, DatabaseOperationException {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  /*
-   * (non-Javadoc)
    * @see com.ac.games.db.GamesDatabase#readUser(java.lang.String)
    */
   public User readUser(String userName) throws ConfigurationException, DatabaseOperationException {
@@ -1331,6 +1316,7 @@ public class MongoGamesDatabase implements GamesDatabase {
         DBObject object = cursor.next();
         user = UserConverter.convertMongoToUser(object);
       }
+      try { cursor.close(); } catch (Throwable t) { /** Ignore Errors */ }
       
       if (debugMode)
         System.out.println ("The user found by this query was:                   " + (user == null ? "Nothing Found" : user.getUserName()));
@@ -1371,6 +1357,7 @@ public class MongoGamesDatabase implements GamesDatabase {
         DBObject object = cursor.next();
         user = UserConverter.convertMongoToUser(object);
       }
+      try { cursor.close(); } catch (Throwable t) { /** Ignore Errors */ }
       
       if (debugMode)
         System.out.println ("The user found by this query was:                   " + (user == null ? "Nothing Found" : user.getUserName()));
@@ -1514,6 +1501,8 @@ public class MongoGamesDatabase implements GamesDatabase {
     while (cursor.hasNext()) {
       docID = (ObjectId)cursor.next().get("_id");
     }
+    try { cursor.close(); } catch (Throwable t) { /** Ignore Errors */ }
+
     return docID;
   }
   
@@ -1545,7 +1534,8 @@ public class MongoGamesDatabase implements GamesDatabase {
         DBObject object = cursor.next();
         user = UserDetailConverter.convertMongoToUserDetail(object);
       }
-      
+      try { cursor.close(); } catch (Throwable t) { /** Ignore Errors */ }
+
       if (debugMode)
         System.out.println ("The user found by this query was:                   " + (user == null ? "Nothing Found" : user.getUserID()));
       return user;
@@ -1680,6 +1670,8 @@ public class MongoGamesDatabase implements GamesDatabase {
     while (cursor.hasNext()) {
       docID = (ObjectId)cursor.next().get("_id");
     }
+    try { cursor.close(); } catch (Throwable t) { /** Ignore Errors */ }
+
     return docID;
   }
   
@@ -1711,7 +1703,8 @@ public class MongoGamesDatabase implements GamesDatabase {
         DBObject object = cursor.next();
         collection = CollectionConverter.convertMongoToCollection(object);
       }
-      
+      try { cursor.close(); } catch (Throwable t) { /** Ignore Errors */ }
+
       if (debugMode)
         System.out.println ("The Collection found by this query was:             " + (collection == null ? "Nothing Found" : collection.getCollectionID()));
       return collection;
@@ -1854,6 +1847,8 @@ public class MongoGamesDatabase implements GamesDatabase {
     while (cursor.hasNext()) {
       docID = (ObjectId)cursor.next().get("_id");
     }
+    try { cursor.close(); } catch (Throwable t) { /** Ignore Errors */ }
+
     return docID;
   }
   
@@ -1885,7 +1880,8 @@ public class MongoGamesDatabase implements GamesDatabase {
         DBObject object = cursor.next();
         item = CollectionItemConverter.convertMongoToCollectionItem(object);
       }
-      
+      try { cursor.close(); } catch (Throwable t) { /** Ignore Errors */ }
+
       if (debugMode)
         System.out.println ("The game found by this query was:                   " + (item == null ? "Nothing Found" : item.getItemID()));
       return item;
@@ -2028,6 +2024,8 @@ public class MongoGamesDatabase implements GamesDatabase {
     while (cursor.hasNext()) {
       docID = (ObjectId)cursor.next().get("_id");
     }
+    try { cursor.close(); } catch (Throwable t) { /** Ignore Errors */ }
+
     return docID;
   }
 
@@ -2094,6 +2092,8 @@ public class MongoGamesDatabase implements GamesDatabase {
         DBObject object = cursor.next();
         items.add(MediaItemConverter.convertMongoToMediaItem(object));
       }
+      try { cursor.close(); } catch (Throwable t) { /** Ignore Errors */ }
+
       return items;
       
     } catch (MongoException me) {
@@ -2130,6 +2130,8 @@ public class MongoGamesDatabase implements GamesDatabase {
         DBObject object = cursor.next();
         items.add(MediaItemConverter.convertMongoToMediaItem(object));
       }
+      try { cursor.close(); } catch (Throwable t) { /** Ignore Errors */ }
+
       return items;
       
     } catch (MongoException me) {
@@ -2270,6 +2272,8 @@ public class MongoGamesDatabase implements GamesDatabase {
     while (cursor.hasNext()) {
       docID = (ObjectId)cursor.next().get("_id");
     }
+    try { cursor.close(); } catch (Throwable t) { /** Ignore Errors */ }
+
     return docID;
   }
 
@@ -2300,6 +2304,8 @@ public class MongoGamesDatabase implements GamesDatabase {
         DBObject object = cursor.next();
         item = WishlistItemConverter.convertMongoToWishlistItem(object);
       }
+      try { cursor.close(); } catch (Throwable t) { /** Ignore Errors */ }
+
       return item;
       
     } catch (MongoException me) {
@@ -2440,6 +2446,8 @@ public class MongoGamesDatabase implements GamesDatabase {
     while (cursor.hasNext()) {
       docID = (ObjectId)cursor.next().get("_id");
     }
+    try { cursor.close(); } catch (Throwable t) { /** Ignore Errors */ }
+
     return docID;
   }
 
@@ -2470,6 +2478,8 @@ public class MongoGamesDatabase implements GamesDatabase {
         DBObject object = cursor.next();
         item = PlaythruItemConverter.convertMongoToPlaythruItem(object);
       }
+      try { cursor.close(); } catch (Throwable t) { /** Ignore Errors */ }
+
       return item;
       
     } catch (MongoException me) {
@@ -2610,6 +2620,8 @@ public class MongoGamesDatabase implements GamesDatabase {
     while (cursor.hasNext()) {
       docID = (ObjectId)cursor.next().get("_id");
     }
+    try { cursor.close(); } catch (Throwable t) { /** Ignore Errors */ }
+
     return docID;
   }
 
@@ -2665,6 +2677,8 @@ public class MongoGamesDatabase implements GamesDatabase {
         DBObject object = cursor.next();
         stats = StatsConverter.convertMongoToBGGGameStats(object);
       }
+      try { cursor.close(); } catch (Throwable t) { /** Ignore Errors */ }
+
       return stats;
       
     } catch (MongoException me) {
@@ -2731,6 +2745,8 @@ public class MongoGamesDatabase implements GamesDatabase {
         DBObject object = cursor.next();
         stats = StatsConverter.convertMongoToCSIDataStats(object);
       }
+      try { cursor.close(); } catch (Throwable t) { /** Ignore Errors */ }
+
       return stats;
       
     } catch (MongoException me) {
@@ -2797,6 +2813,8 @@ public class MongoGamesDatabase implements GamesDatabase {
         DBObject object = cursor.next();
         stats = StatsConverter.convertMongoToMMDataStats(object);
       }
+      try { cursor.close(); } catch (Throwable t) { /** Ignore Errors */ }
+
       return stats;
       
     } catch (MongoException me) {
@@ -2876,7 +2894,7 @@ public class MongoGamesDatabase implements GamesDatabase {
         searchObject.append("gameType", GameTypeConverter.convertGameTypeToFlag(gameTypeFilter));
       }
       
-      //TODO - DEBUG
+      //DEBUG
       System.out.println ("The query I'm about to run is: db.bgggame.find(" + searchObject + ")");
       debugMode = true;
       
@@ -2890,6 +2908,7 @@ public class MongoGamesDatabase implements GamesDatabase {
         DBObject object = cursor.next();
         games.add(BGGGameConverter.convertMongoToGame(object));
       }
+      try { cursor.close(); } catch (Throwable t) { /** Ignore Errors */ }
 
       debugMode = false;
       System.out.println ("games.size(): " + games.size());
@@ -2935,7 +2954,8 @@ public class MongoGamesDatabase implements GamesDatabase {
         DBObject object = cursor.next();
         game = BGGGameConverter.convertMongoToGame(object);
       }
-      
+      try { cursor.close(); } catch (Throwable t) { /** Ignore Errors */ }
+
       return game;
       
     } catch (MongoException me) {
@@ -2982,7 +3002,8 @@ public class MongoGamesDatabase implements GamesDatabase {
         DBObject object = cursor.next();
         games.add(CSIDataConverter.convertMongoToCSI(object));
       }
-      
+      try { cursor.close(); } catch (Throwable t) { /** Ignore Errors */ }
+
       return games;
       
     } catch (MongoException me) {
@@ -3028,7 +3049,8 @@ public class MongoGamesDatabase implements GamesDatabase {
         DBObject object = cursor.next();
         game = CSIDataConverter.convertMongoToCSI(object);
       }
-      
+      try { cursor.close(); } catch (Throwable t) { /** Ignore Errors */ }
+
       return game;
       
     } catch (MongoException me) {
@@ -3075,7 +3097,8 @@ public class MongoGamesDatabase implements GamesDatabase {
         DBObject object = cursor.next();
         games.add(MMDataConverter.convertMongoToMM(object));
       }
-      
+      try { cursor.close(); } catch (Throwable t) { /** Ignore Errors */ }
+
       return games;
       
     } catch (MongoException me) {
@@ -3118,7 +3141,8 @@ public class MongoGamesDatabase implements GamesDatabase {
         DBObject object = cursor.next();
         game = MMDataConverter.convertMongoToMM(object);
       }
-      
+      try { cursor.close(); } catch (Throwable t) { /** Ignore Errors */ }
+
       return game;
       
     } catch (MongoException me) {
@@ -3173,6 +3197,7 @@ public class MongoGamesDatabase implements GamesDatabase {
         DBObject object = cursor.next();
         data = GameConverter.convertMongoToCompact(object);
       }
+      try { cursor.close(); } catch (Throwable t) { /** Ignore Errors */ }
       
       return data;
     } catch (MongoException me) {
@@ -3234,6 +3259,7 @@ public class MongoGamesDatabase implements GamesDatabase {
         DBObject object = cursor.next();
         games.add(BGGGameConverter.convertMongoToCompact(object));
       }
+      try { cursor.close(); } catch (Throwable t) { /** Ignore Errors */ }
 
       debugMode = false;
       System.out.println ("games.size(): " + games.size());
@@ -3301,8 +3327,481 @@ public class MongoGamesDatabase implements GamesDatabase {
         results.add(searchResult);
       }
       try { cursor.close(); } catch (Throwable t) { /** Ignore Me */ }
+      Collections.sort(results);
       return results;
       
+    } catch (MongoException me) {
+      throw new DatabaseOperationException("Mongo raised an exception to this select: " + me.getMessage(), me);
+    } catch (Throwable t) {
+      throw new DatabaseOperationException("Something bad happened executing the select", t);
+    }
+  }
+
+  public List<String> readBGGGameNamesForAutoComplete() throws ConfigurationException, DatabaseOperationException {
+    if (mongoClient == null || mongoDB == null)
+      throw new ConfigurationException("There is a problem with the database connection.");
+    
+    //Run the operation
+    try {
+      //Open the collection, i.e. table
+      DBCollection gameCollection = mongoDB.getCollection("bgggame");
+      
+      BasicDBObject searchObject = new BasicDBObject();
+      BasicDBList ignoreRejectList = new BasicDBList();
+      ignoreRejectList.add(new Integer(ReviewStateConverter.convertReviewStateToFlag(ReviewState.REVIEWED)));
+      ignoreRejectList.add(new Integer(ReviewStateConverter.convertReviewStateToFlag(ReviewState.PENDING)));
+      searchObject.append("reviewState", new BasicDBObject("$in", ignoreRejectList));
+
+      BasicDBObject columnsObject = new BasicDBObject("name", 1);
+      columnsObject.append("bggID", 1);
+      columnsObject.append("yearPublished", 1);
+      
+      DBCursor cursor = gameCollection.find(searchObject, columnsObject);
+      List<String> results = new LinkedList<String>();
+      
+      while (cursor.hasNext()) {
+        DBObject object = cursor.next();
+        
+        String gameName   = (String)object.get("name");
+        long bggID        = (Long)object.get("bggID");
+        
+        int yearPublished = -1;
+        if (object.containsField("yearPublished"))
+          yearPublished = (Integer)object.get("yearPublished");
+        
+        boolean writeYear = (yearPublished > 1);
+        
+        String searchResult = gameName;
+        
+        if (writeYear)
+          searchResult += " (" + bggID + " - " + yearPublished + ")";
+        else 
+          searchResult += " (" + bggID + ")";
+        
+        results.add(searchResult);
+      }
+      try { cursor.close(); } catch (Throwable t) { /** Ignore Me */ }
+      Collections.sort(results);
+      return results;
+      
+    } catch (MongoException me) {
+      throw new DatabaseOperationException("Mongo raised an exception to this select: " + me.getMessage(), me);
+    } catch (Throwable t) {
+      t.printStackTrace();
+      throw new DatabaseOperationException("Something bad happened executing the select", t);
+    }
+  }
+
+  public List<String> readCSITitlesForAutoComplete() throws ConfigurationException, DatabaseOperationException {
+    if (mongoClient == null || mongoDB == null)
+      throw new ConfigurationException("There is a problem with the database connection.");
+    
+    //Run the operation
+    try {
+      //Open the collection, i.e. table
+      DBCollection gameCollection = mongoDB.getCollection("csidata");
+      
+      BasicDBObject searchObject = new BasicDBObject();
+      BasicDBList ignoreRejectList = new BasicDBList();
+      ignoreRejectList.add(new Integer(ReviewStateConverter.convertReviewStateToFlag(ReviewState.REVIEWED)));
+      ignoreRejectList.add(new Integer(ReviewStateConverter.convertReviewStateToFlag(ReviewState.PENDING)));
+      searchObject.append("reviewState", new BasicDBObject("$in", ignoreRejectList));
+
+      BasicDBObject columnsObject = new BasicDBObject("title", 1);
+      columnsObject.append("csiID", 1);
+      columnsObject.append("category", 1);
+      
+      DBCursor cursor = gameCollection.find(searchObject, columnsObject);
+      List<String> results = new LinkedList<String>();
+      
+      while (cursor.hasNext()) {
+        DBObject object = cursor.next();
+        
+        String gameName   = (String)object.get("title");
+        long csiID        = (Long)object.get("csiID");
+        int catValue      = (Integer)object.get("category");
+        String category   = null;
+        
+        switch (catValue) {
+        case CoolStuffIncCategoryConverter.COLLECTIBLE_FLAG : category = "Collectible"; break;
+        case CoolStuffIncCategoryConverter.DICEMASTERS_FLAG : category = "Dice Masters"; break;
+        case CoolStuffIncCategoryConverter.BOARDGAMES_FLAG  : category = "Board Game"; break;
+        case CoolStuffIncCategoryConverter.RPGS_FLAG        : category = "RPG"; break;
+        case CoolStuffIncCategoryConverter.LCGS_FLAG        : category = "LCG"; break;
+        case CoolStuffIncCategoryConverter.SUPPLIES_FLAG    : category = "Supplies"; break;
+        case CoolStuffIncCategoryConverter.MINIATURES_FLAG  : category = "Miniature"; break;
+        case CoolStuffIncCategoryConverter.VIDEOGAMES_FLAG  : category = "Video Game"; break;
+        case CoolStuffIncCategoryConverter.UNKNOWN_FLAG     : category = "Unknown"; break;
+        default : category = null;
+        }
+        
+        String searchResult = gameName + " (" + csiID + " - " + category + ")";
+        results.add(searchResult);
+      }
+      try { cursor.close(); } catch (Throwable t) { /** Ignore Me */ }
+      Collections.sort(results);
+      return results;
+      
+    } catch (MongoException me) {
+      throw new DatabaseOperationException("Mongo raised an exception to this select: " + me.getMessage(), me);
+    } catch (Throwable t) {
+      throw new DatabaseOperationException("Something bad happened executing the select", t);
+    }
+  }
+
+  public List<String> readMMTitlesForAutoComplete() throws ConfigurationException, DatabaseOperationException {
+    if (mongoClient == null || mongoDB == null)
+      throw new ConfigurationException("There is a problem with the database connection.");
+    
+    //Run the operation
+    try {
+      //Open the collection, i.e. table
+      DBCollection gameCollection = mongoDB.getCollection("mmdata");
+      
+      BasicDBObject searchObject = new BasicDBObject();
+      BasicDBList ignoreRejectList = new BasicDBList();
+      ignoreRejectList.add(new Integer(ReviewStateConverter.convertReviewStateToFlag(ReviewState.REVIEWED)));
+      ignoreRejectList.add(new Integer(ReviewStateConverter.convertReviewStateToFlag(ReviewState.PENDING)));
+      searchObject.append("reviewState", new BasicDBObject("$in", ignoreRejectList));
+
+      BasicDBObject columnsObject = new BasicDBObject("title", 1);
+      columnsObject.append("mmID", 1);
+      columnsObject.append("category", 1);
+      
+      DBCursor cursor = gameCollection.find(searchObject, columnsObject);
+      List<String> results = new LinkedList<String>();
+      
+      while (cursor.hasNext()) {
+        DBObject object = cursor.next();
+        
+        String gameName   = (String)object.get("title");
+        long mmID         = (Long)object.get("mmID");
+        int catValue      = (Integer)object.get("category");
+        String category   = null;
+        
+        switch (catValue) {
+        case MiniatureMarketCategoryConverter.BOARDGAMES_FLAG   : category = "Board Game"; break;
+        case MiniatureMarketCategoryConverter.TABLETOP_FLAG     : category = "Table Top"; break;
+        case MiniatureMarketCategoryConverter.CCGS_FLAG         : category = "CCG"; break;
+        case MiniatureMarketCategoryConverter.LCGS_FLAG         : category = "LCG"; break;
+        case MiniatureMarketCategoryConverter.COLLECTIBLES_FLAG : category = "Collectibles"; break;
+        case MiniatureMarketCategoryConverter.RPGS_FLAG         : category = "RPG"; break;
+        case MiniatureMarketCategoryConverter.ACCESSORIES_FLAG  : category = "Accessories"; break;
+        case MiniatureMarketCategoryConverter.UNKNOWN_FLAG      : category = "Unknown"; break;
+        default : category = null;
+        }
+        
+        String searchResult = gameName + " (" + mmID + " - " + category + ")";
+        results.add(searchResult);
+      }
+      try { cursor.close(); } catch (Throwable t) { /** Ignore Me */ }
+      Collections.sort(results);
+      return results;
+      
+    } catch (MongoException me) {
+      throw new DatabaseOperationException("Mongo raised an exception to this select: " + me.getMessage(), me);
+    } catch (Throwable t) {
+      throw new DatabaseOperationException("Something bad happened executing the select", t);
+    }
+  }
+
+  public List<CompactSearchData> readGamesCompact(String gameIDs) throws ConfigurationException, DatabaseOperationException {
+    if (mongoClient == null || mongoDB == null)
+      throw new ConfigurationException("There is a problem with the database connection.");
+    
+    //DEBUG
+    System.out.println ("The gameIDs list: " + gameIDs);
+    
+    List<Long> processIDs = new LinkedList<Long>();
+    if (gameIDs.indexOf(",") != -1) {
+      String processString = new String(gameIDs);
+      while (true) {
+        int commaPos = processString.indexOf(",");
+        if (commaPos == -1) {
+          try {
+            processIDs.add(Long.parseLong(processString));
+            break;
+          } catch (NumberFormatException nfe) {
+            throw new ConfigurationException("The gameIDs list provided is not in the correct format.");
+          }
+        } else {
+          String singleTerm = processString.substring(0, commaPos);
+          processString = processString.substring(commaPos + 1);
+          try {
+            processIDs.add(Long.parseLong(singleTerm));
+          } catch (NumberFormatException nfe) {
+            throw new ConfigurationException("The gameIDs list provided is not in the correct format.");
+          }
+        }
+      }
+    } else {
+      try {
+        processIDs.add(Long.parseLong(gameIDs));
+      } catch (NumberFormatException nfe) {
+        throw new ConfigurationException("The gameIDs list provided is not in the correct format.");
+      }
+    }
+    
+    //DEBUG
+    System.out.println ("The number of IDs we want to process is: " + processIDs.size());
+    
+    try {
+      //Open the collection, i.e. table
+      DBCollection gameCollection = mongoDB.getCollection("game");
+      
+      List<CompactSearchData> results = new ArrayList<CompactSearchData>(processIDs.size());
+      for (long curID : processIDs) {
+        BasicDBObject searchObject = new BasicDBObject("gameID", curID);
+        
+        BasicDBObject columnsObject = new BasicDBObject("gameID", 1);
+        columnsObject.append("name", 1);
+        columnsObject.append("yearPublished", 1);
+        columnsObject.append("imageThumbnailURL", 1);
+        
+        CompactSearchData data = null;
+        DBCursor cursor = gameCollection.find(searchObject, columnsObject);
+        
+        while (cursor.hasNext()) {
+          DBObject object = cursor.next();
+          data = GameConverter.convertMongoToCompact(object);
+        }
+        try { cursor.close(); } catch (Throwable t) { /** Ignore Errors */ }
+        
+        if (data != null)
+          results.add(data);
+      }
+      
+      return results;
+    } catch (MongoException me) {
+      throw new DatabaseOperationException("Mongo raised an exception to this select: " + me.getMessage(), me);
+    } catch (Throwable t) {
+      throw new DatabaseOperationException("Something bad happened executing the select", t);
+    }
+  }
+
+  public UserCollectionStats readCollectionStats(long userID) throws ConfigurationException, DatabaseOperationException {
+    if (mongoClient == null || mongoDB == null)
+      throw new ConfigurationException("There is a problem with the database connection.");
+    
+    if (userID <= 0)
+      throw new DatabaseOperationException("The provided userID was invalid");
+    
+    try {
+      User user = readUser(userID);
+      if (user == null)
+        return new UserCollectionStats();
+      
+      Collection collection = readCollection(user.getCollectionID());
+      if (collection == null)
+        return new UserCollectionStats();
+      
+      //We have a valid user and a valid collection.
+      UserCollectionStats stats = new UserCollectionStats();
+      stats.setBaseOwned(collection.getBaseGameCount());
+      stats.setExpOwned(collection.getExpansionGameCount());
+      stats.setColOwned(collection.getCollectibleGameCount());
+      
+      List<CollectionItem> items = collection.getGames();
+      
+      List<SimpleSortable> mechList = new LinkedList<SimpleSortable>();
+      List<SimpleSortable> desList  = new LinkedList<SimpleSortable>();
+      List<SimpleSortable> pubList  = new LinkedList<SimpleSortable>();
+      
+      for (CollectionItem item : items) {
+        Game game = item.getGame();
+        
+        //Start with mechanisms
+        List<String> mechanisms = game.getMechanisms();
+        if (mechanisms != null) {
+          for (String mech : mechanisms) {
+            boolean found = false;
+            for (SimpleSortable simple : mechList) {
+              if (simple.getContent().equalsIgnoreCase(mech)) {
+                found = true;
+                simple.setHits(simple.getHits() + 1);
+                break;
+              }
+            }
+            if (!found) {
+              SimpleSortable simple = new SimpleSortable(mech);
+              simple.setHits(simple.getHits() + 1);
+              mechList.add(simple);
+            }
+          }
+        }
+        
+        List<String> designers = game.getDesigners();
+        if (designers != null) {
+          for (String des : designers) {
+            boolean found = false;
+            for (SimpleSortable simple : desList) {
+              if (simple.getContent().equalsIgnoreCase(des)) {
+                found = true;
+                simple.setHits(simple.getHits() + 1);
+                break;
+              }
+            }
+            if (!found) {
+              SimpleSortable simple = new SimpleSortable(des);
+              simple.setHits(simple.getHits() + 1);
+              desList.add(simple);
+            }
+          }
+        }
+        
+        //Note: we count only the primary publisher first
+        boolean found = false;
+        for (SimpleSortable simple : pubList) {
+          if (simple.getContent().equalsIgnoreCase(game.getPrimaryPublisher())) {
+            found = true;
+            simple.setHits(simple.getHits() + 1);
+            break;
+          }
+        }
+        if (!found) {
+          SimpleSortable simple = new SimpleSortable(game.getPrimaryPublisher());
+          simple.setHits(simple.getHits() + 1);
+          pubList.add(simple);
+        }
+      }//end for all items
+      
+      //We want a second pass through the publishers to see if we can make this count smarter
+      for (CollectionItem item : items) {
+        Game game = item.getGame();
+        
+        //Note: we count the primary publisher twice to help weight those higher
+        List<String> publishers = game.getPublishers();
+        if (publishers != null) {
+          publishers.remove(game.getPrimaryPublisher());
+          for (String pub : publishers) {
+            //Unlike other models, we aren't adding new entries, only incrementing existing hits
+            for (SimpleSortable simple : pubList) {
+              if (simple.getContent().equalsIgnoreCase(pub)) {
+                simple.setHits(simple.getHits() + 1);
+                break;
+              }
+            }
+          }
+        }
+      }
+      
+      Collections.sort(mechList);
+      Collections.sort(desList);
+      Collections.sort(pubList);
+      
+      if (mechList.size() >= 3) stats.setMech3(mechList.get(2).getContent() + " (" + mechList.get(2).getHits() + ")");
+      if (mechList.size() >= 2) stats.setMech2(mechList.get(1).getContent() + " (" + mechList.get(1).getHits() + ")");
+      if (mechList.size() >= 1) stats.setMech1(mechList.get(0).getContent() + " (" + mechList.get(0).getHits() + ")");
+      
+      if (desList.size() >= 3) stats.setDes3(desList.get(2).getContent() + " (" + desList.get(2).getHits() + ")");
+      if (desList.size() >= 2) stats.setDes2(desList.get(1).getContent() + " (" + desList.get(1).getHits() + ")");
+      if (desList.size() >= 1) stats.setDes1(desList.get(0).getContent() + " (" + desList.get(0).getHits() + ")");
+
+      if (pubList.size() >= 3) stats.setPub3(pubList.get(2).getContent() + " (" + pubList.get(2).getHits() + ")");
+      if (pubList.size() >= 2) stats.setPub2(pubList.get(1).getContent() + " (" + pubList.get(1).getHits() + ")");
+      if (pubList.size() >= 1) stats.setPub1(pubList.get(0).getContent() + " (" + pubList.get(0).getHits() + ")");
+      
+      return stats;
+    } catch (MongoException me) {
+      throw new DatabaseOperationException("Mongo raised an exception to this select: " + me.getMessage(), me);
+    } catch (Throwable t) {
+      throw new DatabaseOperationException("Something bad happened executing the select", t);
+    }
+  }
+
+  public List<CollectionItem> getNewestCollectionItems(long userID, int topX) throws ConfigurationException,
+      DatabaseOperationException {
+    // TODO Auto-generated method stub
+    return null;
+  }
+  
+  /*
+   * (non-Javadoc)
+   * @see com.ac.games.db.GamesDatabase#readWishlistForUser(long)
+   */
+  public List<WishlistItem> readWishlistForUser(long userID) throws ConfigurationException, DatabaseOperationException {
+    if (mongoClient == null || mongoDB == null)
+      throw new ConfigurationException("There is a problem with the database connection.");
+    
+    if (userID <= 0)
+      throw new DatabaseOperationException("The provided userID was invalid");
+      
+    try {
+      DBCollection wishCollection = mongoDB.getCollection("wishlist");
+      
+      BasicDBObject searchObject = new BasicDBObject("userID", userID);
+      DBCursor cursor = wishCollection.find(searchObject);
+      List<WishlistItem> wishlist = new LinkedList<WishlistItem>();
+      while (cursor.hasNext()) {
+        wishlist.add(WishlistItemConverter.convertMongoToWishlistItem(cursor.next()));
+      }
+      try { cursor.close(); } catch (Throwable t) { /** Ignore Errors */ }
+      
+      return wishlist;
+    } catch (MongoException me) {
+      throw new DatabaseOperationException("Mongo raised an exception to this select: " + me.getMessage(), me);
+    } catch (Throwable t) {
+      throw new DatabaseOperationException("Something bad happened executing the select", t);
+    }
+  }
+
+  /*
+   * (non-Javadoc)
+   * @see com.ac.games.db.GamesDatabase#readWishlistByGame(long)
+   */
+  public List<WishlistItem> readWishlistByGame(long gameID) throws ConfigurationException, DatabaseOperationException {
+    if (mongoClient == null || mongoDB == null)
+      throw new ConfigurationException("There is a problem with the database connection.");
+    
+    if (gameID <= 0)
+      throw new DatabaseOperationException("The provided gameID was invalid");
+      
+    try {
+      DBCollection wishCollection = mongoDB.getCollection("wishlist");
+      
+      BasicDBObject searchObject = new BasicDBObject("gameID", gameID);
+      DBCursor cursor = wishCollection.find(searchObject);
+      List<WishlistItem> wishlist = new LinkedList<WishlistItem>();
+      while (cursor.hasNext()) {
+        wishlist.add(WishlistItemConverter.convertMongoToWishlistItem(cursor.next()));
+      }
+      try { cursor.close(); } catch (Throwable t) { /** Ignore Errors */ }
+      
+      return wishlist;
+    } catch (MongoException me) {
+      throw new DatabaseOperationException("Mongo raised an exception to this select: " + me.getMessage(), me);
+    } catch (Throwable t) {
+      throw new DatabaseOperationException("Something bad happened executing the select", t);
+    }
+  }
+
+  /*
+   * (non-Javadoc)
+   * @see com.ac.games.db.GamesDatabase#readWishlistItem(long, long)
+   */
+  public WishlistItem readWishlistItem(long userID, long gameID)  throws ConfigurationException, DatabaseOperationException {
+    if (mongoClient == null || mongoDB == null)
+      throw new ConfigurationException("There is a problem with the database connection.");
+    
+    if (userID <= 0)
+      throw new DatabaseOperationException("The provided userID was invalid");
+    if (gameID <= 0)
+      throw new DatabaseOperationException("The provided gameID was invalid");
+      
+    try {
+      DBCollection wishCollection = mongoDB.getCollection("wishlist");
+      
+      BasicDBObject searchObject = new BasicDBObject("userID", userID);
+      searchObject.append("gameID", gameID);
+      
+      DBCursor cursor = wishCollection.find(searchObject);
+      WishlistItem wishlist = null;
+      while (cursor.hasNext()) {
+        wishlist = WishlistItemConverter.convertMongoToWishlistItem(cursor.next());
+      }
+      try { cursor.close(); } catch (Throwable t) { /** Ignore Errors */ }
+      
+      return wishlist;
     } catch (MongoException me) {
       throw new DatabaseOperationException("Mongo raised an exception to this select: " + me.getMessage(), me);
     } catch (Throwable t) {

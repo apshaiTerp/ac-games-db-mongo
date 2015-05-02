@@ -61,6 +61,12 @@ public class CollectionItemConverter {
     if (item.getWeights() != null)       dbObject.append("weights", convertList(item.getWeights()));
     if (item.getDateAcquired() != null)  dbObject.append("dateAcquired", item.getDateAcquired());
     if (item.getWhereAcquired() != null) dbObject.append("whereAcquired", item.getWhereAcquired());
+    
+    if (item.getOverrideMinPlayers() != -1) dbObject.append("overrideMinPlayers", item.getOverrideMinPlayers());
+    if (item.getOverrideMaxPlayers() != -1) dbObject.append("overrideMaxPlayers", item.getOverrideMaxPlayers());
+    if (item.getOverrideMinTime() != -1)    dbObject.append("overrideMinTime", item.getOverrideMinTime());
+    if (item.getOverrideMaxTime() != -1)    dbObject.append("overrideMaxTime", item.getOverrideMaxTime());
+    
     return dbObject;
   }
   
@@ -81,6 +87,11 @@ public class CollectionItemConverter {
     if (dbObject.containsField("weights"))       item.setWeights(convertDBListToGameWeightList((BasicDBList)dbObject.get("weights")));
     if (dbObject.containsField("dateAcquired"))  item.setDateAcquired((Date)dbObject.get("dateAcquired"));
     if (dbObject.containsField("whereAcquired")) item.setWhereAcquired((String)dbObject.get("whereAcquired"));
+    
+    if (dbObject.containsField("overrideMinPlayers")) item.setOverrideMinPlayers((Integer)dbObject.get("overrideMinPlayers"));
+    if (dbObject.containsField("overrideMaxPlayers")) item.setOverrideMaxPlayers((Integer)dbObject.get("overrideMaxPlayers"));
+    if (dbObject.containsField("overrideMinTime"))    item.setOverrideMinTime((Integer)dbObject.get("overrideMinTime"));
+    if (dbObject.containsField("overrideMaxTime"))    item.setOverrideMaxTime((Integer)dbObject.get("overrideMaxTime"));
     
     return item;
   }
